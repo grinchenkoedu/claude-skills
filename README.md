@@ -144,7 +144,8 @@ The plugin route is easier to keep up to date. Use this only if you have a reaso
 They follow the order of the work:
 
 ```
-   /plan  ──▶  /implement  ──▶  /review  ──▶  open a pull request
+   /init ──▶ /plan  ──▶  /implement  ──▶  /review  ──▶  open a pull request
+(once per repo)
                                                       │
                                     ┌─────────────────┴──────────────────┐
                                     ▼                                    ▼

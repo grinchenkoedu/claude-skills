@@ -46,14 +46,21 @@ Read `.claude/repo-profile.json`, or detect and cache it per `reference/repo-pro
 need: family, language and version, base branch, install / lint / test / build commands, the
 execution environment, the runtime surface, and whether there is a database.
 
-**Detect the family** from the profile, or from the markers directly:
+**Take the family from the profile** (`reference/repo-profile.md` detects it) and map it to a
+template. The two vocabularies are not identical — the profile distinguishes cases that share a
+template — so map explicitly rather than assuming the names line up:
 
-| Signal | Family |
-|---|---|
-| `version.php` with `$plugin->component`, plus `db/` and `lang/` | `moodle-plugin` |
-| `wp-content/`, `style.css` with a theme header, `functions.php`, WordPress dependencies | `cms` |
-| `composer.json` with an application or library layout | `php-app` |
-| `requirements.txt` / `pyproject.toml` | `python-app` |
+| Profile family | Template | Note |
+|---|---|---|
+| `moodle-plugin` | `moodle-plugin` | |
+| `cms` | `cms` | |
+| `php-app` | `php-app` | |
+| `php-library` | `php-app` | Skip its request-handling sections; the style and bulk-write rules still apply |
+| `python-app` | `python-app` | |
+| `node` | — | No template yet. Write the commands section, skip the family block, and say so |
+| `other` | — | Same: commands only, and name what it is |
+
+`--family` overrides the mapping and takes a **template** name, not a profile family.
 
 None of them fitting is a real answer: say so, write the commands section, and skip the family
 block rather than forcing a bad match.
@@ -95,8 +102,11 @@ Two structural cases:
 
 ## Step 3 — Write it
 
-Take the family file from `templates/<family>.md` in this plugin, extract the content between
-its markers, and assemble:
+Take the family file from `templates/<family>.md` **inside this plugin directory** (a sibling
+of `skills/` and `reference/`, so it ships with the plugin and is present however it was
+installed). Extract everything between the `<!-- toolkit:begin family-rules -->` and
+`<!-- toolkit:end family-rules -->` **HTML comments** — match the comment form, not the bare
+words, which also appear in the template's own prose. Then assemble:
 
 ```markdown
 # <Repository name> — notes for Claude

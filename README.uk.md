@@ -141,7 +141,8 @@ Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude
 Вони йдуть у порядку самої роботи:
 
 ```
-   /plan  ──▶  /implement  ──▶  /review  ──▶  відкрити пул-реквест
+   /init ──▶ /plan  ──▶  /implement  ──▶  /review  ──▶  відкрити пул-реквест
+(раз на репозиторій)
                                                        │
                                     ┌──────────────────┴──────────────────┐
                                     ▼                                     ▼
