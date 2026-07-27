@@ -109,11 +109,40 @@ In Claude Code, run these two commands:
 That is all. Type `/` and you will see `/plan`, `/implement`, `/review`, `/pr-review`,
 `/pr-resolve` and `/verify` in the list.
 
-To update later:
+### Updating
+
+The skills are improved regularly. To pull the latest:
 
 ```
 /plugin marketplace update grinchenkoedu
+/reload-plugins
 ```
+
+The first refreshes the marketplace from GitHub; the second reloads skills in the current
+session so you do not have to restart.
+
+If you would rather not think about it, `/plugin` opens the manager where you can check what is
+installed and update from there.
+
+**Why you always get updates:** this plugin deliberately omits the `version` field in its
+manifest. Claude Code then treats **every commit as a new version**, so an update always brings
+the latest. Had a version been declared, you would receive nothing until it was bumped — and a
+forgotten bump means silently running months-old skills.
+
+<details>
+<summary>If you installed by copying the files instead</summary>
+
+Re-copy them, since nothing tracks the source:
+
+```bash
+cd claude-skills && git pull
+cp -R plugins/toolkit/skills/* ~/.claude/skills/
+cp -R plugins/toolkit/reference ~/.claude/skills/reference
+cp -R plugins/toolkit/templates ~/.claude/skills/templates
+```
+
+This is the main reason to prefer the plugin route.
+</details>
 
 <details>
 <summary>Installing without the plugin system</summary>
@@ -125,6 +154,7 @@ git clone https://github.com/grinchenkoedu/claude-skills.git
 mkdir -p ~/.claude/skills
 cp -R claude-skills/plugins/toolkit/skills/* ~/.claude/skills/
 cp -R claude-skills/plugins/toolkit/reference ~/.claude/skills/reference
+cp -R claude-skills/plugins/toolkit/templates ~/.claude/skills/templates
 ```
 
 Windows PowerShell:
@@ -134,6 +164,7 @@ git clone https://github.com/grinchenkoedu/claude-skills.git
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item -Recurse -Force claude-skills\plugins\toolkit\skills\* "$HOME\.claude\skills\"
 Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude\skills\reference"
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\templates "$HOME\.claude\skills\templates"
 ```
 
 The plugin route is easier to keep up to date. Use this only if you have a reason to.

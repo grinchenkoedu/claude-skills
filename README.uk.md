@@ -106,11 +106,40 @@
 Це все. Наберіть `/` — і побачите у списку `/plan`, `/implement`, `/review`, `/pr-review`,
 `/pr-resolve` та `/verify`.
 
-Оновити пізніше:
+### Оновлення
+
+Навички регулярно покращуються. Щоб отримати найновіші:
 
 ```
 /plugin marketplace update grinchenkoedu
+/reload-plugins
 ```
+
+Перша команда оновлює маркетплейс із GitHub, друга перезавантажує навички в поточній сесії, тож
+перезапускати нічого не треба.
+
+Якщо не хочеться про це думати, `/plugin` відкриває менеджер, де видно встановлене й можна
+оновити звідти.
+
+**Чому оновлення приходять завжди:** цей плагін навмисно не має поля `version` у маніфесті.
+Тоді Claude Code вважає **кожен коміт новою версією**, тож оновлення завжди приносить найсвіжіше.
+Якби версію було вказано, ви не отримували б нічого до її підняття — а забуте підняття означає,
+що ви місяцями непомітно користуєтесь старими навичками.
+
+<details>
+<summary>Якщо ви встановлювали копіюванням файлів</summary>
+
+Скопіюйте їх заново — ніщо не відстежує джерело:
+
+```bash
+cd claude-skills && git pull
+cp -R plugins/toolkit/skills/* ~/.claude/skills/
+cp -R plugins/toolkit/reference ~/.claude/skills/reference
+cp -R plugins/toolkit/templates ~/.claude/skills/templates
+```
+
+Це головна причина віддати перевагу встановленню через плагін.
+</details>
 
 <details>
 <summary>Встановлення без системи плагінів</summary>
@@ -122,6 +151,7 @@ git clone https://github.com/grinchenkoedu/claude-skills.git
 mkdir -p ~/.claude/skills
 cp -R claude-skills/plugins/toolkit/skills/* ~/.claude/skills/
 cp -R claude-skills/plugins/toolkit/reference ~/.claude/skills/reference
+cp -R claude-skills/plugins/toolkit/templates ~/.claude/skills/templates
 ```
 
 Windows PowerShell:
@@ -131,6 +161,7 @@ git clone https://github.com/grinchenkoedu/claude-skills.git
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item -Recurse -Force claude-skills\plugins\toolkit\skills\* "$HOME\.claude\skills\"
 Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude\skills\reference"
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\templates "$HOME\.claude\skills\templates"
 ```
 
 Через плагін оновлювати простіше. Цей спосіб — лише якщо є причина.
