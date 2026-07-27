@@ -90,13 +90,25 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    something that looks like a result:
 
    ```bash
-   docker run --rm -v "${PWD}":/app -w /app <image> ls /app/<a-file-you-know-exists>
+   # use a file you already know is there — the standards doc, composer.json, package.json
+   docker run --rm -v "${PWD}":/app -w /app <image> ls /app/AGENTS.md
    ```
 
    If that cannot see the file, the mount is not working — most often because the Docker daemon
-   is **remote** (`docker context ls` showing an ssh/tcp endpoint, or a forwarded socket). A
-   remote daemon binds paths on *its own* host, so your local files are simply not there. Fall
-   back to the host and record the reason. Do not store a prefix you have not proven.
+   is **remote**, binding paths on *its own* host, where your files do not exist.
+
+   **Do not try to infer this from `docker context ls`.** A forwarded socket looks exactly like
+   a local one — `unix:///tmp/remote-docker-on-ubuntu.sock` is a remote daemon and a plain
+   `unix://` endpoint at the same time, so a reader who checks the endpoint and sees `unix://`
+   concludes "local" and is wrong. If you want a second signal beyond the mount check, compare
+   the daemon's OS with the host's:
+
+   ```bash
+   docker info --format '{{.OperatingSystem}}'   # Ubuntu … while uname -s says Darwin ⇒ not local
+   ```
+
+   The mount check is the one that decides. Fall back to the host, record the reason in
+   `exec.note`, and do not store a prefix you have not proven.
 
    Store the resolved prefix in `exec.prefix` and build every other command on top of it. When
    you fall back to the host, put the reason in `exec.note`; when the host toolchain is a
