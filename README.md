@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
-Six skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
+Skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
 development day: work out what to build, build it, check your own work, review a colleague's
 pull request, deal with the comments on yours, and prove the result actually works.
 
@@ -24,7 +24,7 @@ MIT licensed.
 - [What is this, exactly?](#what-is-this-exactly)
 - [Before you start](#before-you-start)
 - [Installation](#installation)
-- [The six skills](#the-six-skills)
+- [The skills](#the-skills)
 - [A worked example](#a-worked-example-start-to-finish)
 - [Each skill in detail](#each-skill-in-detail)
 - [Writing a task file](#writing-a-task-file)
@@ -139,12 +139,13 @@ Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude
 The plugin route is easier to keep up to date. Use this only if you have a reason to.
 </details>
 
-## The six skills
+## The skills
 
 They follow the order of the work:
 
 ```
-   /plan  ──▶  /implement  ──▶  /review  ──▶  open a pull request
+   /init ──▶ /plan  ──▶  /implement  ──▶  /review  ──▶  open a pull request
+(once per repo)
                                                       │
                                     ┌─────────────────┴──────────────────┐
                                     ▼                                    ▼
@@ -156,6 +157,7 @@ They follow the order of the work:
 
 | Command | What it does | Changes your code? |
 |---|---|---|
+| `/init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
 | `/plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/review` | Checks your own changes before you push them | No |
@@ -231,6 +233,40 @@ Runs the tests *and* actually runs the export, then gives a verdict — includin
 list of anything it could not check.
 
 ## Each skill in detail
+
+### `/init` — give this repository a CLAUDE.md
+
+```
+/init
+/init --refresh
+/init --dry-run
+```
+
+`CLAUDE.md` is read at the start of every session in a repository, so it is where the build and
+test commands and the handful of rules that actually get broken here belong. `/init` detects the
+project family — Moodle plugin, PHP app, CMS, Python — fills in the real commands, and adds that
+family's conventions and security rules.
+
+The shared part sits inside markers:
+
+```markdown
+<!-- toolkit:begin family-rules -->
+...maintained by /init...
+<!-- toolkit:end family-rules -->
+```
+
+`--refresh` replaces **only** that block, so anything you wrote yourself survives.
+
+If a `CLAUDE.md` already exists it is **read and judged first**: correct commands and a current
+family block get reported as *already fine* with nothing written, because churning a good file
+is not an improvement. A stale command or a rule the code contradicts is listed for you rather
+than silently rewritten. A file without markers is never overwritten — it asks.
+
+It also leaves an `AGENTS.md` stub pointing at `CLAUDE.md`, so other agents find the same rules
+without a second copy that drifts. A stub rather than a symlink, because git checks symlinks out
+as plain text files on Windows.
+
+Run it once per repository, and again when the family rules improve.
 
 ### `/plan` — work out what to build
 
@@ -404,8 +440,8 @@ workflows, reading whole repositories) are deliberately absent.
 How they keep the cost down:
 
 - **No sub-agents by default.** At most one, only when you ask with `--deep`.
-- **The stack is detected once**, then cached in `.claude/repo-profile.json` and reused by all
-  six skills. Add that file to `.gitignore` — it describes your machine.
+- **The stack is detected once**, then cached in `.claude/repo-profile.json` and reused by every
+  skill. Add that file to `.gitignore` — it describes your machine.
 - **Reading is capped.** At most five files read in full; everything else judged from the
   diff. When a skill judged a file from the diff alone, it says so.
 - **Answers go in the chat**, not into generated report files. A report is written only when

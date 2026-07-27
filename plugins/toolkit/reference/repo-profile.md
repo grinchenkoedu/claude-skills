@@ -23,7 +23,7 @@ platform (see "Cross-platform notes") — that is precisely what the cache is fo
 {
   "platform": "macos | linux | windows",
   "shell": "bash | git-bash | powershell",
-  "family": "php-app | moodle-plugin | php-library | python-app | node | other",
+  "family": "php-app | moodle-plugin | cms | php-library | python-app | node | other",
   "language": "PHP 7.4",
   "baseBranch": "master",
   "standardsDoc": "AGENTS.md",
@@ -63,6 +63,7 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 | Marker | Family | What it means |
 |---|---|---|
 | `version.php` with `$plugin->component` + `db/`, `lang/` | `moodle-plugin` | Code cannot run standalone; it needs a Moodle install around it |
+| `wp-content/`, a `style.css` theme header, `functions.php`, or a CMS dependency | `cms` | Built on a core you do not own; the update path is also the security path |
 | `composer.json` **and** `application/core/` + `run` | `php-app` | In-house MVC app; `./run` is the CLI entry point |
 | `composer.json` with `type: library` / only `src/` + `tests/` | `php-library` | Importable package, tests are the whole runtime surface |
 | `requirements.txt` / `pyproject.toml` | `python-app` | |
@@ -258,7 +259,7 @@ is normally **Git Bash** (bundled with Git for Windows), so ordinary POSIX comma
   and record `"shell": "powershell"` so skills stop assuming POSIX.
 
 None of this changes what the skills *do* — only the exact strings stored in the profile. That
-is the point of caching it: this is worked out once, not argued about six times.
+is the point of caching it: this is worked out once, not re-derived by every skill.
 
 ## Data-safety rules
 

@@ -7,7 +7,7 @@
     {
       "name": "toolkit",
       "source": "./plugins/toolkit",
-      "description": "Six chained skills for everyday development with Claude Code: /plan (turn a request or brief into a grounded plan), /implement (build it, checkpointed and resumable), /review (check your own diff before pushing), /pr-review (deep review of someone else's pull request), /pr-resolve (act on review comments), /verify (run the tests and drive the real thing). Repository-agnostic — a cached profile detects the stack, test command and runtime surface. Designed to be economical: no background agent swarms, no sub-agents by default, chat-first output."
+      "description": "Chained skills for everyday development with Claude Code: /init (write this repo's CLAUDE.md), /plan (turn a request or brief into a grounded plan), /implement (build it, checkpointed and resumable), /review (check your own diff before pushing), /pr-review (deep review of someone else's pull request), /pr-resolve (act on review comments), /verify (run the tests and drive the real thing). Repository-agnostic — a cached profile detects the stack, test command and runtime surface. Designed to be economical: no background agent swarms, no sub-agents by default, chat-first output."
     }
   ]
 }
