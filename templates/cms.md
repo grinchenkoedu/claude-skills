@@ -12,18 +12,48 @@ anything you change in it is lost and unsupported.
 
 ## CMS conventions
 
-### The core is not ours
+### The core, and who owns it
 
-- **Never edit core files.** Changes are wiped by the next update and leave the site
-  unsupportable. Extend through the documented seams: a child theme, a plugin, hooks and
-  filters.
-- **Never edit a third-party plugin or theme in place** for the same reason. Fork it properly or
-  override through the provided hooks.
-- Keep core, themes and plugins **updated**. On a public CMS the overwhelming majority of
-  compromises come through a known vulnerability in an out-of-date component, not through
-  bespoke code. Treat a pending security update as urgent work, not backlog.
-- Remove what is unused. Every deactivated-but-installed plugin is still code on disk and still
-  a candidate for exploitation.
+**First work out which of these you are in**, because the rules differ and the answer is not
+always obvious. Check whether core is in `.gitignore`, whether a package manager declares it,
+and whether anyone has written down how the site gets updated.
+
+**A. Core is installed and updated outside the repository** — by a package manager, a CLI tool,
+or the host's own updater. Only your themes, plugins and site code are committed. *This is the
+common case and the one to aim for.*
+
+Editing core here is pointless as well as wrong: the next update silently reverts it, so the bug
+comes back at the worst possible moment and nobody remembers why. Extend through the documented
+seams — child theme, plugin, hooks and filters.
+
+**B. Core is committed, and still updated by dropping in new releases.** Editing it means every
+update becomes a manual merge, and a patch quietly lost in one of those merges is a
+reintroduced bug nobody is looking for. Same conclusion, different reason.
+
+**C. Core is committed and permanently forked** — no update path, no intention of one.
+
+Here you genuinely *can* edit anything; the tree is yours. The cost is not lost work, it is
+this: **the update path is also the security path.** Forking core opts you out of upstream
+security releases, and a public CMS is scanned continuously for known vulnerabilities in known
+versions. Whoever forked it has taken on patching every future CVE by hand, forever, including
+the ones announced when they are on holiday.
+
+So the rule in every case is **prefer the hooks** — but for different reasons. In A and B
+because the edit will not survive; in C because every line you add to core is a line that makes
+returning to a supported version harder, and returning is the goal.
+
+If core has already been forked, treat it as a standing risk rather than a settled decision:
+record the version it diverged from, keep the diff against upstream as small and as documented
+as possible, and know which advisories apply to that version. Getting back onto a maintained
+core is a real piece of work worth scheduling, not a purity exercise.
+
+- **Never edit a third-party plugin or theme in place** — the same three cases apply. Fork it
+  properly or override through the provided hooks.
+- Keep core, themes and plugins **updated** wherever an update path exists. On a public CMS the
+  overwhelming majority of compromises arrive through a known vulnerability in an out-of-date
+  component, not through bespoke code. Treat a pending security update as urgent work.
+- Remove what is unused. A deactivated-but-installed plugin is still code on disk and still a
+  candidate for exploitation.
 
 ### Input, output, and the three checks
 
