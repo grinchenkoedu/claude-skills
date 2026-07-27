@@ -152,7 +152,8 @@ Never remove it without asking.
   a human.
 - **Absolute paths** in every finding, rooted at the worktree, so they open in an editor.
 - **Every blocker carries a failure scenario.** No scenario, no blocker.
-- **English**, translating anything quoted.
+- **English or Ukrainian**, matching the pull request. Quote anything cited in its original
+  language.
 - **No diff dumps.**
 
 ## Edge cases

@@ -161,7 +161,9 @@ Do not report success when tests are failing or a criterion is unmet. Say exactl
 - **Never `--no-verify`, `--force`, or `--amend`.** A failing hook means fix the code.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
   right to change it, say so explicitly and explain why.
-- **English in code and commits**, matching the surrounding files for user-facing strings.
+- **Identifiers and commit messages in English**; commit bodies may be English or Ukrainian.
+  User-facing strings follow whatever the file already does — a page written in Ukrainian stays
+  Ukrainian.
 
 ## Edge cases
 
