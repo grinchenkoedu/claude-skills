@@ -254,8 +254,16 @@ The shared part sits inside markers:
 <!-- toolkit:end family-rules -->
 ```
 
-`--refresh` replaces **only** that block, so anything you wrote yourself survives. An existing
-`CLAUDE.md` without markers is never overwritten — it asks first.
+`--refresh` replaces **only** that block, so anything you wrote yourself survives.
+
+If a `CLAUDE.md` already exists it is **read and judged first**: correct commands and a current
+family block get reported as *already fine* with nothing written, because churning a good file
+is not an improvement. A stale command or a rule the code contradicts is listed for you rather
+than silently rewritten. A file without markers is never overwritten — it asks.
+
+It also leaves an `AGENTS.md` stub pointing at `CLAUDE.md`, so other agents find the same rules
+without a second copy that drifts. A stub rather than a symlink, because git checks symlinks out
+as plain text files on Windows.
 
 Run it once per repository, and again when the family rules improve.
 

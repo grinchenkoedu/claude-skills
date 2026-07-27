@@ -1,6 +1,6 @@
 ---
 name: init
-description: Write or refresh this repository's CLAUDE.md — detected build, test and run commands plus the conventions and security rules for its family (Moodle plugin, PHP app, CMS, Python). Regenerating replaces only a marked block, so anything written by hand survives.
+description: Write or refresh this repository's CLAUDE.md — detected build, test and run commands plus the conventions and security rules for its family (Moodle plugin, PHP app, CMS, Python). Reads an existing file first and reports it as already fine rather than churning it; regenerating replaces only a marked block, so hand-written sections survive. Also leaves AGENTS.md as a stub pointing at CLAUDE.md.
 argument-hint: "[--family <name>] [--refresh] [--dry-run]"
 user-invocable: true
 ---
@@ -58,16 +58,40 @@ execution environment, the runtime surface, and whether there is a database.
 None of them fitting is a real answer: say so, write the commands section, and skip the family
 block rather than forcing a bad match.
 
-## Step 2 — Check what is already there
+## Step 2 — Read what is already there before writing anything
 
-- **No `CLAUDE.md`** → write a new one (step 3).
-- **`CLAUDE.md` with the markers** → this is a refresh: replace only the block.
-- **`CLAUDE.md` without the markers** → **do not overwrite it.** Show the family block and ask
-  where to insert it, or offer to append it at the end. Someone wrote that file by hand.
-- **Both `CLAUDE.md` and `AGENTS.md` exist** → compare them. If they are identical, say so and
-  ask which should be authoritative before writing; maintaining two copies of the same rules
-  guarantees they drift and then nobody knows which one is true. If they differ, do not
-  reconcile them silently — show the difference.
+**If there is no `CLAUDE.md`, go to step 3.** Otherwise **read the existing file first and
+judge it** — do not assume a rewrite is wanted. Someone wrote it, and it may already be right.
+
+Check it against what you would produce:
+
+- **Are the commands still true?** Compare each against the profile, and against the repository
+  as it is now. A command that no longer exists is the most damaging kind of staleness, because
+  it will be tried.
+- **Is the family block present, and does it match the current template?** Diff it.
+- **Is anything in it contradicted by the code?** A rule saying output is escaped automatically,
+  in a project whose templates do not escape, is worse than no file at all.
+- **Is anything important missing** that the family block would add?
+
+Then report one of three outcomes, and **do not write without saying which**:
+
+- **Already fine** — commands correct, family block current, nothing contradicted. Say so in one
+  line and stop. This is a real and common result; churning a good file is not an improvement.
+- **Needs a refresh** — the family block is out of date or missing. Show what would change and
+  ask before writing. With `--refresh` the user has already answered; proceed and report the
+  diff.
+- **Needs attention you should not apply yourself** — a stale command, or a claim the code
+  contradicts. List these as findings for the developer. Correcting a factual claim about the
+  project is not a mechanical edit.
+
+Two structural cases:
+
+- **`CLAUDE.md` without the markers** → **never overwrite it.** Show the family block and ask
+  whether to insert it, and where. A hand-written file is someone's work.
+- **Both `CLAUDE.md` and `AGENTS.md` hold real content** → do not reconcile them silently. If
+  identical, say so and propose step 5. If they differ, show the difference and ask which is
+  authoritative; two divergent copies mean nobody knows which is true, and picking one for them
+  is a decision, not a tidy-up.
 
 ## Step 3 — Write it
 
@@ -130,16 +154,49 @@ write what you find:
   directories.
 - **What breaks only in production** — a cache to clear, a version to bump, a migration to run.
 
-## Step 5 — Report
+## Step 5 — Point `AGENTS.md` at it
 
-Say which family was detected and why, the absolute path written, and which commands came out
-`null`. If step 4 left anything unresolved, list it as a question rather than a guess.
+`CLAUDE.md` is the file this toolkit maintains, but `AGENTS.md` is what several other coding
+agents look for. Rather than keeping two copies that drift, leave a pointer.
+
+**Write `AGENTS.md` as a stub**, not a copy:
+
+```markdown
+# Agent instructions
+
+See [CLAUDE.md](CLAUDE.md) — the conventions, commands and rules for this repository live there
+and are maintained in one place.
+```
+
+**Use a stub file, not a symbolic link.** A symlink is tempting and works on macOS and Linux,
+but on Windows git checks it out as a **plain text file containing the literal path** unless
+symlinks are enabled — so `AGENTS.md` silently becomes a one-line file reading `CLAUDE.md`, with
+no error anywhere. A stub is portable and reads correctly whatever checked it out.
+
+Rules for this step:
+
+- **Never overwrite an `AGENTS.md` that has real content.** If it holds actual rules, that is
+  the conflict from step 2 and needs the developer's decision first.
+- **An existing stub is left alone** — do not rewrite it to match wording.
+- If the repository already treats `AGENTS.md` as authoritative and `CLAUDE.md` as the pointer,
+  **leave that arrangement as it is.** It is the same idea in the other direction, and flipping
+  it gains nothing.
+
+## Step 6 — Report
+
+Say which family was detected and why, the absolute path written, whether `AGENTS.md` was
+created or left alone, and which commands came out `null`. If step 4 left anything unresolved,
+list it as a question rather than a guess.
+
+When step 2 found the file already fine, that is the whole report — one line, no diff, no file
+written.
 
 With `--dry-run`, print the file and write nothing.
 
 ## Rules
 
-- **Only ever write `CLAUDE.md`.** No source files, no configuration, no commits.
+- **Only ever write `CLAUDE.md` and a stub `AGENTS.md`.** No source files, no configuration,
+  no commits.
 - **Never overwrite outside the markers.** An existing hand-written file is asked about, not
   replaced.
 - **Never invent a command.** Detected or `none`, with the reason.
@@ -158,6 +215,9 @@ With `--dry-run`, print the file and write nothing.
 - **Family detected but the template does not fit** (a Moodle plugin that is really a library,
   say) — write the commands section, include the family block, and flag the mismatch in the
   report rather than silently trimming rules.
+- **An existing file that is already correct** — say so and stop. Do not reformat it, reorder
+  it, or rewrite prose to match the template's phrasing; none of that is an improvement and all
+  of it produces a diff someone has to read.
 - **A refresh where the family block was hand-edited** — the edits are inside the markers and
   will be lost. Show what differs and ask first; if the edit is worth keeping, it belongs
   outside the markers or in the template.
