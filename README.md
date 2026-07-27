@@ -170,8 +170,13 @@ same name.*
 **1. Work out what is actually wrong.**
 
 ```
-/plan "the statistics export merges departments that have the same name"
+/plan the statistics export merges departments that have the same name
 ```
+
+> **On quotes:** you do not need them. What you type is passed to the skill as plain text —
+> there is no shell involved, so nothing needs escaping, and apostrophes are fine. Quotes are
+> only worth using when you add a flag after a description, to mark where the description ends:
+> `/implement "add a CSV export" --continue`.
 
 Claude finds the export code, reads it, checks the database to see whether same-named
 departments really exist, and writes a plan to `.tasks/export-department-collision.md` — with
@@ -226,7 +231,7 @@ list of anything it could not check.
 ### `/plan` — work out what to build
 
 ```
-/plan "students cannot download their individual plan"
+/plan students cannot download their individual plan
 /plan .tasks/new-grade-export.md
 /plan --review .tasks/proposed-approach.md
 ```
@@ -249,7 +254,7 @@ obvious one-line fix, skip it.
 
 ```
 /implement .tasks/export-department-collision.md
-/implement "add a CSV option to the student export"
+/implement add a CSV option to the student export
 /implement .tasks/big-task.md --continue
 ```
 

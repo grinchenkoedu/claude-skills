@@ -1,7 +1,7 @@
 ---
 name: implement
 description: Build a task step by step in the current session — from a plan file, a markdown brief, or a sentence. Works through ordered steps, ticking each one off in the task file as it lands, so an interrupted run resumes exactly where it stopped instead of starting over.
-argument-hint: "<path/to/task.md> | \"<what to build>\" [--continue] [--step <n>]"
+argument-hint: "<path/to/task.md> | <what to build> [--continue] [--step <n>]"
 user-invocable: true
 ---
 
@@ -20,12 +20,22 @@ step. Nothing is rebuilt.
 
 - **A plan or brief** — `/implement .tasks/individual-plan-export.md`. Preferred: a file from
   `/plan` already has criteria and ordered steps.
-- **A sentence** — `/implement "add a CSV option to the student export"`. Plan it inline
+- **A sentence** — `/implement add a CSV option to the student export`. Plan it inline
   first (step 2).
 - **Nothing** — ask what to build. Never fall back to a leftover file; building the wrong task
   is worse than asking.
 - `--continue` — resume, skipping steps already marked done.
 - `--step <n>` — run one step only, then stop.
+
+**Telling a file from a sentence:** strip any surrounding quotes, then check whether what
+remains resolves to an existing file. It does → a task file. It does not → a request in prose.
+A path that was meant to be a file but does not exist must **stop with "no such file"** — never
+fall through to treating it as a sentence and building something invented. That mistake is
+expensive here, because this skill writes code.
+
+Quotes are optional; arguments are not shell-parsed. They matter only when a flag follows
+prose — `/implement add CSV export --continue` is ambiguous about where the description ends,
+`/implement "add CSV export" --continue` is not.
 
 ## Step 1 — Set up
 

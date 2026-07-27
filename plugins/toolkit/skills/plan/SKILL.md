@@ -1,7 +1,7 @@
 ---
 name: plan
 description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Plans only; writes no production code.
-argument-hint: "\"<what you want>\" | <path/to/brief.md> [--review] [--deep]"
+argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep]"
 user-invocable: true
 ---
 
@@ -16,10 +16,18 @@ one throwaway read-only script used to answer a question about the data.
 
 ## Arguments
 
-- **A sentence** — `/plan "the export merges departments that share a name"`
+- **A sentence** — `/plan the export merges departments that share a name`
 - **A markdown file** — `/plan .tasks/individual-plan-export.md`, for a longer brief that was
   written up in advance. Read the whole file; it is the specification.
 - **Nothing** — ask what to plan. Never guess.
+
+**Telling them apart:** strip any surrounding quotes from the argument, then check whether what
+remains resolves to a file that exists. It does → a brief. It does not → a request in prose.
+Never decide this from punctuation or from whether it looks like a path; a missing file passed
+by mistake must be reported as missing, not silently treated as a sentence to plan from.
+
+Quotes are optional — arguments are not shell-parsed, so the text arrives as typed either way.
+They are only useful for marking where prose ends when a flag follows it.
 - `--review` — a brief that already proposes a solution: judge that proposal instead of
   designing a fresh one (see step 6).
 - `--deep` — allow one sub-agent for mechanical code search on a large unfamiliar area.
