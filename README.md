@@ -37,17 +37,17 @@ MIT licensed.
 ## What is this, exactly?
 
 A **skill** is a set of instructions you can call by name in Claude Code. Instead of
-explaining what a good code review looks like every time, you type `/review` and Claude
+explaining what a good code review looks like every time, you type `/gku:review` and Claude
 follows a procedure that was written once and refined.
 
-You call them with a slash, like `/review`, in the Claude Code chat.
+You call them with a slash, like `/gku:review`, in the Claude Code chat.
 
 They are **not** magic and they are **not** automatic. Every one of them does something you
 could do yourself; they just do it consistently and without forgetting the boring parts —
 which is exactly where mistakes come from.
 
-Four of them (`/plan`, `/review`, `/pr-review`, `/verify`) never change your code at all.
-Two of them do (`/implement`, `/pr-resolve`), and both tell you what they are about to do.
+Four of them (`/gku:plan`, `/gku:review`, `/gku:pr-review`, `/gku:verify`) never change your code at all.
+Two of them do (`/gku:implement`, `/gku:pr-resolve`), and both tell you what they are about to do.
 
 ## Before you start
 
@@ -72,8 +72,8 @@ You need:
    gh auth status
    ```
 
-   `/plan`, `/implement`, `/review` and `/verify` work without `gh`. Only `/pr-review` and
-   `/pr-resolve` need it, because they talk to GitHub.
+   `/gku:plan`, `/gku:implement`, `/gku:review` and `/gku:verify` work without `gh`. Only `/gku:pr-review` and
+   `/gku:pr-resolve` need it, because they talk to GitHub.
 
 4. **Docker** — [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows
    and macOS, Docker Engine on Linux. **Strongly recommended on every platform**, not just
@@ -103,11 +103,11 @@ In Claude Code, run these two commands:
 
 ```
 /plugin marketplace add grinchenkoedu/claude-skills
-/plugin install toolkit@grinchenkoedu
+/plugin install gku@grinchenkoedu
 ```
 
-That is all. Type `/` and you will see `/plan`, `/implement`, `/review`, `/pr-review`,
-`/pr-resolve` and `/verify` in the list.
+That is all. Type `/` and you will see `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:pr-review`,
+`/gku:pr-resolve` and `/gku:verify` in the list.
 
 ### Updating
 
@@ -136,9 +136,9 @@ Re-copy them, since nothing tracks the source:
 
 ```bash
 cd claude-skills && git pull
-cp -R plugins/toolkit/skills/* ~/.claude/skills/
-cp -R plugins/toolkit/reference ~/.claude/skills/reference
-cp -R plugins/toolkit/templates ~/.claude/skills/templates
+cp -R plugins/gku/skills/* ~/.claude/skills/
+cp -R plugins/gku/reference ~/.claude/skills/reference
+cp -R plugins/gku/templates ~/.claude/skills/templates
 ```
 
 This is the main reason to prefer the plugin route.
@@ -152,9 +152,9 @@ macOS, Linux, or Git Bash on Windows:
 ```bash
 git clone https://github.com/grinchenkoedu/claude-skills.git
 mkdir -p ~/.claude/skills
-cp -R claude-skills/plugins/toolkit/skills/* ~/.claude/skills/
-cp -R claude-skills/plugins/toolkit/reference ~/.claude/skills/reference
-cp -R claude-skills/plugins/toolkit/templates ~/.claude/skills/templates
+cp -R claude-skills/plugins/gku/skills/* ~/.claude/skills/
+cp -R claude-skills/plugins/gku/reference ~/.claude/skills/reference
+cp -R claude-skills/plugins/gku/templates ~/.claude/skills/templates
 ```
 
 Windows PowerShell:
@@ -162,12 +162,18 @@ Windows PowerShell:
 ```powershell
 git clone https://github.com/grinchenkoedu/claude-skills.git
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
-Copy-Item -Recurse -Force claude-skills\plugins\toolkit\skills\* "$HOME\.claude\skills\"
-Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude\skills\reference"
-Copy-Item -Recurse -Force claude-skills\plugins\toolkit\templates "$HOME\.claude\skills\templates"
+Copy-Item -Recurse -Force claude-skills\plugins\gku\skills\* "$HOME\.claude\skills\"
+Copy-Item -Recurse -Force claude-skills\plugins\gku\reference "$HOME\.claude\skills\reference"
+Copy-Item -Recurse -Force claude-skills\plugins\gku\templates "$HOME\.claude\skills\templates"
 ```
 
 The plugin route is easier to keep up to date. Use this only if you have a reason to.
+
+> **Two differences with this route.** The skills are **not namespaced** — they install as
+> `/review`, `/init`, `/verify` rather than `/gku:review`. That means **`/init`, `/review` and
+> `/verify` replace Claude Code's own commands of those names**, and `/init` in particular does
+> a similar job, so you will not be able to tell which one you invoked. Rename the directories
+> under `~/.claude/skills/` if you would rather keep the originals.
 </details>
 
 ## The skills
@@ -175,28 +181,28 @@ The plugin route is easier to keep up to date. Use this only if you have a reaso
 They follow the order of the work:
 
 ```
-   /init ──▶ /plan  ──▶  /implement  ──▶  /review  ──▶  open a pull request
+   /gku:init ──▶ /gku:plan  ──▶  /gku:implement  ──▶  /gku:review  ──▶  open a pull request
 (once per repo)
                                                       │
                                     ┌─────────────────┴──────────────────┐
                                     ▼                                    ▼
-                              /pr-review                           /pr-resolve
+                              /gku:pr-review                           /gku:pr-resolve
                         (someone else's PR)                  (comments on yours)
                                     │                                    │
-                                    └─────────────▶ /verify ◀────────────┘
+                                    └─────────────▶ /gku:verify ◀────────────┘
 ```
 
 | Command | What it does | Changes your code? |
 |---|---|---|
-| `/init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
-| `/plan` | Turns a request into a concrete plan, checked against the real code | No |
-| `/implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
-| `/review` | Checks your own changes before you push them | No |
-| `/pr-review` | Reviews someone else's pull request properly | No |
-| `/pr-resolve` | Works through the review comments on *your* pull request | **Yes** |
-| `/verify` | Runs the tests and drives the real thing to prove it works | No |
+| `/gku:init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
+| `/gku:plan` | Turns a request into a concrete plan, checked against the real code | No |
+| `/gku:implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
+| `/gku:review` | Checks your own changes before you push them | No |
+| `/gku:pr-review` | Reviews someone else's pull request properly | No |
+| `/gku:pr-resolve` | Works through the review comments on *your* pull request | **Yes** |
+| `/gku:verify` | Runs the tests and drives the real thing to prove it works | No |
 
-You do not have to use all of them, or use them in order. `/review` on its own, before every
+You do not have to use all of them, or use them in order. `/gku:review` on its own, before every
 push, is already worth it.
 
 ## A worked example, start to finish
@@ -207,13 +213,13 @@ same name.*
 **1. Work out what is actually wrong.**
 
 ```
-/plan the statistics export merges departments that have the same name
+/gku:plan the statistics export merges departments that have the same name
 ```
 
 > **On quotes:** you do not need them. What you type is passed to the skill as plain text —
 > there is no shell involved, so nothing needs escaping, and apostrophes are fine. Quotes are
 > only worth using when you add a flag after a description, to mark where the description ends:
-> `/implement "add a CSV export" --continue`.
+> `/gku:implement "add a CSV export" --continue`.
 
 Claude finds the export code, reads it, checks the database to see whether same-named
 departments really exist, and writes a plan to `.tasks/export-department-collision.md` — with
@@ -223,20 +229,20 @@ say so now** — it is much cheaper to fix a plan than a half-built change.
 **2. Build it.**
 
 ```
-/implement .tasks/export-department-collision.md
+/gku:implement .tasks/export-department-collision.md
 ```
 
 It creates a branch, works through the steps in order, ticks each one off in the task file,
 and runs the tests. You can watch every edit and stop at any time.
 
 > **If you run out of usage partway through, that is fine.** The finished steps are ticked in
-> the task file. When your limit resets, `/implement .tasks/export-department-collision.md
+> the task file. When your limit resets, `/gku:implement .tasks/export-department-collision.md
 > --continue` picks up exactly where it stopped.
 
 **3. Check your own work.**
 
 ```
-/review
+/gku:review
 ```
 
 You get a short list: blockers to fix first, warnings worth a look, and nits you can ignore.
@@ -247,7 +253,7 @@ Fix the blockers, then push and open a pull request as you normally would.
 An automated reviewer comments on the pull request. Instead of fixing each one by hand:
 
 ```
-/pr-resolve 42
+/gku:pr-resolve 42
 ```
 
 It checks **every comment against the actual code first**, then fixes the ones that are
@@ -257,7 +263,7 @@ genuinely ambiguous. One commit per fix, one reply per comment.
 **5. Prove it works.**
 
 ```
-/verify
+/gku:verify
 ```
 
 Runs the tests *and* actually runs the export, then gives a verdict — including an honest
@@ -265,16 +271,16 @@ list of anything it could not check.
 
 ## Each skill in detail
 
-### `/init` — give this repository a CLAUDE.md
+### `/gku:init` — give this repository a CLAUDE.md
 
 ```
-/init
-/init --refresh
-/init --dry-run
+/gku:init
+/gku:init --refresh
+/gku:init --dry-run
 ```
 
 `CLAUDE.md` is read at the start of every session in a repository, so it is where the build and
-test commands and the handful of rules that actually get broken here belong. `/init` detects the
+test commands and the handful of rules that actually get broken here belong. `/gku:init` detects the
 project family — Moodle plugin, PHP app, CMS, Python — fills in the real commands, and adds that
 family's conventions and security rules.
 
@@ -282,7 +288,7 @@ The shared part sits inside markers:
 
 ```markdown
 <!-- toolkit:begin family-rules -->
-...maintained by /init...
+...maintained by /gku:init...
 <!-- toolkit:end family-rules -->
 ```
 
@@ -299,12 +305,12 @@ as plain text files on Windows.
 
 Run it once per repository, and again when the family rules improve.
 
-### `/plan` — work out what to build
+### `/gku:plan` — work out what to build
 
 ```
-/plan students cannot download their individual plan
-/plan .tasks/new-grade-export.md
-/plan --review .tasks/proposed-approach.md
+/gku:plan students cannot download their individual plan
+/gku:plan .tasks/new-grade-export.md
+/gku:plan --review .tasks/proposed-approach.md
 ```
 
 Give it a sentence, or point it at a markdown file with a longer description. It works out
@@ -321,12 +327,12 @@ than inventing a different one.
 **It writes no code.** Use it when you are not yet sure what the right change is. For an
 obvious one-line fix, skip it.
 
-### `/implement` — build it
+### `/gku:implement` — build it
 
 ```
-/implement .tasks/export-department-collision.md
-/implement add a CSV option to the student export
-/implement .tasks/big-task.md --continue
+/gku:implement .tasks/export-department-collision.md
+/gku:implement add a CSV option to the student export
+/gku:implement .tasks/big-task.md --continue
 ```
 
 Works sequentially in your working tree — no background agents, nothing hidden. It creates a
@@ -339,12 +345,12 @@ what landed, which is what makes `--continue` work after an interruption.
 It stays inside the task. If it notices something else broken, it tells you at the end rather
 than quietly fixing it — an implementation that wanders is one nobody can review.
 
-### `/review` — check your own work
+### `/gku:review` — check your own work
 
 ```
-/review
-/review --deep
-/review --report
+/gku:review
+/gku:review --deep
+/gku:review --report
 ```
 
 **The one to use every day.** Run it before you push. It reads your changes, applies your
@@ -369,11 +375,11 @@ project that declares `>=7.4`.
 `--deep` allows one helper agent to double-check callers of code you renamed. It costs more;
 use it when you have touched shared code.
 
-### `/pr-review` — review someone else's pull request
+### `/gku:pr-review` — review someone else's pull request
 
 ```
-/pr-review 42
-/pr-review https://github.com/grinchenkoedu/local_gdo/pull/42
+/gku:pr-review 42
+/gku:pr-review https://github.com/grinchenkoedu/local_gdo/pull/42
 ```
 
 Checks out the pull request in a separate worktree — so your own work is untouched — and
@@ -392,12 +398,12 @@ decide what to say.
 > tuned to be precise about style, and it approves changes containing real bugs. This skill
 > treats its approval as no information at all.
 
-### `/pr-resolve` — act on comments on your pull request
+### `/gku:pr-resolve` — act on comments on your pull request
 
 ```
-/pr-resolve https://github.com/grinchenkoedu/local_gdo/pull/42
-/pr-resolve 42
-/pr-resolve 42 --dry-run
+/gku:pr-resolve https://github.com/grinchenkoedu/local_gdo/pull/42
+/gku:pr-resolve 42
+/gku:pr-resolve 42 --dry-run
 ```
 
 For **your own** pull request. **A URL works from anywhere** — any directory, another project,
@@ -416,12 +422,12 @@ Reviewers — human and automated alike — are sometimes wrong. Fixing a confid
 positive is how you introduce a real bug. Start with `--dry-run` to see the verdicts before
 anything changes.
 
-### `/verify` — prove it works
+### `/gku:verify` — prove it works
 
 ```
-/verify
-/verify 42
-/verify --tests-only
+/gku:verify
+/gku:verify 42
+/gku:verify --tests-only
 ```
 
 Tests passing and a feature working are two different claims. This makes both separately.
@@ -460,11 +466,11 @@ Faculty administrators currently count this by hand every semester.
 - [ ] Same-named departments in different faculties stay separate
 ```
 
-Keep them in `.tasks/` — `/plan` writes there, `/implement` reads and updates them. Add
+Keep them in `.tasks/` — `/gku:plan` writes there, `/gku:implement` reads and updates them. Add
 `.tasks/` to `.gitignore` unless you want the briefs in version control.
 
 **Be specific about what "done" means.** That list becomes the acceptance criteria, which is
-what `/implement` builds against and what `/verify` checks. Vague criteria produce vague work.
+what `/gku:implement` builds against and what `/gku:verify` checks. Vague criteria produce vague work.
 
 ## Using these on a Pro plan
 
@@ -481,15 +487,15 @@ How they keep the cost down:
   diff. When a skill judged a file from the diff alone, it says so.
 - **Answers go in the chat**, not into generated report files. A report is written only when
   there is a blocker, or when you ask with `--report`.
-- **`/implement` is resumable**, so hitting a limit costs you nothing but time.
+- **`/gku:implement` is resumable**, so hitting a limit costs you nothing but time.
 
 Practical advice:
 
 1. **Stay on Sonnet.** Nothing here needs a larger model. Check with `/model`.
 2. **Use `/clear` between unrelated tasks.** A long conversation is re-sent with every
    message, so an unrelated three-hour history makes every request more expensive.
-3. **Run `/review` often and `--deep` rarely.** The plain version catches most of it.
-4. **Prefer `/implement` on a written task file** over a vague sentence — it gets it right the
+3. **Run `/gku:review` often and `--deep` rarely.** The plain version catches most of it.
+4. **Prefer `/gku:implement` on a written task file** over a vague sentence — it gets it right the
    first time more often, and a redo costs more than a good brief.
 5. **If you hit a limit mid-build, do not start over.** Wait for the reset and use
    `--continue`.
@@ -497,9 +503,9 @@ Practical advice:
 ## Troubleshooting
 
 **The commands do not appear after installing.**
-Restart Claude Code. Check with `/plugin` that `toolkit@grinchenkoedu` is listed.
+Restart Claude Code. Check with `/plugin` that `gku@grinchenkoedu` is listed.
 
-**`/pr-review` says it cannot find the pull request.**
+**`/gku:pr-review` says it cannot find the pull request.**
 Check `gh auth status`. For a private repository you need access, and the token needs the
 `repo` scope. Re-authenticate with `gh auth login --scopes "repo,read:org"`.
 
@@ -508,11 +514,11 @@ It caches what it detected. Delete `.claude/repo-profile.json` and run again, or
 `--reprofile`. If the project's real command lives somewhere unusual, put it in the
 repository's `AGENTS.md` — the skills read that file.
 
-**`/implement` refuses to start.**
+**`/gku:implement` refuses to start.**
 Usually uncommitted changes it did not make. Commit or stash them first — it will not build on
 top of work it cannot account for.
 
-**`/verify` says "cannot tell".**
+**`/gku:verify` says "cannot tell".**
 That is deliberate, not a failure. Read the blocked checks and their categories; each has a
 one-line way to unblock it. A `HOSTED` blocker means the code needs its host application
 (a Moodle plugin cannot run on its own) — that one is a fact about the project, not a problem
@@ -546,7 +552,7 @@ once you are done. List them with `git worktree list`.
 
 ## Contributing
 
-Add a skill as `plugins/toolkit/skills/<name>/SKILL.md`, with `name` and `description` in the
+Add a skill as `plugins/gku/skills/<name>/SKILL.md`, with `name` and `description` in the
 frontmatter.
 
 Keep to the conventions the existing skills follow, because they are what make these usable on
@@ -559,7 +565,7 @@ a limited plan:
 - no absolute paths from your own machine in `SKILL.md`;
 - nothing specific to one repository — read the project's own conventions instead.
 
-The shared detection logic lives in `plugins/toolkit/reference/repo-profile.md`. If your skill
+The shared detection logic lives in `plugins/gku/reference/repo-profile.md`. If your skill
 needs to know something about the project, add it there rather than detecting it separately.
 
 ## Licence

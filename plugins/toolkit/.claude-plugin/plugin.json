@@ -1,4 +1,0 @@
-{
-  "name": "toolkit",
-  "description": "Chained development skills: /init, /plan, /implement, /review, /pr-review, /pr-resolve, /verify. Repository-agnostic via a cached repo profile; economical by design (no sub-agents by default, chat-first output, resumable work)."
-}
