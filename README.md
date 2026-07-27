@@ -395,11 +395,15 @@ decide what to say.
 ### `/pr-resolve` — act on comments on your pull request
 
 ```
+/pr-resolve https://github.com/grinchenkoedu/local_gdo/pull/42
 /pr-resolve 42
 /pr-resolve 42 --dry-run
 ```
 
-For **your own** pull request. It collects every comment, and — this is the important part —
+For **your own** pull request. **A URL works from anywhere** — any directory, another project,
+or outside a repository entirely: it resolves the repository from the URL and reuses a local
+clone if you have one, or makes one and tells you where. A bare number only works inside a clone
+of the repository that owns the PR, since there is nothing else to resolve it against. It collects every comment, and — this is the important part —
 **gives each one a verdict before changing any code**:
 
 - **agree** → the smallest fix that resolves it, as its own commit;
