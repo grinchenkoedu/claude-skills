@@ -289,6 +289,12 @@ gives you a list sorted by severity:
 It also checks whether your **tests actually prove anything** — a test with no real assertion,
 or one that mocks away the exact thing you changed, passes while proving nothing.
 
+If the project has a lint command, it **lints the files you changed** and reports a parse error
+as a blocker. In a repository with no tests and no working CI, this is the only mechanical check
+standing between a syntax error and a live site. It will tell you when the linter runs a newer
+language version than the project targets — passing a PHP 8 parser proves nothing about a
+project that declares `>=7.4`.
+
 `--deep` allows one helper agent to double-check callers of code you renamed. It costs more;
 use it when you have touched shared code.
 
