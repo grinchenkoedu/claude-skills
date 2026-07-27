@@ -4,7 +4,7 @@ For a site built on a CMS: a theme, a plugin, or site-specific code around a cor
 own. The defining constraint is that **the core is not yours** — it updates underneath you, and
 anything you change in it is lost and unsupported.
 
-`/init` copies the block below into `CLAUDE.md` between the markers.
+`/gku:init` copies the block below into `CLAUDE.md` between the markers.
 
 ---
 

@@ -5,12 +5,12 @@ argument-hint: "[<pr-number> | <branch>] [--tests-only] [--report]"
 user-invocable: true
 ---
 
-# /verify — prove it works
+# /gku:verify — prove it works
 
 Tests passing and a feature working are different claims. This skill makes both, separately,
 and says which one it can actually support.
 
-Run it after `/implement`, before opening a pull request, or against someone's pull request
+Run it after `/gku:implement`, before opening a pull request, or against someone's pull request
 when you want more than a reading of the diff.
 
 Local only. It never touches a live system and never writes to the pull request.

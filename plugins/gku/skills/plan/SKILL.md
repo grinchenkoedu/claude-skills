@@ -1,23 +1,23 @@
 ---
 name: plan
-description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Plans only; writes no production code.
+description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /gku:implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Plans only; writes no production code.
 argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep]"
 user-invocable: true
 ---
 
-# /plan — work out what to build, before building it
+# /gku:plan — work out what to build, before building it
 
 Give it a request in plain words, or point it at a markdown brief. It reads the code, checks
 its assumptions against real data where it can, and produces a plan concrete enough that
-`/implement` can execute it without thinking the problem through again.
+`/gku:implement` can execute it without thinking the problem through again.
 
 It writes **no production code**. The only files it creates are the plan itself and, at most,
 one throwaway read-only script used to answer a question about the data.
 
 ## Arguments
 
-- **A sentence** — `/plan the export merges departments that share a name`
-- **A markdown file** — `/plan .tasks/individual-plan-export.md`, for a longer brief that was
+- **A sentence** — `/gku:plan the export merges departments that share a name`
+- **A markdown file** — `/gku:plan .tasks/individual-plan-export.md`, for a longer brief that was
   written up in advance. Read the whole file; it is the specification.
 - **Nothing** — ask what to plan. Never guess.
 
@@ -118,7 +118,7 @@ project deliberately commits briefs). Overwrite an existing plan for the same sl
 For a feature: where it hooks in and what it touches. For a question: the answer.>
 
 ## Acceptance criteria
-- [ ] <checkable, specific — this is what /implement builds against and what /verify checks>
+- [ ] <checkable, specific — this is what /gku:implement builds against and what /gku:verify checks>
 
 ## Steps
 1. <ordered, file-level, buildable one at a time>
@@ -159,7 +159,7 @@ In chat: the absolute path to the plan, the summary verbatim, and — when there
 build — the next command:
 
 ```
-/implement .tasks/<slug>.md
+/gku:implement .tasks/<slug>.md
 ```
 
 The plan was written to be executed without re-deriving it.
@@ -173,7 +173,7 @@ The plan was written to be executed without re-deriving it.
   against production goes in the plan as a command for a person.
 - **Data-safety rules apply to any strategy you propose** — see `reference/repo-profile.md`.
   A data fix must specify dry-run by default, safe re-runs, and bounded scope with an expected
-  row count. Design it here; write it in `/implement`.
+  row count. Design it here; write it in `/gku:implement`.
 - **One clarifying question, maximum**, and only when classification is genuinely blocked.
 - **Absolute paths. English or Ukrainian. No essays** — a reader of the summary alone should be
   able to act.

@@ -1,6 +1,6 @@
 # Family template — Moodle plugin
 
-`/init` copies the block below into a repository's `CLAUDE.md`, between the
+`/gku:init` copies the block below into a repository's `CLAUDE.md`, between the
 `toolkit:begin family-rules` / `toolkit:end` markers. Everything outside those markers belongs
 to the repository and is never overwritten.
 

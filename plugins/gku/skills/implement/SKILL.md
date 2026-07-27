@@ -5,7 +5,7 @@ argument-hint: "<path/to/task.md> | <what to build> [--continue] [--step <n>]"
 user-invocable: true
 ---
 
-# /implement — build it, one step at a time
+# /gku:implement — build it, one step at a time
 
 Takes a plan (or a brief, or a sentence) and builds it here, in this conversation, in order.
 
@@ -13,14 +13,14 @@ It does **not** spawn a fleet of agents. Work happens sequentially in one workin
 is both cheaper and easier to follow — you can watch every edit and stop at any point.
 
 **Progress is written into the task file as it goes.** If the session ends — you close it, or
-you hit a usage limit — `/implement <same file> --continue` picks up at the first unfinished
+you hit a usage limit — `/gku:implement <same file> --continue` picks up at the first unfinished
 step. Nothing is rebuilt.
 
 ## Arguments
 
-- **A plan or brief** — `/implement .tasks/individual-plan-export.md`. Preferred: a file from
-  `/plan` already has criteria and ordered steps.
-- **A sentence** — `/implement add a CSV option to the student export`. Plan it inline
+- **A plan or brief** — `/gku:implement .tasks/individual-plan-export.md`. Preferred: a file from
+  `/gku:plan` already has criteria and ordered steps.
+- **A sentence** — `/gku:implement add a CSV option to the student export`. Plan it inline
   first (step 2).
 - **Nothing** — ask what to build. Never fall back to a leftover file; building the wrong task
   is worse than asking.
@@ -34,8 +34,8 @@ fall through to treating it as a sentence and building something invented. That 
 expensive here, because this skill writes code.
 
 Quotes are optional; arguments are not shell-parsed. They matter only when a flag follows
-prose — `/implement add CSV export --continue` is ambiguous about where the description ends,
-`/implement "add CSV export" --continue` is not.
+prose — `/gku:implement add CSV export --continue` is ambiguous about where the description ends,
+`/gku:implement "add CSV export" --continue` is not.
 
 ## Step 1 — Set up
 
@@ -66,8 +66,8 @@ If the input already has acceptance criteria and ordered steps, use them as they
 
 If it is a sentence or a loose brief, work out the plan now, inline: find the relevant code,
 decide the approach, write down the criteria and the ordered steps. Keep it short — this is
-the planning `/plan` would have done, at the scale the task deserves. For anything substantial
-or unfamiliar, stop and suggest running `/plan` first; a real plan is worth the separate pass.
+the planning `/gku:plan` would have done, at the scale the task deserves. For anything substantial
+or unfamiliar, stop and suggest running `/gku:plan` first; a real plan is worth the separate pass.
 
 Write the plan into the task file so `--continue` has something to resume from.
 
@@ -127,7 +127,7 @@ Then check the change actually does something, using the runtime surface from th
 run the command, load the page, call the function. A green test suite for code that was never
 executed is not evidence. For a `hosted` runtime (a Moodle plugin and similar), say clearly
 that runtime checking needs the host application and stop at lint plus tests. Or hand it to
-`/verify`, which does this properly.
+`/gku:verify`, which does this properly.
 
 ## Step 6 — Finish
 
@@ -145,14 +145,14 @@ Then, in chat:
 - the acceptance criteria, ticked or explicitly not met;
 - files changed, tests added, the quoted test result;
 - anything you noticed but deliberately left alone;
-- the next command: `/review` before pushing.
+- the next command: `/gku:review` before pushing.
 
 Do not report success when tests are failing or a criterion is unmet. Say exactly what stands.
 
 ## Rules
 
 - **Local only.** Never push, never open a pull request, never touch a live system. Pushing is
-  a decision a person makes, after `/review`.
+  a decision a person makes, after `/gku:review`.
 - **Sequential. No agent fleets, no background workflows.** One working tree, in order.
 - **The task file is the progress log.** Update it as each step lands, so an interrupted run
   resumes instead of restarting.
@@ -173,6 +173,6 @@ Do not report success when tests are failing or a criterion is unmet. Say exactl
 - **The task needs a decision you cannot make** — build everything that does not depend on it,
   then ask one specific question with the options.
 - **Usage limit interrupts you mid-run** — the task file already has the ticked steps.
-  `/implement <file> --continue` resumes from the first unticked one.
+  `/gku:implement <file> --continue` resumes from the first unticked one.
 - **The task turns out to be much larger than described** — say so early, propose splitting it,
   and let the developer decide before you build half of it.

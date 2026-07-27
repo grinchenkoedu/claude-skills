@@ -3,7 +3,7 @@
 For a PHP web application or service: an in-house MVC framework, Symfony, Laravel, or a plain
 front-controller app. Also usable for a Composer library — skip the request-handling sections.
 
-`/init` copies the block below into `CLAUDE.md` between the markers. Everything outside them
+`/gku:init` copies the block below into `CLAUDE.md` between the markers. Everything outside them
 belongs to the repository.
 
 **Adjust before trusting.** The security rules below assume the worst — that the template layer
