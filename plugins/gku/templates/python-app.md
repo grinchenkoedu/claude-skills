@@ -1,6 +1,6 @@
 # Family template — Python application
 
-For a Python service, web app or CLI. `/init` copies the block below into `CLAUDE.md` between
+For a Python service, web app or CLI. `/gku:init` copies the block below into `CLAUDE.md` between
 the markers.
 
 ---

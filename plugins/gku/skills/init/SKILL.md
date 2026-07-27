@@ -5,7 +5,7 @@ argument-hint: "[--family <name>] [--refresh] [--dry-run]"
 user-invocable: true
 ---
 
-# /init — give this repository a CLAUDE.md
+# /gku:init — give this repository a CLAUDE.md
 
 `CLAUDE.md` is read at the start of every session in a repository. It is the one place to record
 how to build the project, how to test it, and the handful of rules that are actually violated
@@ -31,7 +31,7 @@ Two parts, and the distinction is the whole point:
    anything you want said every session...
 
 <!-- toolkit:begin family-rules -->
-...maintained by /init — replaced wholesale on --refresh...
+...maintained by /gku:init — replaced wholesale on --refresh...
 <!-- toolkit:end family-rules -->
 
 ...more of your own sections if you like...

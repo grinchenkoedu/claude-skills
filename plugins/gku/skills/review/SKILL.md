@@ -5,7 +5,7 @@ argument-hint: "[branch] [--target <base>] [--deep] [--report]"
 user-invocable: true
 ---
 
-# /review — check your own work before anyone else sees it
+# /gku:review — check your own work before anyone else sees it
 
 Run this when you think you are done. It reads what you changed and tells you what a careful
 reviewer would say, so you fix it before a bot or a colleague finds it.

@@ -5,7 +5,7 @@ argument-hint: "<pr-number-or-url> [--repo <owner/name>] [--deep] [--report]"
 user-invocable: true
 ---
 
-# /pr-review — review someone else's pull request
+# /gku:pr-review — review someone else's pull request
 
 The last check before a change lands. By the time this runs, an automated reviewer has
 usually already commented and CI has usually already passed — so this skill deliberately does
@@ -14,7 +14,7 @@ usually already commented and CI has usually already passed — so this skill de
 Read-only: it never edits, commits, pushes, or posts a comment. You paste what you want to
 say yourself.
 
-For your *own* changes before pushing, use `/review` instead.
+For your *own* changes before pushing, use `/gku:review` instead.
 
 ## What to skip, and what to hunt
 
@@ -86,7 +86,7 @@ git diff --stat <baseRefName>...HEAD
 git diff --name-status <baseRefName>...HEAD
 ```
 
-Read in the priority order from `/review` step 2, with the same **cap of five files read in
+Read in the priority order from `/gku:review` step 2, with the same **cap of five files read in
 full** plus the unchanged code immediately around them. Everything else is judged from the
 diff, and the review says so.
 
