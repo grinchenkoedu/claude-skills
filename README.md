@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
-Seven skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
+Skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
 development day: work out what to build, build it, check your own work, review a colleague's
 pull request, deal with the comments on yours, and prove the result actually works.
 
@@ -24,7 +24,7 @@ MIT licensed.
 - [What is this, exactly?](#what-is-this-exactly)
 - [Before you start](#before-you-start)
 - [Installation](#installation)
-- [The six skills](#the-six-skills)
+- [The skills](#the-skills)
 - [A worked example](#a-worked-example-start-to-finish)
 - [Each skill in detail](#each-skill-in-detail)
 - [Writing a task file](#writing-a-task-file)
@@ -139,7 +139,7 @@ Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude
 The plugin route is easier to keep up to date. Use this only if you have a reason to.
 </details>
 
-## The six skills
+## The skills
 
 They follow the order of the work:
 
@@ -439,8 +439,8 @@ workflows, reading whole repositories) are deliberately absent.
 How they keep the cost down:
 
 - **No sub-agents by default.** At most one, only when you ask with `--deep`.
-- **The stack is detected once**, then cached in `.claude/repo-profile.json` and reused by all
-  six skills. Add that file to `.gitignore` — it describes your machine.
+- **The stack is detected once**, then cached in `.claude/repo-profile.json` and reused by every
+  skill. Add that file to `.gitignore` — it describes your machine.
 - **Reading is capped.** At most five files read in full; everything else judged from the
   diff. When a skill judged a file from the diff alone, it says so.
 - **Answers go in the chat**, not into generated report files. A report is written only when

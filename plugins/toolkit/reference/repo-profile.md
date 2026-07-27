@@ -258,7 +258,7 @@ is normally **Git Bash** (bundled with Git for Windows), so ordinary POSIX comma
   and record `"shell": "powershell"` so skills stop assuming POSIX.
 
 None of this changes what the skills *do* — only the exact strings stored in the profile. That
-is the point of caching it: this is worked out once, not argued about six times.
+is the point of caching it: this is worked out once, not re-derived by every skill.
 
 ## Data-safety rules
 
