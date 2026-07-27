@@ -31,7 +31,9 @@ Check, and report all of these together in one block rather than discovering the
 time:
 
 - Is there a test command at all? Many repositories here have none.
-- If the profile names a container, is it running? (`docker compose ps`)
+- Is the execution environment available? For `exec.kind: compose`, is the service up
+  (`docker compose ps`)? For `image`, is the Docker daemon running? If Docker is down and the
+  profile expects it, that is a `SETUP` blocker — starting it is usually the whole fix.
 - Are dependencies installed? (`vendor/`, `node_modules/` as applicable)
 - Is there a `timeoutTool`?
 - Does the runtime surface need something you do not have — a host application, a credential,
@@ -59,11 +61,16 @@ git fetch origin pull/<n>/head
 git worktree add ../<repo>-verify-<n> <head-sha>
 ```
 
-**If the profile names a container, note this:** the container mounts the *primary* checkout,
-not the worktree — so commands run inside it will test the wrong code. Either run the checks
-from the primary checkout with that commit checked out (record the original branch and restore
-it in step 6, without exception), or record the checks as not run. Do not run them against the
-wrong tree and report the result.
+**Mind what the execution environment is actually pointed at.** A compose service
+(`exec.kind: compose`) mounts the *primary* checkout, not this worktree — so commands run
+through it would test the wrong code. Two honest options:
+
+- run the checks from the primary checkout with that commit checked out — record the original
+  branch and restore it in step 6, without exception; or
+- for `exec.kind: image`, mount the worktree instead (`-v "<worktree>":/app`), which avoids the
+  problem entirely and is the better route when the project has a usable image.
+
+Do not run the checks against the wrong tree and report the result as if it meant something.
 
 For the current working tree, none of this applies.
 

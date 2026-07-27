@@ -68,14 +68,30 @@ You need:
    gh auth status
    ```
 
-`/plan`, `/implement`, `/review` and `/verify` work without `gh`. Only `/pr-review` and
-`/pr-resolve` need it, because they talk to GitHub.
+   `/plan`, `/implement`, `/review` and `/verify` work without `gh`. Only `/pr-review` and
+   `/pr-resolve` need it, because they talk to GitHub.
 
-**Windows works**, with Git Bash as above. The skills detect the platform on first use and
-adjust the commands they store — `make` is usually missing on Windows, Docker mounts need a
-path-translation guard, and Windows has its own unrelated `timeout` command that has to be
-worked around. That is handled for you; it is mentioned only so the workarounds in
-`.claude/repo-profile.json` do not look mysterious. WSL also works and behaves like Linux.
+4. **Docker** — [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows
+   and macOS, Docker Engine on Linux. **Strongly recommended on every platform**, not just
+   Windows.
+
+   The skills run a project's own commands **inside its container** by default. That is not
+   about convenience — it is about being right. These projects target specific runtime
+   versions: a plugin written for PHP 7.4 checked by a host PHP 8.4 will accept syntax that
+   breaks in production, and a test suite that passes against the wrong version has not proven
+   anything. The container has the version the project actually uses, along with its
+   dependencies and its database.
+
+   It also means you do not need PHP, Composer, Python or Node installed locally at all —
+   several of these projects assume you do not have them — and the same commands work
+   identically on Windows, macOS, Linux and WSL.
+
+   Without Docker the skills still work, falling back to whatever is on your machine, and they
+   will tell you they did. If the versions differ from the project's, treat a green run with
+   suspicion.
+
+**Windows works.** Use Git Bash, as in step 2. The skills detect your platform on first use and
+store commands that work there. WSL also works and behaves like Linux.
 
 ## Installation
 
@@ -416,14 +432,23 @@ one-line way to unblock it. A `HOSTED` blocker means the code needs its host app
 (a Moodle plugin cannot run on its own) — that one is a fact about the project, not a problem
 to fix.
 
-**On Windows: a command fails with "make: command not found".**
-Expected — `make` is not part of a standard Windows install. Delete
-`.claude/repo-profile.json` and run the skill again; it will read the `Makefile` and store the
-underlying command instead. You can also install make via `winget install ezwinports.make`.
+**A skill says it fell back to the host instead of Docker.**
+The daemon is not running, or Docker is not installed. Start Docker Desktop and delete
+`.claude/repo-profile.json` so it redetects. Worth doing: on the host you are testing against
+whatever versions your machine happens to have, which for these projects is often not the
+version they target.
+
+**"make: command not found".**
+`make` is not part of a standard Windows install, and the skills should not be calling it —
+they store the command from inside the `Makefile` rather than the `make` invocation. Delete
+`.claude/repo-profile.json` and run again. If you want `make` anyway:
+`winget install ezwinports.make`.
 
 **On Windows: a Docker command fails with a strange path like `C:/Program Files/Git/app`.**
-Git Bash rewrote the container path. The profile should store the command with
+Git Bash rewrote the container path. The profile should store that command with
 `MSYS_NO_PATHCONV=1` in front of it; delete `.claude/repo-profile.json` and let it redetect.
+Projects with a `docker-compose.yml` avoid this entirely, since `docker compose exec` has no
+mount argument to mangle.
 
 **On Windows: the diff shows every line as changed.**
 Line endings, not real changes — the file was converted between CRLF and LF. Check

@@ -27,16 +27,20 @@ platform (see "Cross-platform notes") — that is precisely what the cache is fo
   "language": "PHP 7.4",
   "baseBranch": "master",
   "standardsDoc": "AGENTS.md",
-  "install": "make install",
-  "lint": "docker run --rm -v \"$(pwd)\":/app -w /app composer:lts php -l {file}",
-  "test": "make test",
-  "testScoped": "./application/lib/vendor/bin/phpunit --filter {name}",
+  "exec": {
+    "kind": "compose | image | host",
+    "prefix": "docker compose exec -T app",
+    "note": "PHP 7.4 in the container; the host has 8.4 and would lint against the wrong version"
+  },
+  "install": "docker compose run --rm app composer install",
+  "lint": "docker compose exec -T app php -l {file}",
+  "test": "docker compose exec -T app ./application/lib/vendor/bin/phpunit",
+  "testScoped": "docker compose exec -T app ./application/lib/vendor/bin/phpunit --filter {name}",
   "build": "npm run build",
-  "runtime": { "kind": "cli", "how": "./run <command>" },
-  "container": "docker compose exec app",
+  "runtime": { "kind": "cli", "how": "docker compose exec -T app ./run <command>" },
   "hasDatabase": true,
   "timeoutTool": "gtimeout",
-  "notes": "No local php binary — everything goes through the composer:lts image."
+  "notes": "No local php binary. make is present here but the recipes are stored resolved."
 }
 ```
 
@@ -65,12 +69,26 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 | `package.json` with no PHP | `node` | |
 | none of the above | `other` | Say so plainly; skills degrade rather than guess |
 
-4. **Install / test / build** — read them out of the repo instead of inventing them:
-   - a `Makefile` — its targets are the intended interface, prefer them over raw commands.
-     **But check `make` actually exists first** (`make --version`); it is absent from a default
-     Windows install. When it is missing, open the `Makefile`, take the command the target
-     actually runs, and store *that* in the profile — the recipe works even where `make` does
-     not. Note the substitution in `notes`;
+4. **Execution environment — decide this before the commands themselves.** See
+   "Run things in a container" below. In precedence order:
+   1. a `docker-compose.yml` service that mounts the code → `docker compose exec -T <service>`
+      (use `docker compose run --rm <service>` when nothing is running yet);
+   2. no compose file, but a known language and a `Dockerfile` or an obvious official image →
+      `docker run --rm -v "${PWD}":/app -w /app <image>`;
+   3. **host, only as a fallback** — no Docker installed, or the daemon is not running.
+
+   Store the resolved prefix in `exec.prefix` and build every other command on top of it. When
+   you fall back to the host, put the reason in `exec.note`; when the host toolchain is a
+   *different version* from the project's target, that is worth saying out loud, because it is
+   the case where a green local run means nothing.
+
+5. **Install / test / build** — read them out of the repo instead of inventing them, then wrap
+   them in `exec.prefix`:
+   - a `Makefile` — its targets tell you the intended commands. **Store the resolved recipe,
+     not the `make` invocation:** open the `Makefile`, take what the target actually runs, and
+     save that. It then works whether or not `make` is installed — which matters, since `make`
+     is absent from a default Windows install — and it lets you run the recipe inside the
+     container while `make` itself stays on the host;
    - `composer.json` `scripts`, `package.json` `scripts`;
    - `phpunit.xml` / `phpunit.xml.dist` → PHPUnit is present; the binary is usually
      `vendor/bin/phpunit`, but check `composer.json`'s `config.vendor-dir` — it is not always
@@ -78,16 +96,17 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    - `pytest.ini` / `tests/conftest.py` → `pytest`;
    - `.github/workflows/*.yml` — **the most reliable source.** Whatever CI runs is the real
      test command. Read it before guessing.
-5. **Runtime surface** — what can actually be driven to prove a change works:
+6. **Runtime surface** — what can actually be driven to prove a change works. Wrap it in
+   `exec.prefix` too:
    - `cli` — a `run` / `bin/*` / `cli/*.php` entry point, or `python main.py`;
-   - `http` — a `docker-compose.yml` publishing a port, or a Flask/framework entry point;
+   - `http` — a `docker-compose.yml` publishing a port, or a Flask/framework entry point.
+     Note that this one is reached from the **host**, over the published port — the request
+     goes to `localhost:<port>`, not through `exec`;
    - `library` — importable API only, exercised through tests;
    - `hosted` — a Moodle plugin or similar, which needs a host application. Record this
      honestly: it means runtime verification is limited to lint plus whatever the host's own
-     CLI offers, and skills must say so rather than pretend.
-6. **Container** — if `docker-compose.yml` exists, the prefix that runs a command inside the
-   app service. Check whether it is actually running (`docker compose ps`) before relying on
-   it; if it is not, the profile still records it but skills fall back to the host.
+     CLI offers, and skills must say so rather than pretend. A container does not fix this —
+     the missing piece is the host application, not a runtime.
 7. **`timeoutTool`** — **verify by behaviour, never by presence.** Run `timeout 1 true` and
    check it exits 0 promptly. If that fails, try `gtimeout 1 true` (macOS with coreutils).
    If neither works, `null`.
@@ -113,25 +132,58 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
   all**; skills must not report "tests pass" when what happened is "there are no tests".
 - **`php-library`** — CI already runs the suite on every push. The tests are the contract.
 
-## Cross-platform notes
+## Run things in a container
 
-Detect the platform once (step 0, before anything else) and record it. `uname -s` returns
-`Darwin`, `Linux`, or something containing `MINGW`/`MSYS` under Git Bash on Windows.
+**Default to running the project's own commands inside Docker, on every platform.** Not as a
+Windows workaround — as the normal way. Fall back to the host only when Docker is genuinely
+unavailable, and say so when you do.
 
-On Windows, Claude Code's shell is normally **Git Bash** (bundled with Git for Windows), so
-ordinary POSIX commands work. The differences that actually bite:
+The reason is correctness before convenience:
 
-- **`make` is usually absent.** Resolve targets to their underlying commands (step 4).
-- **`timeout` is a different program.** Verify by behaviour (step 7).
-- **Docker volume mounts get path-mangled.** Git Bash rewrites `/app` into a Windows path, so
-  `docker run -v "$(pwd)":/app …` fails or mounts the wrong thing. Prefix the command with
-  `MSYS_NO_PATHCONV=1`, and prefer `${PWD}` over `$(pwd)`:
+- **Version fidelity.** These projects target specific runtimes — a plugin written for PHP 7.4
+  linted by a host PHP 8.4 will happily accept syntax that breaks in production, and a suite
+  that passes on the host's version proves nothing about the version that actually runs. The
+  container has the right one.
+- **The toolchain is in the image.** No local `php`, `composer`, `pytest` or `node` needed.
+  Several of these repositories are explicit that the host has no PHP at all.
+- **Same commands everywhere.** One recipe for macOS, Linux, WSL and Windows. Most of what
+  makes Windows awkward — a missing `make`, a different `timeout`, absent Unix utilities —
+  stops being a special case when the command runs in Linux inside a container.
+- **The database comes with it.** `hasDatabase` work needs a database; compose already defines
+  one.
+
+What stays on the host, always: `git` (worktrees, diffs, commits), `gh`, file reading and
+editing, and HTTP requests to a published port. Do not try to containerise those.
+
+When you fall back to the host, record why in `exec.note` — and if the host toolchain version
+differs from the project's target, say that explicitly in the report. It is the difference
+between "the tests passed" and "the tests passed against the wrong runtime".
+
+### Platform specifics
+
+Detect the platform once (step 0) and record it. `uname -s` returns `Darwin`, `Linux`, or
+something containing `MINGW`/`MSYS` under Git Bash on Windows. On Windows, Claude Code's shell
+is normally **Git Bash** (bundled with Git for Windows), so ordinary POSIX commands work.
+
+- **Docker volume mounts get path-mangled under Git Bash.** This is the one Windows problem
+  that a container-first approach makes *more* important, not less: Git Bash rewrites the
+  container-side `/app` into a Windows path, so the mount fails or lands somewhere wrong.
+  Prefix with `MSYS_NO_PATHCONV=1` and prefer `${PWD}` over `$(pwd)`:
 
   ```bash
   MSYS_NO_PATHCONV=1 docker run --rm -v "${PWD}":/app -w /app composer:lts php -l file.php
   ```
 
-  Store the working form in the profile's `lint`/`test` fields so it is resolved once.
+  `docker compose exec` does not need this — there is no mount argument to mangle, which is
+  another reason to prefer a compose service when the project has one. Store the working form
+  in the profile so it is solved once.
+- **`docker compose exec` needs `-T`** when the command is not interactive; without it output
+  can be mangled or the call can hang waiting on a TTY.
+- **Bind-mount I/O is slow on macOS and Windows.** A large suite may take noticeably longer in
+  a container than on the host. That is a reason to scope tests tightly, not a reason to run
+  against the wrong runtime.
+- **`make` absent, `timeout` different** — handled by steps 5 and 7. With a container-first
+  profile both mostly stop mattering, since the recipe runs inside Linux.
 - **Paths in output.** Absolute paths on Windows look like `C:/Users/...` — still clickable in
   an editor. Keep them absolute; just do not assume a leading `/`.
 - **Line endings.** A diff that looks like every line changed usually means the file was
@@ -140,8 +192,8 @@ ordinary POSIX commands work. The differences that actually bite:
   exist. Prefer passing bodies to `gh` via `--input` with a file rather than inline quoting,
   and record `"shell": "powershell"` so skills stop assuming POSIX.
 
-None of this changes what the skills *do* — only the exact strings stored in the profile.
-That is the point of caching it: the platform is worked out once, not argued about six times.
+None of this changes what the skills *do* — only the exact strings stored in the profile. That
+is the point of caching it: this is worked out once, not argued about six times.
 
 ## Data-safety rules
 

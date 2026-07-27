@@ -73,9 +73,11 @@ If the path exists already, ask before reusing it. Never overwrite silently.
 Work inside the worktree for steps 3–5. Capture the primary repository path first
 (`git rev-parse --show-toplevel`) — any report goes there, not into the worktree.
 
-**If the profile records a container**, note that it bind-mounts the *primary* checkout, not
-this worktree. That is fine for a static review; if verifying a finding would need to run
-code, mark it `[unverified]` rather than guessing.
+**If the profile's execution environment is a compose service**, it mounts the *primary*
+checkout, not this worktree — so anything run through it would exercise the wrong code. That is
+fine for a static review; if verifying a finding would need to run code, either mount the
+worktree into a one-off container (`exec.kind: image` style) or mark the finding `[unverified]`
+rather than guessing.
 
 ## Step 3 — Read, risk-ranked
 
