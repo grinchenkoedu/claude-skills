@@ -18,6 +18,8 @@ one developer's machine, not the project.
 
 ```json
 {
+  "platform": "macos | linux | windows",
+  "shell": "bash | git-bash | powershell",
   "family": "php-app | moodle-plugin | php-library | python-app | node | other",
   "language": "PHP 7.4",
   "baseBranch": "master",
@@ -42,6 +44,9 @@ it — a repository with no test command does not get a made-up one.
 
 Stop as soon as the family is clear. This should be a handful of file checks, not an audit.
 
+0. **Platform** — `uname -s`. `Darwin` → macos, `Linux` → linux, anything containing `MINGW`
+   or `MSYS` → windows (Git Bash). See "Cross-platform notes" below; it changes several of the
+   commands stored here.
 1. **Base branch** — `git symbolic-ref refs/remotes/origin/HEAD` (strip `refs/remotes/origin/`).
    Falls back to whichever of `master` / `main` exists. Do not assume.
 2. **Standards doc** — first of `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `README.md` that
@@ -58,7 +63,11 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 | none of the above | `other` | Say so plainly; skills degrade rather than guess |
 
 4. **Install / test / build** — read them out of the repo instead of inventing them:
-   - a `Makefile` — its targets are the intended interface, prefer them over raw commands;
+   - a `Makefile` — its targets are the intended interface, prefer them over raw commands.
+     **But check `make` actually exists first** (`make --version`); it is absent from a default
+     Windows install. When it is missing, open the `Makefile`, take the command the target
+     actually runs, and store *that* in the profile — the recipe works even where `make` does
+     not. Note the substitution in `notes`;
    - `composer.json` `scripts`, `package.json` `scripts`;
    - `phpunit.xml` / `phpunit.xml.dist` → PHPUnit is present; the binary is usually
      `vendor/bin/phpunit`, but check `composer.json`'s `config.vendor-dir` — it is not always
@@ -76,9 +85,15 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 6. **Container** — if `docker-compose.yml` exists, the prefix that runs a command inside the
    app service. Check whether it is actually running (`docker compose ps`) before relying on
    it; if it is not, the profile still records it but skills fall back to the host.
-7. **`timeoutTool`** — `timeout`, else `gtimeout` (macOS with coreutils), else `null`. When
-   `null`, skills must not silently drop the timeout; they run the command and say that a hang
-   cannot be bounded automatically.
+7. **`timeoutTool`** — **verify by behaviour, never by presence.** Run `timeout 1 true` and
+   check it exits 0 promptly. If that fails, try `gtimeout 1 true` (macOS with coreutils).
+   If neither works, `null`.
+
+   This matters because **Windows ships its own `timeout.exe` in `System32` that is a sleep,
+   not a command wrapper** — `timeout 5 <command>` there pauses and ignores the command. A
+   presence check (`which timeout`) finds it and would silently produce checks that run
+   nothing and report success. When `timeoutTool` is `null`, skills must not silently drop the
+   timeout: they run the command and say that a hang cannot be bounded automatically.
 8. **`hasDatabase`** — a `docker-compose.yml` database service, a `schema.sql`, `db/install.xml`,
    or migrations. Gates the data-safety rules below.
 
@@ -94,6 +109,36 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
   `core/`. `./run` dispatches CLI commands. Several of these repositories have **no tests at
   all**; skills must not report "tests pass" when what happened is "there are no tests".
 - **`php-library`** — CI already runs the suite on every push. The tests are the contract.
+
+## Cross-platform notes
+
+Detect the platform once (step 0, before anything else) and record it. `uname -s` returns
+`Darwin`, `Linux`, or something containing `MINGW`/`MSYS` under Git Bash on Windows.
+
+On Windows, Claude Code's shell is normally **Git Bash** (bundled with Git for Windows), so
+ordinary POSIX commands work. The differences that actually bite:
+
+- **`make` is usually absent.** Resolve targets to their underlying commands (step 4).
+- **`timeout` is a different program.** Verify by behaviour (step 7).
+- **Docker volume mounts get path-mangled.** Git Bash rewrites `/app` into a Windows path, so
+  `docker run -v "$(pwd)":/app …` fails or mounts the wrong thing. Prefix the command with
+  `MSYS_NO_PATHCONV=1`, and prefer `${PWD}` over `$(pwd)`:
+
+  ```bash
+  MSYS_NO_PATHCONV=1 docker run --rm -v "${PWD}":/app -w /app composer:lts php -l file.php
+  ```
+
+  Store the working form in the profile's `lint`/`test` fields so it is resolved once.
+- **Paths in output.** Absolute paths on Windows look like `C:/Users/...` — still clickable in
+  an editor. Keep them absolute; just do not assume a leading `/`.
+- **Line endings.** A diff that looks like every line changed usually means the file was
+  rewritten CRLF↔LF. Say so rather than reviewing it as a real change.
+- **PowerShell instead of Git Bash** (rare, but possible): quoting differs and heredocs do not
+  exist. Prefer passing bodies to `gh` via `--input` with a file rather than inline quoting,
+  and record `"shell": "powershell"` so skills stop assuming POSIX.
+
+None of this changes what the skills *do* — only the exact strings stored in the profile.
+That is the point of caching it: the platform is worked out once, not argued about six times.
 
 ## Data-safety rules
 

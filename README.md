@@ -51,22 +51,31 @@ You need:
 
 1. **Claude Code** installed and working — [installation guide](https://docs.claude.com/en/docs/claude-code/overview).
 2. **git** — you have this already if you are cloning repositories.
+   **On Windows, install [Git for Windows](https://git-scm.com/download/win)**, which includes
+   Git Bash. Claude Code uses it to run commands, and these skills assume it is there.
 3. **The GitHub CLI (`gh`)**, for the two pull-request skills:
 
    ```bash
-   brew install gh          # macOS
-   sudo apt install gh      # Ubuntu/Debian
-   gh auth login            # sign in once
+   winget install --id GitHub.cli     # Windows
+   brew install gh                    # macOS
+   sudo apt install gh                # Ubuntu/Debian
    ```
 
-   Check it worked:
+   Then sign in once, and check it worked:
 
    ```bash
+   gh auth login
    gh auth status
    ```
 
 `/plan`, `/implement`, `/review` and `/verify` work without `gh`. Only `/pr-review` and
 `/pr-resolve` need it, because they talk to GitHub.
+
+**Windows works**, with Git Bash as above. The skills detect the platform on first use and
+adjust the commands they store — `make` is usually missing on Windows, Docker mounts need a
+path-translation guard, and Windows has its own unrelated `timeout` command that has to be
+worked around. That is handled for you; it is mentioned only so the workarounds in
+`.claude/repo-profile.json` do not look mysterious. WSL also works and behaves like Linux.
 
 ## Installation
 
@@ -89,11 +98,22 @@ To update later:
 <details>
 <summary>Installing without the plugin system</summary>
 
+macOS, Linux, or Git Bash on Windows:
+
 ```bash
 git clone https://github.com/grinchenkoedu/claude-skills.git
 mkdir -p ~/.claude/skills
 cp -R claude-skills/plugins/toolkit/skills/* ~/.claude/skills/
 cp -R claude-skills/plugins/toolkit/reference ~/.claude/skills/reference
+```
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/grinchenkoedu/claude-skills.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\skills\* "$HOME\.claude\skills\"
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude\skills\reference"
 ```
 
 The plugin route is easier to keep up to date. Use this only if you have a reason to.
@@ -395,6 +415,19 @@ That is deliberate, not a failure. Read the blocked checks and their categories;
 one-line way to unblock it. A `HOSTED` blocker means the code needs its host application
 (a Moodle plugin cannot run on its own) — that one is a fact about the project, not a problem
 to fix.
+
+**On Windows: a command fails with "make: command not found".**
+Expected — `make` is not part of a standard Windows install. Delete
+`.claude/repo-profile.json` and run the skill again; it will read the `Makefile` and store the
+underlying command instead. You can also install make via `winget install ezwinports.make`.
+
+**On Windows: a Docker command fails with a strange path like `C:/Program Files/Git/app`.**
+Git Bash rewrote the container path. The profile should store the command with
+`MSYS_NO_PATHCONV=1` in front of it; delete `.claude/repo-profile.json` and let it redetect.
+
+**On Windows: the diff shows every line as changed.**
+Line endings, not real changes — the file was converted between CRLF and LF. Check
+`git config core.autocrlf` before reviewing it as a real diff.
 
 **A skill wants to remove a worktree.**
 Worktrees are extra checkouts under `../<repo>-pr-42` and similar. They are safe to remove

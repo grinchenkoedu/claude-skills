@@ -49,22 +49,32 @@
 
 1. **Claude Code**, встановлений і робочий — [інструкція зі встановлення](https://docs.claude.com/en/docs/claude-code/overview).
 2. **git** — він у вас уже є, якщо ви клонуєте репозиторії.
+   **На Windows встановіть [Git for Windows](https://git-scm.com/download/win)** — він містить
+   Git Bash. Claude Code запускає команди через нього, і ці навички розраховують, що він є.
 3. **GitHub CLI (`gh`)** — для двох навичок, що працюють із пул-реквестами:
 
    ```bash
-   brew install gh          # macOS
-   sudo apt install gh      # Ubuntu/Debian
-   gh auth login            # увійти один раз
+   winget install --id GitHub.cli     # Windows
+   brew install gh                    # macOS
+   sudo apt install gh                # Ubuntu/Debian
    ```
 
-   Перевірити, що спрацювало:
+   Далі один раз увійти й перевірити, що спрацювало:
 
    ```bash
+   gh auth login
    gh auth status
    ```
 
 `/plan`, `/implement`, `/review` і `/verify` працюють без `gh`. Він потрібен лише для
 `/pr-review` та `/pr-resolve`, бо вони звертаються до GitHub.
+
+**Windows працює** — за умови Git Bash, як вище. Навички визначають платформу під час першого
+запуску й підлаштовують команди, які зберігають: на Windows зазвичай немає `make`, монтуванню
+томів Docker потрібен захист від підміни шляхів, а власна команда `timeout` у Windows робить
+зовсім інше й потребує обхідного шляху. Про це подбано автоматично — згадуємо лише для того,
+щоб ці обхідні шляхи у `.claude/repo-profile.json` не виглядали загадково. WSL теж працює й
+поводиться як Linux.
 
 ## Встановлення
 
@@ -87,11 +97,22 @@
 <details>
 <summary>Встановлення без системи плагінів</summary>
 
+macOS, Linux або Git Bash на Windows:
+
 ```bash
 git clone https://github.com/grinchenkoedu/claude-skills.git
 mkdir -p ~/.claude/skills
 cp -R claude-skills/plugins/toolkit/skills/* ~/.claude/skills/
 cp -R claude-skills/plugins/toolkit/reference ~/.claude/skills/reference
+```
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/grinchenkoedu/claude-skills.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\skills\* "$HOME\.claude\skills\"
+Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude\skills\reference"
 ```
 
 Через плагін оновлювати простіше. Цей спосіб — лише якщо є причина.
@@ -396,6 +417,19 @@ stash`) — вона не будуватиме поверх роботи, за �
 Це задумано, а не збій. Подивіться на заблоковані перевірки та їхні категорії — до кожної є
 однорядкова підказка. Категорія `HOSTED` означає, що коду потрібен застосунок-господар (плагін
 Moodle не запускається сам по собі) — це факт про проєкт, а не проблема, яку треба виправляти.
+
+**На Windows: команда падає з «make: command not found».**
+Так і має бути — `make` не входить до стандартної інсталяції Windows. Видаліть
+`.claude/repo-profile.json` і запустіть навичку знову: вона прочитає `Makefile` і збереже
+команду, яка стоїть за ціллю. Можна також встановити make: `winget install ezwinports.make`.
+
+**На Windows: команда Docker падає з дивним шляхом на кшталт `C:/Program Files/Git/app`.**
+Git Bash підмінив шлях усередині контейнера. У профілі команда має зберігатися з
+`MSYS_NO_PATHCONV=1` на початку; видаліть `.claude/repo-profile.json` і дайте визначити наново.
+
+**На Windows: у diff змінилися геть усі рядки.**
+Це закінчення рядків, а не справжні зміни — файл перетворився між CRLF і LF. Перевірте
+`git config core.autocrlf`, перш ніж рецензувати це як реальні зміни.
 
 **Навичка просить видалити worktree.**
 Worktree — це додаткові робочі копії в каталогах на кшталт `../<repo>-pr-42`. Їх безпечно
