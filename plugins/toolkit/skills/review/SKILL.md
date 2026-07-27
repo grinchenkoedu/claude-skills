@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, its tests, and the failure modes that green tests miss. Review-only; never edits, commits or pushes.
+description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, and the failure modes that green tests miss. Review-only; never edits, commits or pushes.
 argument-hint: "[branch] [--target <base>] [--deep] [--report]"
 user-invocable: true
 ---
@@ -102,6 +102,23 @@ change that should have had one:
 - **The repository has no tests at all** — say so once, plainly, and suggest the first one
   worth writing. Do not file a warning per file, and never report this as "tests pass".
 
+## Step 4b — Lint the changed files
+
+If the profile has a `lint` command, run it over the changed files, through `exec.prefix`. It is
+read-only, it costs seconds, and it is the one mechanical check this skill can make.
+
+This matters most in exactly the repositories that need it most: where there are no tests and no
+working CI, nothing else will catch a syntax error before it reaches a live site. A parse error
+found here costs a minute; found in production it costs a white page.
+
+- A lint failure is a **BLOCKER**, quoted verbatim. It is not an opinion.
+- **Mind the version.** A linter running a newer language version than the project targets will
+  happily accept syntax the target rejects — a PHP 8 parser on a project declaring `>=7.4` proves
+  only that PHP 8 can read it. When the profile records that mismatch, say so alongside the
+  result, and check the diff for constructs newer than the target allows.
+- No `lint` command, or `exec` fell back to a host without the toolchain → skip it and say the
+  review is unlinted. Never report a lint that did not run.
+
 ## Step 5 — Cross-check (only with `--deep`)
 
 One sub-agent, on a small fast model, doing mechanical lookup only: for each function, class
@@ -121,9 +138,9 @@ Then, per finding, one bullet: absolute `path:line`, one sentence on the problem
 sentence on the fix, and the line of evidence. Group by severity, blockers first. Collapse
 nits into a single short list.
 
-Close with one line naming what you checked and did not find problems in — conventions,
-tests, data safety, wiring — so a clean review reads as *covered*, not *skipped*. Name any
-file you judged from the diff alone.
+Close with one line naming what you checked and did not find problems in — conventions, lint,
+tests, data safety, wiring — so a clean review reads as *covered*, not *skipped*. Name any file
+you judged from the diff alone, and say so if the lint step was skipped.
 
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
 

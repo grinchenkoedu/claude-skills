@@ -73,9 +73,30 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    "Run things in a container" below. In precedence order:
    1. a `docker-compose.yml` service that mounts the code → `docker compose exec -T <service>`
       (use `docker compose run --rm <service>` when nothing is running yet);
-   2. no compose file, but a known language and a `Dockerfile` or an obvious official image →
+   2. no compose file, but a known language and a usable image →
       `docker run --rm -v "${PWD}":/app -w /app <image>`;
-   3. **host, only as a fallback** — no Docker installed, or the daemon is not running.
+   3. **host, only as a fallback** — no Docker, daemon not running, or the mount check below
+      fails.
+
+   **Choosing the image (precedence 2).** Take the image the **standards doc or `Makefile`
+   already names** — a project that runs PHP through `composer:lts` says so, and that is the
+   answer. Only if nothing is named should you infer one from the language. **Do not assume a
+   `Dockerfile` in the repo root is a development runtime:** a `Dockerfile.deploy` built on
+   `node:lts-alpine` for rsync deployment has nothing to do with running the project's tests.
+   Read what it is `FROM` and what it installs before trusting it.
+
+   **Verify the mount before storing an image-based prefix.** A bind mount can succeed and
+   still be empty, which is the worst kind of failure — commands run, find no files, and report
+   something that looks like a result:
+
+   ```bash
+   docker run --rm -v "${PWD}":/app -w /app <image> ls /app/<a-file-you-know-exists>
+   ```
+
+   If that cannot see the file, the mount is not working — most often because the Docker daemon
+   is **remote** (`docker context ls` showing an ssh/tcp endpoint, or a forwarded socket). A
+   remote daemon binds paths on *its own* host, so your local files are simply not there. Fall
+   back to the host and record the reason. Do not store a prefix you have not proven.
 
    Store the resolved prefix in `exec.prefix` and build every other command on top of it. When
    you fall back to the host, put the reason in `exec.note`; when the host toolchain is a
@@ -116,8 +137,24 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    presence check (`which timeout`) finds it and would silently produce checks that run
    nothing and report success. When `timeoutTool` is `null`, skills must not silently drop the
    timeout: they run the command and say that a hang cannot be bounded automatically.
-8. **`hasDatabase`** — a `docker-compose.yml` database service, a `schema.sql`, `db/install.xml`,
-   or migrations. Gates the data-safety rules below.
+8. **`hasDatabase`** — gates the data-safety rules below, so **getting this wrong silently
+   disables them.** Do not decide it from one marker file. Check, in this order, and stop at the
+   first hit:
+
+   - **Does the code query a database?** This is the reliable signal and the one to trust:
+     `$DB->` or `get_record`/`get_records` (Moodle), an ORM or query builder, `PDO`, `sqlalchemy`,
+     `knex`, a raw `SELECT` in a string. One grep answers it.
+   - a `docker-compose.yml` service for a database engine;
+   - schema or migrations in any form — `schema.sql`, `db/install.xml`, `db/tables/`,
+     `db/upgrade.php`, a `migrations/` directory, `alembic/`.
+
+   **A missing `install.xml` does not mean "no database."** A Moodle plugin may define its schema
+   entirely through `db/tables/` and `db/upgrade.php` and still write to dozens of tables. If the
+   code says `$DB->`, the answer is `true` — whatever the file layout looks like.
+
+   When unsure, answer **`true`**. The cost of a wrong `true` is a few extra questions about
+   dry-runs; the cost of a wrong `false` is the data-safety rules silently not applying to code
+   that writes student records.
 
 ## Family notes worth carrying
 
