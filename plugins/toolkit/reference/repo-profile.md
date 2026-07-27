@@ -16,6 +16,9 @@ test command errors with "not found"). After detection, write the file.
 Add `.claude/repo-profile.json` to `.gitignore` if it is not already covered — it describes
 one developer's machine, not the project.
 
+The example below is what this looks like on macOS. The exact command strings differ per
+platform (see "Cross-platform notes") — that is precisely what the cache is for.
+
 ```json
 {
   "platform": "macos | linux | windows",
