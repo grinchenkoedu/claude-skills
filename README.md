@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
-Six skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
+Seven skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
 development day: work out what to build, build it, check your own work, review a colleague's
 pull request, deal with the comments on yours, and prove the result actually works.
 
@@ -156,6 +156,7 @@ They follow the order of the work:
 
 | Command | What it does | Changes your code? |
 |---|---|---|
+| `/init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
 | `/plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/review` | Checks your own changes before you push them | No |
@@ -231,6 +232,32 @@ Runs the tests *and* actually runs the export, then gives a verdict — includin
 list of anything it could not check.
 
 ## Each skill in detail
+
+### `/init` — give this repository a CLAUDE.md
+
+```
+/init
+/init --refresh
+/init --dry-run
+```
+
+`CLAUDE.md` is read at the start of every session in a repository, so it is where the build and
+test commands and the handful of rules that actually get broken here belong. `/init` detects the
+project family — Moodle plugin, PHP app, CMS, Python — fills in the real commands, and adds that
+family's conventions and security rules.
+
+The shared part sits inside markers:
+
+```markdown
+<!-- toolkit:begin family-rules -->
+...maintained by /init...
+<!-- toolkit:end family-rules -->
+```
+
+`--refresh` replaces **only** that block, so anything you wrote yourself survives. An existing
+`CLAUDE.md` without markers is never overwritten — it asks first.
+
+Run it once per repository, and again when the family rules improve.
 
 ### `/plan` — work out what to build
 

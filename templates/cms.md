@@ -1,0 +1,73 @@
+# Family template — CMS (WordPress and similar)
+
+For a site built on a CMS: a theme, a plugin, or site-specific code around a core you do not
+own. The defining constraint is that **the core is not yours** — it updates underneath you, and
+anything you change in it is lost and unsupported.
+
+`/init` copies the block below into `CLAUDE.md` between the markers.
+
+---
+
+<!-- toolkit:begin family-rules -->
+
+## CMS conventions
+
+### The core is not ours
+
+- **Never edit core files.** Changes are wiped by the next update and leave the site
+  unsupportable. Extend through the documented seams: a child theme, a plugin, hooks and
+  filters.
+- **Never edit a third-party plugin or theme in place** for the same reason. Fork it properly or
+  override through the provided hooks.
+- Keep core, themes and plugins **updated**. On a public CMS the overwhelming majority of
+  compromises come through a known vulnerability in an out-of-date component, not through
+  bespoke code. Treat a pending security update as urgent work, not backlog.
+- Remove what is unused. Every deactivated-but-installed plugin is still code on disk and still
+  a candidate for exploitation.
+
+### Input, output, and the three checks
+
+WordPress-style APIs are named below; the equivalents in another CMS follow the same shape.
+
+- **Sanitise on input.** Never trust `$_GET`, `$_POST`, `$_REQUEST` or `$_COOKIE`. Run each
+  through the narrowest sanitiser that fits — `sanitize_text_field()`, `absint()`,
+  `sanitize_email()`, `esc_url_raw()`.
+- **Escape on output, per context.** `esc_html()` in the body, `esc_attr()` inside an attribute,
+  `esc_url()` for links, `wp_kses_post()` where limited markup is genuinely wanted. Escape at
+  the point of output, not on the way in — the same value can be safe in one context and an
+  injection in another.
+- **Nonces on every state-changing action.** `wp_nonce_field()` in the form,
+  `check_admin_referer()` or `wp_verify_nonce()` on the handler. A form without one is a
+  cross-site request forgery hole.
+- **Capabilities, not roles.** `current_user_can('edit_others_posts')` on the action itself.
+  Hiding an admin menu entry is not access control; the endpoint remains reachable.
+- **`$wpdb->prepare()` for every query with a variable**, including integers. Never concatenate
+  into SQL.
+
+Those four — sanitise, escape, nonce, capability — are the checks that get skipped under time
+pressure, and each one skipped is a real hole rather than a style lapse.
+
+### Files, uploads and secrets
+
+- Uploads go through the CMS media API, validated by inspecting content rather than the
+  supplied name or MIME header.
+- Never place executable code in an uploads directory, and ensure that directory cannot execute.
+- Credentials and salts live in the configuration file, which is **not committed**. Confirm the
+  ignore rules cover it and that it sits outside the web root where the host allows.
+- Disable file editing from the admin UI (`DISALLOW_FILE_EDIT`) — it turns any admin account
+  compromise into arbitrary code execution.
+- Turn display of errors off in production; log instead. A stack trace in a page reveals paths
+  and versions.
+
+### Style
+
+- Follow the CMS's own coding standards rather than a general PHP guide — its linter and its
+  reviewers assume them.
+- Prefix every global function, class, option key and database table with the theme or plugin
+  slug. The global namespace is shared with every other plugin on the site, and a collision is
+  a hard-to-trace breakage.
+- Enqueue scripts and styles properly (`wp_enqueue_script`/`_style`) with declared dependencies
+  and a version string. Never hard-code a `<script>` tag into a template.
+- Use the CMS's translation functions for user-facing text rather than inline literals.
+
+<!-- toolkit:end family-rules -->

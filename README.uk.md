@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
-Шість навичок (skills) для [Claude Code](https://claude.com/claude-code), які покривають
+Сім навичок (skills) для [Claude Code](https://claude.com/claude-code), які покривають
 звичайний робочий день розробника: зрозуміти, що саме треба зробити, зробити це, перевірити
 власну роботу, відрецензувати чужий пул-реквест, опрацювати коментарі до свого та переконатися,
 що результат справді працює.
@@ -153,6 +153,7 @@ Copy-Item -Recurse -Force claude-skills\plugins\toolkit\reference "$HOME\.claude
 
 | Команда | Що робить | Змінює код? |
 |---|---|---|
+| `/init` | Створює `CLAUDE.md` цього репозиторію — команди та правила його родини | **Так** (один файл) |
 | `/plan` | Перетворює запит на конкретний план, звірений із реальним кодом | Ні |
 | `/implement` | Виконує план крок за кроком, відмічаючи прогрес | **Так** |
 | `/review` | Перевіряє ваші власні зміни перед відправкою | Ні |
@@ -229,6 +230,32 @@ Claude знайде код експорту, прочитає його, пере
 того, що перевірити не вдалося.
 
 ## Кожна навичка докладно
+
+### `/init` — створити `CLAUDE.md` для репозиторію
+
+```
+/init
+/init --refresh
+/init --dry-run
+```
+
+`CLAUDE.md` читається на початку кожної сесії в репозиторії, тож саме там мають бути команди
+збірки й тестів і ті кілька правил, які тут справді порушують. `/init` визначає родину проєкту —
+плагін Moodle, PHP-застосунок, CMS, Python — підставляє справжні команди й додає домовленості та
+правила безпеки цієї родини.
+
+Спільна частина лежить між маркерами:
+
+```markdown
+<!-- toolkit:begin family-rules -->
+...підтримується /init...
+<!-- toolkit:end family-rules -->
+```
+
+`--refresh` замінює **лише** цей блок, тож написане вами руками зберігається. Наявний
+`CLAUDE.md` без маркерів ніколи не перезаписується — спершу буде запитання.
+
+Запустіть один раз на репозиторій і ще раз, коли правила родини покращаться.
 
 ### `/plan` — зрозуміти, що робити
 
