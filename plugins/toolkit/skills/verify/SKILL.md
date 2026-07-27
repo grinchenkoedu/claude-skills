@@ -39,6 +39,16 @@ time:
 - Does the runtime surface need something you do not have — a host application, a credential,
   an external service?
 
+**Everything that exercises the project runs through the profile's `exec.prefix`** — its
+container, not your machine. The stored `test`, `lint` and `runtime` commands already carry it;
+any probe you compose yourself needs it too. On the host stay: `git`, `gh`, file reading, and
+HTTP requests to a published port (those go to `localhost:<port>`, not through `exec`).
+
+This matters most here, because this skill's whole output is a claim about whether something
+works. A suite that passed against your machine's runtime instead of the project's has not
+verified the project — if `exec.kind` is `host`, the verdict must say which versions were
+actually used.
+
 Every blocker gets a **category** and a one-line way out:
 
 | Category | Means | Example |

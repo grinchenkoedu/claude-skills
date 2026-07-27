@@ -99,7 +99,13 @@ For each **agree** verdict, in order:
 3. Commit, referencing what it addresses:
    `Fix: <one-line description of the finding>`
 4. If the repository has a lint or test command in the profile and the change is testable, run
-   the scoped version now. A failure means the fix is wrong — fix the fix before continuing.
+   the scoped version now, **through the profile's `exec.prefix`** — the project's container,
+   not your machine, so the check uses the version the project targets. A failure means the fix
+   is wrong; fix the fix before continuing.
+
+   Note that a compose service mounts the *primary* checkout, not this worktree. Either use an
+   image-based prefix mounting the worktree, or record the fix as unverified — do not run the
+   check against the wrong tree and call it passed. `git`, `gh` and file edits stay on the host.
 
 **If a commit hook fails, that finding is skipped and reported as skipped.** Never pass
 `--no-verify`. The hook is there for a reason and silencing it is not resolving anything.

@@ -52,6 +52,14 @@ Check the working tree:
 Read the task file. Echo the goal back in one sentence before touching anything — a wrong task
 caught here costs nothing.
 
+**Everything that touches the project's toolchain runs through the profile's `exec.prefix`** —
+its container, not your machine. The stored `install`, `lint`, `test`, `build` and `runtime`
+commands already include it; anything you compose yourself (a one-off script, a database query,
+a single-file lint) must be prefixed too. `git`, `gh`, reading and editing files, and HTTP
+requests to a published port stay on the host. If the profile fell back to `exec.kind: host`,
+say so when you report test results — you tested against your machine's versions, not the
+project's.
+
 ## Step 2 — Make sure there is a plan
 
 If the input already has acceptance criteria and ordered steps, use them as they are.
