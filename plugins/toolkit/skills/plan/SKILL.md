@@ -175,7 +175,8 @@ The plan was written to be executed without re-deriving it.
   A data fix must specify dry-run by default, safe re-runs, and bounded scope with an expected
   row count. Design it here; write it in `/implement`.
 - **One clarifying question, maximum**, and only when classification is genuinely blocked.
-- **Absolute paths. English. No essays** — a reader of the summary alone should be able to act.
+- **Absolute paths. English or Ukrainian. No essays** — a reader of the summary alone should be
+  able to act.
 
 ## Edge cases
 
