@@ -47,7 +47,9 @@ could do yourself; they just do it consistently and without forgetting the borin
 which is exactly where mistakes come from.
 
 Four of them (`/gku:plan`, `/gku:review`, `/gku:pr-review`, `/gku:verify`) never change your code at all.
-Two of them do (`/gku:implement`, `/gku:pr-resolve`), and both tell you what they are about to do.
+Three do (`/gku:implement`, `/gku:fix`, `/gku:pr-resolve`), and each tells you what it is about to
+do. `/gku:pr` changes nothing locally; it pushes commits you already made and opens the pull
+request.
 
 ## Before you start
 
@@ -57,7 +59,7 @@ You need:
 2. **git** — you have this already if you are cloning repositories.
    **On Windows, install [Git for Windows](https://git-scm.com/download/win)**, which includes
    Git Bash. Claude Code uses it to run commands, and these skills assume it is there.
-3. **The GitHub CLI (`gh`)**, for the two pull-request skills:
+3. **The GitHub CLI (`gh`)**, for the three pull-request skills:
 
    ```bash
    winget install --id GitHub.cli     # Windows
@@ -72,8 +74,8 @@ You need:
    gh auth status
    ```
 
-   `/gku:plan`, `/gku:implement`, `/gku:review` and `/gku:verify` work without `gh`. Only `/gku:pr-review` and
-   `/gku:pr-resolve` need it, because they talk to GitHub.
+   `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:fix` and `/gku:verify` work without `gh`.
+   Only `/gku:pr`, `/gku:pr-review` and `/gku:pr-resolve` need it, because they talk to GitHub.
 
 4. **Docker** — [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows
    and macOS, Docker Engine on Linux. **Strongly recommended on every platform**, not just
@@ -106,8 +108,8 @@ In Claude Code, run these two commands:
 /plugin install gku@grinchenkoedu
 ```
 
-That is all. Type `/` and you will see `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:pr-review`,
-`/gku:pr-resolve` and `/gku:verify` in the list.
+That is all. Type `/` and you will see `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:fix`,
+`/gku:pr`, `/gku:pr-review`, `/gku:pr-resolve` and `/gku:verify` in the list.
 
 ### Updating
 
@@ -181,15 +183,14 @@ The plugin route is easier to keep up to date. Use this only if you have a reaso
 They follow the order of the work:
 
 ```
-   /gku:init ──▶ /gku:plan  ──▶  /gku:implement  ──▶  /gku:review  ──▶  open a pull request
-(once per repo)
-                                                      │
-                                    ┌─────────────────┴──────────────────┐
-                                    ▼                                    ▼
-                              /gku:pr-review                           /gku:pr-resolve
-                        (someone else's PR)                  (comments on yours)
-                                    │                                    │
-                                    └─────────────▶ /gku:verify ◀────────────┘
+   /gku:init ──▶ /gku:plan ──▶ /gku:implement ──▶ /gku:review ⇄ /gku:fix ──▶ /gku:pr
+(once per repo)                                                                 │
+                                       ┌────────────────────────────────────────┤
+                                       ▼                                        ▼
+                                /gku:pr-review                          /gku:pr-resolve
+                            (someone else's PR)                      (comments on yours)
+                                       │                                        │
+                                       └───────────────▶ /gku:verify ◀──────────┘
 ```
 
 | Command | What it does | Changes your code? |
@@ -198,6 +199,8 @@ They follow the order of the work:
 | `/gku:plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/gku:implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/gku:review` | Checks your own changes before you push them | No |
+| `/gku:fix` | Investigates a symptom, or applies review findings — one commit each | **Yes** |
+| `/gku:pr` | Opens the pull request for this branch, or updates the existing one | No (pushes commits you made) |
 | `/gku:pr-review` | Reviews someone else's pull request properly | No |
 | `/gku:pr-resolve` | Works through the review comments on *your* pull request | **Yes** |
 | `/gku:verify` | Runs the tests and drives the real thing to prove it works | No |
@@ -245,10 +248,35 @@ and runs the tests. You can watch every edit and stop at any time.
 /gku:review
 ```
 
-You get a short list: blockers to fix first, warnings worth a look, and nits you can ignore.
-Fix the blockers, then push and open a pull request as you normally would.
+You get a short list: blockers to fix first, warnings worth a look, and nits you can ignore. It
+ends by naming what to run next, so you are not left holding a list.
 
-**4. Deal with the review comments.**
+**4. Apply the fixes.**
+
+```
+/gku:fix
+```
+
+It picks up the findings from the review you just ran, **re-checks each one against the code**
+before touching it — some will already be fixed, and some will turn out to be wrong — then
+applies the blockers and warnings, one commit each, and re-runs the tests. Nits are listed, not
+applied, unless you add `--nits`.
+
+> The same command also starts from cold. `/gku:fix the export merges same-named departments`
+> in a brand-new session investigates the report first — finds the code, reproduces it, proves
+> the cause — and then fixes it, rather than handing you a plan to run.
+
+**5. Open the pull request.**
+
+```
+/gku:pr
+```
+
+It reads the whole branch, checks that it **reads as one pull request** — and asks first if it
+looks like a feature with an unrelated fix riding along — then pushes and writes a description
+from the actual diff, using your repository's template if it has one.
+
+**6. Deal with the review comments.**
 
 An automated reviewer comments on the pull request. Instead of fixing each one by hand:
 
@@ -260,7 +288,7 @@ It checks **every comment against the actual code first**, then fixes the ones t
 right, pushes back with evidence on the ones that are wrong, and asks you about anything
 genuinely ambiguous. One commit per fix, one reply per comment.
 
-**5. Prove it works.**
+**7. Prove it works.**
 
 ```
 /gku:verify
@@ -324,8 +352,9 @@ and how to check the result.
 `--review` is for when the file *already* proposes a solution: it judges that proposal rather
 than inventing a different one.
 
-**It writes no code.** Use it when you are not yet sure what the right change is. For an
-obvious one-line fix, skip it.
+**It writes no code.** Use it when you are not yet sure what the right change is, or when the
+answer needs agreeing before anyone builds it. For something that is simply broken and wants
+fixing, `/gku:fix` does the same investigation and then acts on it.
 
 ### `/gku:implement` — build it
 
@@ -374,6 +403,97 @@ project that declares `>=7.4`.
 
 `--deep` allows one helper agent to double-check callers of code you renamed. It costs more;
 use it when you have touched shared code.
+
+It ends by naming the next command — `/gku:fix` when there is something to fix, `/gku:pr` when
+there is not. It never applies anything itself.
+
+### `/gku:fix` — find what is wrong, then fix it
+
+```
+/gku:fix
+/gku:fix REVIEW.md
+/gku:fix the export blows up when a department has no head
+/gku:fix --nits
+/gku:fix --dry-run
+```
+
+Two jobs in one command, because in practice they are the same job.
+
+**Given findings**, it applies them — **blockers and warnings by default**, one commit each,
+then re-runs the tests. Nits are listed rather than applied; they are matters of taste and they
+bury the real changes in a diff somebody has to read. `--nits` takes them too. This is the half
+`/gku:review` deliberately leaves undone.
+
+**Given a symptom** — a sentence describing something broken — **it investigates first**, the
+way `/gku:plan` does: work out whether you are describing a bug, a feature, a question or a data
+problem; find the code; reproduce it; prove the cause. Only then does it edit anything.
+
+The difference from `/gku:plan` is what happens next: **when the cause is proven and the fix is
+clear, it acts.** No plan file, no approval step for your own bug report. It tells you what it
+found in two or three lines and fixes it. It asks only when the answer would change the fix —
+two defensible options, a cause outside this branch, or something that turns out to be a feature
+rather than a fix. *A question it could answer by reading more code is not a question.*
+
+That is what makes it a reasonable way to **open a fresh session on a bug report**. Nothing
+needs to be in the conversation already:
+
+- **with nothing** — findings from a `/gku:review` earlier in the conversation, or that review
+  run inline if there are none;
+- **with a file** — `REVIEW.md`, or any markdown holding findings;
+- **with a sentence** — investigate it, then fix it.
+
+It is explicit about the difference between a **proven cause** and a **hypothesis**, and it says
+which one it acted on. When it reproduced the symptom, it re-runs that same reproduction after
+the fix — a green test suite does not prove your bug is gone; the thing that used to fail no
+longer failing does.
+
+**It re-checks every finding against the code before editing anything**, including findings it
+produced itself a minute ago. Findings go stale: the file moved, somebody already fixed it, or
+the claim was wrong to begin with. Each one comes back *fixed*, *already resolved*, *does not
+hold* with the evidence, or *needs your decision* — and the ones that do not hold cost you
+nothing but a line in the report.
+
+`--dry-run` stops after the diagnosis, which is `/gku:fix` behaving like `/gku:plan` when that
+is what you want from it.
+
+It applies **the smallest change that resolves each finding**, with no drive-by refactoring, and
+it never pushes. When a "fix" turns out to need a redesign, it stops on that finding and says so
+rather than quietly building something larger.
+
+> It will not re-run the review afterwards, on purpose. Review → fix → review → fix is a loop
+> that spends a lot of usage for very little. It names the next command; you choose it.
+
+### `/gku:pr` — open the pull request
+
+```
+/gku:pr
+/gku:pr "Keep same-named departments separate in the statistics export"
+/gku:pr --draft
+/gku:pr --dry-run
+```
+
+Opens the pull request for the current branch, or updates the one already linked to it. It
+pushes commits you have already made; it never commits for you, never merges, and never
+force-pushes.
+
+**The part worth having: it checks the branch reads as one pull request.** A branch carrying a
+feature *and* an unrelated bug fix *and* a formatting sweep is three reviews pretending to be
+one, and that is where review quality quietly disappears. When it finds that, it stops, shows
+you the groups it found — the sentence describing each, its commits, its files — and asks:
+
+- **open one pull request anyway**, which is often the right answer for a small passenger; or
+- **stop, so you can split it**, with the commits that would go in each named for you.
+
+It will not split the branch itself. Rewriting your history is not its decision to make.
+
+Many files with one purpose, or an implementation with its tests and its migration, are **one**
+change — it does not flag those.
+
+The description comes from the actual diff and your repository's own
+`.github/pull_request_template.md` if it has one, with the title matching the house style it
+reads from your recent merged pull requests. The testing section says what was actually run and
+**admits it when nothing was**. Updating an existing pull request never silently overwrites a
+description somebody wrote by hand.
 
 ### `/gku:pr-review` — review someone else's pull request
 
@@ -495,6 +615,8 @@ Practical advice:
 2. **Use `/clear` between unrelated tasks.** A long conversation is re-sent with every
    message, so an unrelated three-hour history makes every request more expensive.
 3. **Run `/gku:review` often and `--deep` rarely.** The plain version catches most of it.
+   `/gku:fix` deliberately does not re-review afterwards — one review, one fix pass, then decide.
+   Looping the two is the easiest way to burn a limit on diminishing returns.
 4. **Prefer `/gku:implement` on a written task file** over a vague sentence — it gets it right the
    first time more often, and a redo costs more than a good brief.
 5. **If you hit a limit mid-build, do not start over.** Wait for the reset and use
@@ -517,6 +639,28 @@ repository's `AGENTS.md` — the skills read that file.
 **`/gku:implement` refuses to start.**
 Usually uncommitted changes it did not make. Commit or stash them first — it will not build on
 top of work it cannot account for.
+
+**`/gku:pr` says my branch looks like more than one pull request.**
+It found groups of commits with no thread between them. Read the groups it printed: if the extra
+part is small and related enough, tell it to open one pull request anyway — that is a normal
+answer, not a workaround. If they really are separate, it names which commits belong where, but
+you split the branch yourself; it will not rewrite your history.
+
+**`/gku:fix` changed nothing and said the findings do not hold.**
+Working as intended. It re-checks each finding against the code first, and a review — including
+its own — is sometimes wrong about your codebase. Read the evidence it gave per finding; if you
+disagree with the re-check, say so and it will fix it.
+
+**`/gku:fix` called its cause a "hypothesis".**
+It could not reproduce the symptom, so it is telling you the difference between what it proved
+and what it inferred from reading the code. Weigh the fix accordingly. Giving it the input that
+reproduces the problem — the record id, the command, the request — turns the hypothesis into a
+proven cause on the next run.
+
+**`/gku:fix` investigated and then asked me a question instead of fixing.**
+It only does that when the answer changes the fix: two defensible options, a cause in code this
+branch never touched, or something that turns out to be a feature rather than a bug. Answer it
+and it carries on. If you want the diagnosis without any edits, use `--dry-run`.
 
 **`/gku:verify` says "cannot tell".**
 That is deliberate, not a failure. Read the blocked checks and their categories; each has a

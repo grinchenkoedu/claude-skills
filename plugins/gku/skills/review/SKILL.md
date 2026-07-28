@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, and the failure modes that green tests miss. Review-only; never edits, commits or pushes.
+description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
 argument-hint: "[branch] [--target <base>] [--deep] [--report]"
 user-invocable: true
 ---
@@ -142,6 +142,17 @@ Close with one line naming what you checked and did not find problems in — con
 tests, data safety, wiring — so a clean review reads as *covered*, not *skipped*. Name any file
 you judged from the diff alone, and say so if the lint step was skipped.
 
+**Then name the next step**, on its own line. A review that ends in a list leaves the developer
+to work out what to do with it, which is a step they should not have to take:
+
+- **blockers or warnings** → `/gku:fix` applies them, one commit each, re-checking every finding
+  against the code first. `/gku:fix --nits` takes the nits too.
+- **nits only, or clean** → `/gku:pr` opens the pull request; `/gku:verify` first if the change
+  needs proving rather than re-reading.
+
+Suggest it; do not run it. This skill does not edit, and the developer decides whether a finding
+is worth acting on.
+
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
 
 Write `REVIEW.md` at the repository root **only** with `--report`, or when there is at least
@@ -149,7 +160,7 @@ one blocker. Print its absolute path.
 
 ## Rules
 
-- **Never edit, commit or push.** You list; the developer decides.
+- **Never edit, commit or push.** You list; the developer decides, and `/gku:fix` applies.
 - **Absolute paths** everywhere, so they are clickable in an editor.
 - **Never suggest `--no-verify`, `--force`, or `git push --force`.** If a hook fails, the fix
   is the code, not the flag.

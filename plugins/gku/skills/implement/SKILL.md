@@ -145,14 +145,15 @@ Then, in chat:
 - the acceptance criteria, ticked or explicitly not met;
 - files changed, tests added, the quoted test result;
 - anything you noticed but deliberately left alone;
-- the next command: `/gku:review` before pushing.
+- the next command: `/gku:review` before pushing — then `/gku:fix` for what it finds, and
+  `/gku:pr` to open the pull request.
 
 Do not report success when tests are failing or a criterion is unmet. Say exactly what stands.
 
 ## Rules
 
 - **Local only.** Never push, never open a pull request, never touch a live system. Pushing is
-  a decision a person makes, after `/gku:review`.
+  a decision a person makes, after `/gku:review` — and `/gku:pr` is where it happens.
 - **Sequential. No agent fleets, no background workflows.** One working tree, in order.
 - **The task file is the progress log.** Update it as each step lands, so an interrupted run
   resumes instead of restarting.
