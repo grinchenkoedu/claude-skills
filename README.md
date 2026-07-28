@@ -199,7 +199,7 @@ They follow the order of the work:
 | `/gku:plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/gku:implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/gku:review` | Checks your own changes before you push them | No |
-| `/gku:fix` | Applies what the review found, one commit per finding | **Yes** |
+| `/gku:fix` | Investigates a symptom, or applies review findings — one commit each | **Yes** |
 | `/gku:pr` | Opens the pull request for this branch, or updates the existing one | No (pushes commits you made) |
 | `/gku:pr-review` | Reviews someone else's pull request properly | No |
 | `/gku:pr-resolve` | Works through the review comments on *your* pull request | **Yes** |
@@ -261,6 +261,10 @@ It picks up the findings from the review you just ran, **re-checks each one agai
 before touching it — some will already be fixed, and some will turn out to be wrong — then
 applies the blockers and warnings, one commit each, and re-runs the tests. Nits are listed, not
 applied, unless you add `--nits`.
+
+> The same command also starts from cold. `/gku:fix the export merges same-named departments`
+> in a brand-new session investigates the report first — finds the code, reproduces it, proves
+> the cause — and then fixes it, rather than handing you a plan to run.
 
 **5. Open the pull request.**
 
@@ -348,8 +352,9 @@ and how to check the result.
 `--review` is for when the file *already* proposes a solution: it judges that proposal rather
 than inventing a different one.
 
-**It writes no code.** Use it when you are not yet sure what the right change is. For an
-obvious one-line fix, skip it.
+**It writes no code.** Use it when you are not yet sure what the right change is, or when the
+answer needs agreeing before anyone builds it. For something that is simply broken and wants
+fixing, `/gku:fix` does the same investigation and then acts on it.
 
 ### `/gku:implement` — build it
 
@@ -402,33 +407,54 @@ use it when you have touched shared code.
 It ends by naming the next command — `/gku:fix` when there is something to fix, `/gku:pr` when
 there is not. It never applies anything itself.
 
-### `/gku:fix` — apply what the review found
+### `/gku:fix` — find what is wrong, then fix it
 
 ```
 /gku:fix
 /gku:fix REVIEW.md
 /gku:fix the export blows up when a department has no head
 /gku:fix --nits
+/gku:fix --dry-run
 ```
 
-The other half of `/gku:review`. It takes the findings and applies them: **blockers and warnings
-by default**, one commit each, then re-runs the tests. Nits are listed rather than applied —
-they are matters of taste, and they bury the real changes in a diff somebody has to read. Add
-`--nits` to take them too.
+Two jobs in one command, because in practice they are the same job.
 
-It works three ways, which is what makes it usable **at the start of a fresh session** and not
-just as a follow-on:
+**Given findings**, it applies them — **blockers and warnings by default**, one commit each,
+then re-runs the tests. Nits are listed rather than applied; they are matters of taste and they
+bury the real changes in a diff somebody has to read. `--nits` takes them too. This is the half
+`/gku:review` deliberately leaves undone.
 
-- **with nothing** — it uses the findings from a `/gku:review` earlier in the conversation, or
-  runs that review inline if there are none;
-- **with a file** — `REVIEW.md`, or any markdown holding a list of findings;
-- **with a sentence** — fixes that one thing and nothing else.
+**Given a symptom** — a sentence describing something broken — **it investigates first**, the
+way `/gku:plan` does: work out whether you are describing a bug, a feature, a question or a data
+problem; find the code; reproduce it; prove the cause. Only then does it edit anything.
+
+The difference from `/gku:plan` is what happens next: **when the cause is proven and the fix is
+clear, it acts.** No plan file, no approval step for your own bug report. It tells you what it
+found in two or three lines and fixes it. It asks only when the answer would change the fix —
+two defensible options, a cause outside this branch, or something that turns out to be a feature
+rather than a fix. *A question it could answer by reading more code is not a question.*
+
+That is what makes it a reasonable way to **open a fresh session on a bug report**. Nothing
+needs to be in the conversation already:
+
+- **with nothing** — findings from a `/gku:review` earlier in the conversation, or that review
+  run inline if there are none;
+- **with a file** — `REVIEW.md`, or any markdown holding findings;
+- **with a sentence** — investigate it, then fix it.
+
+It is explicit about the difference between a **proven cause** and a **hypothesis**, and it says
+which one it acted on. When it reproduced the symptom, it re-runs that same reproduction after
+the fix — a green test suite does not prove your bug is gone; the thing that used to fail no
+longer failing does.
 
 **It re-checks every finding against the code before editing anything**, including findings it
 produced itself a minute ago. Findings go stale: the file moved, somebody already fixed it, or
 the claim was wrong to begin with. Each one comes back *fixed*, *already resolved*, *does not
 hold* with the evidence, or *needs your decision* — and the ones that do not hold cost you
 nothing but a line in the report.
+
+`--dry-run` stops after the diagnosis, which is `/gku:fix` behaving like `/gku:plan` when that
+is what you want from it.
 
 It applies **the smallest change that resolves each finding**, with no drive-by refactoring, and
 it never pushes. When a "fix" turns out to need a redesign, it stops on that finding and says so
@@ -624,6 +650,17 @@ you split the branch yourself; it will not rewrite your history.
 Working as intended. It re-checks each finding against the code first, and a review — including
 its own — is sometimes wrong about your codebase. Read the evidence it gave per finding; if you
 disagree with the re-check, say so and it will fix it.
+
+**`/gku:fix` called its cause a "hypothesis".**
+It could not reproduce the symptom, so it is telling you the difference between what it proved
+and what it inferred from reading the code. Weigh the fix accordingly. Giving it the input that
+reproduces the problem — the record id, the command, the request — turns the hypothesis into a
+proven cause on the next run.
+
+**`/gku:fix` investigated and then asked me a question instead of fixing.**
+It only does that when the answer changes the fix: two defensible options, a cause in code this
+branch never touched, or something that turns out to be a feature rather than a bug. Answer it
+and it carries on. If you want the diagnosis without any edits, use `--dry-run`.
 
 **`/gku:verify` says "cannot tell".**
 That is deliberate, not a failure. Read the blocked checks and their categories; each has a
