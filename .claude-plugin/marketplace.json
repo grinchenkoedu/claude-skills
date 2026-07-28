@@ -7,7 +7,7 @@
     {
       "name": "gku",
       "source": "./plugins/gku",
-      "description": "Chained skills for everyday development with Claude Code: /gku:init (write this repo's CLAUDE.md), /gku:plan (turn a request or brief into a grounded plan), /gku:implement (build it, checkpointed and resumable), /gku:review (check your own diff before pushing), /gku:pr-review (deep review of someone else's pull request), /gku:pr-resolve (act on review comments), /gku:verify (run the tests and drive the real thing). Repository-agnostic — a cached profile detects the stack, test command and runtime surface. Designed to be economical: no background agent swarms, no sub-agents by default, chat-first output."
+      "description": "Chained skills for everyday development with Claude Code: /gku:init (write this repo's CLAUDE.md), /gku:plan (turn a request or brief into a grounded plan), /gku:implement (build it, checkpointed and resumable), /gku:review (check your own diff before pushing), /gku:fix (apply what the review found, one commit each), /gku:pr (open or update the pull request for this branch), /gku:pr-review (deep review of someone else's pull request), /gku:pr-resolve (act on review comments), /gku:verify (run the tests and drive the real thing). Repository-agnostic — a cached profile detects the stack, test command and runtime surface. Designed to be economical: no background agent swarms, no sub-agents by default, chat-first output."
     }
   ]
 }
