@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
+description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, a security pass over the well-known flaws (injection, escaping, login and permission checks, CSRF, secrets, files, outbound requests), and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
 argument-hint: "[branch] [--target <base>] [--deep] [--report]"
 user-invocable: true
 ---
@@ -67,9 +67,11 @@ Assign every finding one of three severities:
 - **BLOCKER** — do not push this. A secret or credential committed; a change that silently
   loses or corrupts data; a mass write with no bounded scope; a batch script with no dry-run;
   a data-fix script that duplicates on a second run; a removed or renamed function still
-  called elsewhere; user input reaching SQL, HTML or a spreadsheet cell unescaped; broken
-  authorisation; a Moodle `classes/`, `db/`, cache or task change with **no `version.php`
-  bump** (the live site will not see it).
+  called elsewhere; user input reaching SQL, a shell, the filesystem, HTML or a spreadsheet
+  cell unescaped; an entry point with no login or permission check; a record reachable by
+  changing an id; a state change with no CSRF token (the full list, with what counts as proof
+  for each, is in step 3b); a Moodle `classes/`, `db/`, cache or task change with **no
+  `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a value that can be null and is not checked; a
   loop that can run forever on unexpected data; a comment explaining *what* instead of *why*.
@@ -79,6 +81,43 @@ Assign every finding one of three severities:
 offending code, drop it one severity and mark it `[unverified]`. Nits can be looser — they
 are cheap to dismiss. Overall, lean toward mentioning things: a missed bug costs more than a
 nit somebody waves away. The high bar is on the *label*, not on whether you speak up.
+
+## Step 3b — Security pass
+
+Read the changed code against `reference/security-checklist.md` in this plugin. It is the list
+of well-known flaws — injection into SQL, shell, filesystem and templates; output that skips
+escaping; entry points with no login or permission check; records fetched by id with no
+ownership check; mass assignment; state changes with no CSRF token; committed secrets; uploads
+and downloads; the server fetching a URL the user chose; weak tokens and hashing; data
+exposure; missing resource limits; vulnerable dependencies — each with the code pattern to
+look for, what counts as proof, and the severity it carries.
+
+This pass is not optional and not a separate mode. It is part of every review, the way the
+tests are, and it is the one part the repository's own conventions document is least likely
+to spell out. Do it in this order:
+
+1. **Run the mechanical sweep** from the checklist over the added lines of the diff. Hits are
+   leads; open the file at each one. Misses are not clearance.
+2. **For every changed entry point** — page, route, controller action, AJAX handler, external
+   function, CLI script — answer the checklist's four questions by reading: where is the login
+   check, where is the permission check and against which context, where is the token check on
+   a state change, and where does each request value end up. "Nowhere" is a finding.
+3. **For every file read in full in step 2**, walk the checklist's sections that apply to what
+   it does. A file that writes SQL gets section 1; a file that renders gets section 2; a file
+   that reads an id from the request gets section 4.
+
+A security finding is reported like any other: `path:line`, the one-sentence problem, the
+one-sentence fix, and **the input that demonstrates it** — a single quote, `../`, a `<b>` tag,
+the id of another test user's record, the request with its token removed. That input is the
+evidence line; it is all the evidence needed, and a finding without it drops a severity and is
+marked `[unverified]`, same as any other. Never report "consider adding validation" — say
+which line, which value, and what happens.
+
+This is a review of the developer's own code on their own machine. It names mistakes and the
+input that shows each one; it does not build anything beyond that, and it never touches a
+system the developer does not own. If some part of the pass genuinely could not be done, say
+which part and why in the closing line — a silent skip reads as "checked, clean", which is a
+claim the review would then be making falsely.
 
 ## Step 4 — The tests pass. Do they mean anything?
 
@@ -139,8 +178,11 @@ sentence on the fix, and the line of evidence. Group by severity, blockers first
 nits into a single short list.
 
 Close with one line naming what you checked and did not find problems in — conventions, lint,
-tests, data safety, wiring — so a clean review reads as *covered*, not *skipped*. Name any file
-you judged from the diff alone, and say so if the lint step was skipped.
+tests, data safety, wiring, **and the security pass by its parts** (injection, escaping,
+login and permission checks, CSRF, secrets, files, outbound requests — whichever applied to
+this diff) — so a clean review reads as *covered*, not *skipped*. Name any file you judged from
+the diff alone, say so if the lint step was skipped, and say so if any part of the security
+pass was not done and why. A review with no security line is an unfinished review.
 
 **Then name the next step**, on its own line. A review that ends in a list leaves the developer
 to work out what to do with it, which is a step they should not have to take:
@@ -167,6 +209,8 @@ one blocker. Print its absolute path.
 - **Write the review in English or Ukrainian** — match the language the developer is using.
   Quote code and comments in their original language, whatever that is.
 - **No diff dumps.** One sentence per finding.
+- **The security pass is part of every review.** Not only with a flag, not only for "security
+  changes" — a date-formatting fix can still echo a request value unescaped. See step 3b.
 
 ## Edge cases
 

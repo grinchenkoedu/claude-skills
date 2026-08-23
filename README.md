@@ -395,6 +395,17 @@ gives you a list sorted by severity:
 It also checks whether your **tests actually prove anything** — a test with no real assertion,
 or one that mocks away the exact thing you changed, passes while proving nothing.
 
+Every review includes a **security pass** against the well-known flaws — a request value
+reaching SQL, a shell, the filesystem or the page unescaped; an entry point with no login or
+permission check; a record anyone can read by changing an id; a form bound straight to a model;
+a state change with no CSRF token; a committed secret; an upload stored where the server would
+run it; the server fetching a URL the user chose; weak tokens and hashing; a dependency with a
+published advisory. The list, with the code pattern and the proof for each, lives in
+`plugins/gku/reference/security-checklist.md`. A finding names the line and the one input that
+shows it — a single quote, `../`, a `<b>` tag — and nothing more than that is ever built. The
+closing line of the review names which parts of the pass were done, so a skipped part is
+visible rather than silent.
+
 If the project has a lint command, it **lints the files you changed** and reports a parse error
 as a blocker. In a repository with no tests and no working CI, this is the only mechanical check
 standing between a syntax error and a live site. It will tell you when the linter runs a newer
@@ -555,6 +566,12 @@ Tests passing and a feature working are two different claims. This makes both se
 It runs the project's test suite (quoting the actual result line, not "tests pass"), then
 **runs the real thing** — the command, the page, the function — and checks the effect.
 
+Then it **confirms the guards hold**: the same entry point requested with no session, as a test
+account without the permission, with the CSRF token removed, with another account's record id,
+with `../` in a filename, with `<b>` in a text field. Each is one minimal local probe on
+throwaway accounts, each gets its own row — passed, failed, or skipped with a reason — and a
+refusal is the result being looked for. Everything created for it is removed afterwards.
+
 Its most useful feature is honesty about what it could not check. Every skipped check gets a
 category and a way to unblock it, and **"cannot tell" is a valid verdict**. A confident
 "works" resting on three skipped checks is worse than no answer at all.
@@ -711,6 +728,9 @@ a limited plan:
 
 The shared detection logic lives in `plugins/gku/reference/repo-profile.md`. If your skill
 needs to know something about the project, add it there rather than detecting it separately.
+The security checklist that `/gku:review` and `/gku:verify` share lives in
+`plugins/gku/reference/security-checklist.md` — add a flaw there once, with its pattern, proof
+and severity, rather than in each skill.
 
 ## Licence
 
