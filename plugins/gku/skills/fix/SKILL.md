@@ -1,6 +1,6 @@
 ---
 name: fix
-description: Fix what is wrong — the findings from a review still in this conversation, a REVIEW.md, or a symptom you describe in a sentence. A described symptom gets investigated first, the way /gku:plan investigates, until the cause is proven; then it acts instead of writing a plan. Re-checks every finding against the current code before touching it, lands the smallest change per finding, and re-runs the tests. Blockers and warnings by default; nits only when you ask.
+description: Fix what is wrong — the findings from a review still in this conversation, a review report file, or a symptom you describe in a sentence. A described symptom gets investigated first, the way /gku:plan investigates, until the cause is proven; then it acts instead of writing a plan. Re-checks every finding against the current code before touching it, lands the smallest change per finding, and re-runs the tests. Blockers and warnings by default; nits only when you ask.
 argument-hint: "[<what is wrong> | <path/to/review.md>] [--nits] [--blockers-only] [--dry-run]"
 user-invocable: true
 ---
@@ -9,7 +9,7 @@ user-invocable: true
 
 Two jobs in one command, because in practice they are the same job.
 
-**Given findings** — from a `/gku:review` in this conversation, or a `REVIEW.md` — it applies
+**Given findings** — from a `/gku:review` in this conversation, or a review report file — it applies
 them: smallest change first, one commit per finding, then re-runs the tests. That is the half
 `/gku:review` deliberately leaves undone.
 
@@ -33,7 +33,10 @@ and symptoms are traced to a cause you can quote, before anything changes.
   are none, run the review analysis inline first (step 2) and fix what it finds.
 - **A sentence** — `/gku:fix the export blows up when a department has no head`. A symptom, not
   a location: it gets investigated (step 3), then fixed. Nothing else is touched.
-- **A file** — `/gku:fix REVIEW.md`, or any markdown holding a list of findings.
+- **A file** — `/gku:fix .gku/reports/review-my-branch-20260824-143201.md`, or any markdown
+  holding a list of findings. `/gku:review --report` writes its reports under `.gku/reports/`
+  (see `reference/reports.md`); `ls -t .gku/reports/review-*.md 2>/dev/null | head -1` is the
+  last one.
 - `--nits` — apply nits too. Off by default: nits are matters of taste and they bury the real
   changes in a diff somebody has to read.
 - `--blockers-only` — apply blockers, list everything else.

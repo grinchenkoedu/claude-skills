@@ -135,8 +135,10 @@ it keeps the review fair. Close with one line on what the earlier layers already
 
 Under ~25 lines for a clean PR, ~40 with findings.
 
-Write `PR_REVIEW_<n>.md` in the **primary** repository only when there is at least one
-blocker, or four or more findings, or `--report` was passed. Print its absolute path.
+Write a report file only when there is at least one blocker, or four or more findings, or
+`--report` was passed. It goes to `.gku/reports/pr-review-pr-<n>-<timestamp>.md` in the
+**primary** repository — not the worktree, and not any repository root — per
+`reference/reports.md` in this plugin. Print its absolute path.
 
 ## Step 7 — Offer to clean up
 

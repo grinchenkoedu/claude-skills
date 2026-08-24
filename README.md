@@ -28,6 +28,7 @@ MIT licensed.
 - [A worked example](#a-worked-example-start-to-finish)
 - [Each skill in detail](#each-skill-in-detail)
 - [Writing a task file](#writing-a-task-file)
+- [Where the reports go](#where-the-reports-go)
 - [Using these on a Pro plan](#using-these-on-a-pro-plan)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -422,7 +423,7 @@ there is not. It never applies anything itself.
 
 ```
 /gku:fix
-/gku:fix REVIEW.md
+/gku:fix .gku/reports/review-my-branch-20260824-143201.md
 /gku:fix the export blows up when a department has no head
 /gku:fix --nits
 /gku:fix --dry-run
@@ -450,7 +451,7 @@ needs to be in the conversation already:
 
 - **with nothing** — findings from a `/gku:review` earlier in the conversation, or that review
   run inline if there are none;
-- **with a file** — `REVIEW.md`, or any markdown holding findings;
+- **with a file** — a report from `.gku/reports/`, or any markdown holding findings;
 - **with a sentence** — investigate it, then fix it.
 
 It is explicit about the difference between a **proven cause** and a **hypothesis**, and it says
@@ -609,6 +610,28 @@ Keep them in `.tasks/` — `/gku:plan` writes there, `/gku:implement` reads and 
 **Be specific about what "done" means.** That list becomes the acceptance criteria, which is
 what `/gku:implement` builds against and what `/gku:verify` checks. Vague criteria produce vague work.
 
+## Where the reports go
+
+Most answers stay in the chat. When a skill does write a file — `/gku:review`, `/gku:verify` and
+`/gku:pr-review`, on `--report` or when they find a blocker — it goes into one ignored directory,
+never the repository root:
+
+```
+.gku/reports/review-security-pass-20260824-143201.md
+.gku/reports/review-security-pass-20260824-171045.md
+.gku/reports/verify-security-pass-20260824-172230.md
+.gku/reports/pr-review-pr-118-20260824-093700.md
+```
+
+The name is `<kind>-<branch-or-pr>-<UTC timestamp>.md`. The prefix says which skill wrote it,
+the timestamp keeps a second run on the same branch from overwriting the first, and sorting the
+directory sorts it by kind, then branch, then time. Nothing is ever overwritten, so a series of
+reviews collects there for comparison.
+
+The skills add `.gku/` to your `.gitignore` the first time they write one — these are working
+notes about a moment in your working tree, not project history. Delete the directory whenever
+you like; nothing reads it except you and `/gku:fix <path>`.
+
 ## Using these on a Pro plan
 
 Claude Code on a Pro subscription has usage limits that reset periodically. These skills were
@@ -623,7 +646,8 @@ How they keep the cost down:
 - **Reading is capped.** At most five files read in full; everything else judged from the
   diff. When a skill judged a file from the diff alone, it says so.
 - **Answers go in the chat**, not into generated report files. A report is written only when
-  there is a blocker, or when you ask with `--report`.
+  there is a blocker, or when you ask with `--report` — and it goes to `.gku/reports/`, never
+  the repository root (see [Where the reports go](#where-the-reports-go)).
 - **`/gku:implement` is resumable**, so hitting a limit costs you nothing but time.
 
 Practical advice:
@@ -722,7 +746,8 @@ a limited plan:
 - no sub-agents by default, at most one behind `--deep`;
 - no background workflows or agent fleets;
 - read the diff, not the repository, with an explicit cap;
-- answer in the chat; write a file only on a blocker or on request;
+- answer in the chat; write a file only on a blocker or on request, and write it to
+  `.gku/reports/` under the shared naming scheme, never to the repository root;
 - no absolute paths from your own machine in `SKILL.md`;
 - nothing specific to one repository — read the project's own conventions instead.
 
@@ -730,7 +755,9 @@ The shared detection logic lives in `plugins/gku/reference/repo-profile.md`. If 
 needs to know something about the project, add it there rather than detecting it separately.
 The security checklist that `/gku:review` and `/gku:verify` share lives in
 `plugins/gku/reference/security-checklist.md` — add a flaw there once, with its pattern, proof
-and severity, rather than in each skill.
+and severity, rather than in each skill. Where report files go and how they are named is in
+`plugins/gku/reference/reports.md`; a skill that writes one follows it rather than inventing
+its own file name.
 
 ## Licence
 

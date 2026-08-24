@@ -21,7 +21,7 @@ Local only. It never touches a live system and never writes to the pull request.
 - **`<pr-number>`** — check out that pull request's head in a worktree and verify it.
 - **`<branch>`** — verify that branch.
 - `--tests-only` — skip driving the runtime (steps 5 and 5b); just run the suite.
-- `--report` — write `VERIFY.md`. Otherwise the verdict stays in chat.
+- `--report` — write a report file under `.gku/reports/`. Otherwise the verdict stays in chat.
 
 ## Step 1 — Preflight, and be honest about blockers
 
@@ -217,7 +217,9 @@ which refusals were confirmed and which were not checked.
 **"Cannot tell" is a real and useful verdict.** A confident "works" that rests on three
 skipped checks is worse than useless — it is misleading.
 
-Write `VERIFY.md` only with `--report` or when the verdict is "does not work".
+Write a report file only with `--report` or when the verdict is "does not work". It goes to
+`.gku/reports/verify-<branch-slug>-<timestamp>.md` — never the repository root — per
+`reference/reports.md` in this plugin. Print its absolute path.
 
 ## Rules
 

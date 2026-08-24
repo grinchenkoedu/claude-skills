@@ -18,7 +18,8 @@ Review-only. It never edits your code, never commits, never pushes, never posts 
 - `--target <base>` — what to compare against. Defaults to the profile's base branch.
 - `--deep` — allow one sub-agent to cross-check callers of changed code. Costs more; use it
   for changes that touch shared code.
-- `--report` — also write `REVIEW.md`. By default the review stays in the conversation.
+- `--report` — also write a report file under `.gku/reports/`. By default the review stays in
+  the conversation.
 
 ## Step 1 — Work out what changed
 
@@ -197,8 +198,10 @@ is worth acting on.
 
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
 
-Write `REVIEW.md` at the repository root **only** with `--report`, or when there is at least
-one blocker. Print its absolute path.
+Write a report file **only** with `--report`, or when there is at least one blocker. It goes to
+`.gku/reports/review-<branch-slug>-<timestamp>.md` — never the repository root — per
+`reference/reports.md` in this plugin, which also covers creating the directory and making sure
+it is ignored. Print its absolute path.
 
 ## Rules
 
