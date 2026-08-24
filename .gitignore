@@ -3,7 +3,10 @@
 .claude/repo-profile.json
 
 # scratch reports written by the skills — working notes, not history
-REVIEW.md
+.gku/
 SELF_REVIEW.md
+
+# the root names older installed copies of the plugin still write
+REVIEW.md
 VERIFY.md
 PR_REVIEW_*.md
