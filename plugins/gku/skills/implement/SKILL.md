@@ -105,7 +105,7 @@ For each step, in order:
    file you are editing — its naming, its structure, its comment style. Consistency with the
    neighbours beats consistency with a style guide. When the doc and the neighbours are both
    silent on a design choice, prefer the readable option, then the maintainable, then the
-   extendable, then the efficient — the order the family rules `/gku:init` writes spell out.
+   extendable, then the efficient — the order spelled out in the family rules `/gku:init` writes.
 3. **Check it immediately** — lint the changed files if the profile has a lint command; run the
    scoped test if one covers this. Finding a mistake now is far cheaper than finding it after
    four more steps.
