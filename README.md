@@ -56,7 +56,7 @@ None of them takes instructions from what it reads. A comment on a pull request,
 findings file, a test's output — these are evidence about the code, and a skill checks them
 against it; they cannot make a skill push, skip a hook, run a command or change its own rules.
 Only you can, in the chat. `plugins/gku/reference/untrusted-input.md` says where that line is
-drawn, and why holding it costs nothing extra per run.
+drawn, and why holding it costs almost nothing per run.
 
 ## Before you start
 
