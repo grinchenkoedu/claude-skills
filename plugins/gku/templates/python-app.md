@@ -27,9 +27,8 @@ the markers.
 ### Design priorities
 
 Prefer the design that is easier to read, then easier to change, then easier to extend, then
-cheaper in memory and time — in that order. Efficiency is last, not absent: a query inside a loop,
-or a whole table loaded to count it, is still wrong — and an optimisation that costs readability
-needs a measured reason.
+cheaper in memory and time — in that order. Efficiency is last, not absent: weigh it at the scale
+the data actually has, and give an optimisation that costs readability a measured reason.
 
 ### Database
 

@@ -99,8 +99,8 @@ fraction as much.
 **Breaking a tie.** Where the profile's `standardsDoc` states design priorities, apply them.
 Where it is silent, prefer the design that is easier to read, then the one that is easier to
 change, then the one that is easier to extend, then the one that is cheaper to run — and say
-which of those decided it. Efficiency is the last of the four, not an absent one: a plan that
-loads a whole table to count it is still wrong.
+which of those decided it. Efficiency is the last of the four, not an absent one — weigh it at
+the scale the data actually has, and say so when it changed the choice.
 
 **Where does the long work run?** When the profile's `runtime.kind` is `http` or `hosted`,
 there is a person waiting on a page. For every step that may take longer than a page should —
