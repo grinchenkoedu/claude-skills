@@ -136,7 +136,7 @@ long-running piece, where it runs and how the user learns it finished. For a que
 
 ## Acceptance criteria
 - [ ] <checkable, specific — this is what /gku:implement builds against and what /gku:verify checks>
-- [ ] <for background work: "the request returns without waiting for <the work>", and how the result is reached>
+- [ ] <for background work: the request returns without waiting for it, and how the result is reached>
 
 ## Steps
 1. <ordered, file-level, buildable one at a time>
