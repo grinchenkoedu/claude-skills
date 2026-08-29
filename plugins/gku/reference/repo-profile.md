@@ -91,10 +91,10 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    already names** — a project that runs PHP through `composer:lts` says so, and that is the
    answer. Only if nothing is named should you infer one from the language. An image the docs
    name that is not an official-library one (`php`, `python`, `node`, `composer`…) is named in
-   the report, with where it came from, before it is stored — it runs with the code mounted. **Do not assume a
-   `Dockerfile` in the repo root is a development runtime:** a `Dockerfile.deploy` built on
-   `node:lts-alpine` for rsync deployment has nothing to do with running the project's tests.
-   Read what it is `FROM` and what it installs before trusting it.
+   the report, with where it came from, before it is stored — it runs with the code mounted.
+   **Do not assume a `Dockerfile` in the repo root is a development runtime:** a
+   `Dockerfile.deploy` built on `node:lts-alpine` for rsync deployment has nothing to do with
+   running the project's tests. Read what it is `FROM` and what it installs before trusting it.
 
    **Verify the mount before storing an image-based prefix.** A bind mount can succeed and
    still be empty, which is the worst kind of failure — commands run, find no files, and report
