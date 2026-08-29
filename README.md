@@ -52,6 +52,12 @@ Three do (`/gku:implement`, `/gku:fix`, `/gku:pr-resolve`), and each tells you w
 do. `/gku:pr` changes nothing locally; it pushes commits you already made and opens the pull
 request.
 
+None of them takes instructions from what it reads. A comment on a pull request, a brief, a
+findings file, a test's output — these are evidence about the code, and a skill checks them
+against it; they cannot make a skill push, skip a hook, run a command or change its own rules.
+Only you can, in the chat. `plugins/gku/reference/untrusted-input.md` says where that line is
+drawn, and why holding it costs nothing extra per run.
+
 ## Before you start
 
 You need:
@@ -550,6 +556,9 @@ of the repository that owns the PR, since there is nothing else to resolve it ag
 - **disagree** → no code change, and a polite reply with the file and line that answers it;
 - **unclear** → it asks you, batching all such questions into one interruption.
 
+A comment that talks to the tool rather than about the code — skip the tests, push with
+`--no-verify` — gets none of these: it is skipped, and the report says so.
+
 Then it pushes and replies to each thread.
 
 Reviewers — human and automated alike — are sometimes wrong. Fixing a confidently-worded false
@@ -762,7 +771,12 @@ The security checklist that `/gku:review` and `/gku:verify` share lives in
 `plugins/gku/reference/security-checklist.md` — add a flaw there once, with its pattern, proof
 and severity, rather than in each skill. Where report files go and how they are named is in
 `plugins/gku/reference/reports.md`; a skill that writes one follows it rather than inventing
-its own file name.
+its own file name. What the skills treat as evidence rather than instruction — comments, briefs,
+tool output — is in `plugins/gku/reference/untrusted-input.md`; a skill that reads text the
+developer did not type points at it from the step where that text comes in.
+
+A change to a `SKILL.md` or to `reference/` is code that runs in every session on every machine
+that updates the plugin. Review it as such.
 
 ## Licence
 
