@@ -72,7 +72,8 @@ path is the request: an export, a bulk recalculation, a call to an outside servi
 may outlast a page load — goes to the task queue or scheduled command the project already has
 (Celery, RQ, a cron-driven management command); the request returns at once, and the user is told
 when it is done. Reuse that mechanism rather than adding another. In a CLI the caller is the one
-waiting: a progress indicator, or a lock on a resource that must not be used mid-change, is right.
+waiting: a progress indicator, or a lock on a resource that must not be used mid-change, is the
+right tool there.
 
 ### Changing data in bulk
 
