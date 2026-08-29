@@ -196,7 +196,8 @@ Rules for this step:
 
 Say which family was detected and why, the absolute path written, whether `AGENTS.md` was
 created or left alone, which commands came out `null` — and, when the profile was detected in
-this run rather than read, the commands it stored (see `reference/untrusted-input.md`). If step 4 left anything unresolved,
+this run rather than read, the commands it stored (see
+`reference/untrusted-input.md`). If step 4 left anything unresolved,
 list it as a question rather than a guess.
 
 When step 2 found the file already fine, that is the whole report — one line, no diff, no file
