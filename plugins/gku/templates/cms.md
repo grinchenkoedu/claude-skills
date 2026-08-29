@@ -14,44 +14,30 @@ anything you change in it is lost and unsupported.
 
 ### The core, and who owns it
 
-**First work out which of these you are in**, because the rules differ and the answer is not
-always obvious. Check whether core is in `.gitignore`, whether a package manager declares it,
-and whether anyone has written down how the site gets updated.
+**First work out which of these you are in** — check whether core is in `.gitignore`, whether a
+package manager declares it, and whether anyone has written down how the site gets updated.
 
-**A. Core is installed and updated outside the repository** — by a package manager, a CLI tool,
-or the host's own updater. Only your themes, plugins and site code are committed. *This is the
-common case and the one to aim for.*
+- **A. Core is installed and updated outside the repository** — only your themes, plugins and
+  site code are committed. The common case, and the one to aim for. An edit to core is silently
+  reverted by the next update, so the bug comes back at the worst moment and nobody remembers why.
+- **B. Core is committed and still updated by dropping in releases.** Every update becomes a
+  manual merge, and a patch quietly lost in one is a reintroduced bug nobody is looking for.
+- **C. Core is committed and permanently forked.** You *can* edit anything, but **the update path
+  is also the security path**: a public CMS is scanned continuously for known vulnerabilities in
+  known versions, and whoever forked core took on patching every future CVE by hand, forever.
 
-Editing core here is pointless as well as wrong: the next update silently reverts it, so the bug
-comes back at the worst possible moment and nobody remembers why. Extend through the documented
-seams — child theme, plugin, hooks and filters.
-
-**B. Core is committed, and still updated by dropping in new releases.** Editing it means every
-update becomes a manual merge, and a patch quietly lost in one of those merges is a
-reintroduced bug nobody is looking for. Same conclusion, different reason.
-
-**C. Core is committed and permanently forked** — no update path, no intention of one.
-
-Here you genuinely *can* edit anything; the tree is yours. The cost is not lost work, it is
-this: **the update path is also the security path.** Forking core opts you out of upstream
-security releases, and a public CMS is scanned continuously for known vulnerabilities in known
-versions. Whoever forked it has taken on patching every future CVE by hand, forever, including
-the ones announced when they are on holiday.
-
-So the rule in every case is **prefer the hooks** — but for different reasons. In A and B
-because the edit will not survive; in C because every line you add to core is a line that makes
-returning to a supported version harder, and returning is the goal.
-
-If core has already been forked, treat it as a standing risk rather than a settled decision:
-record the version it diverged from, keep the diff against upstream as small and as documented
-as possible, and know which advisories apply to that version. Getting back onto a maintained
-core is a real piece of work worth scheduling, not a purity exercise.
+So in every case **prefer the hooks** — child theme, plugin, filters — for different reasons: in
+A and B the edit will not survive; in C every line added to core makes returning to a supported
+version harder, and returning is the goal. A forked core is a standing risk, not a settled
+decision: record the version it diverged from, keep the diff against upstream small and
+documented, know which advisories apply, and treat getting back onto a maintained core as real
+work worth scheduling.
 
 - **Never edit a third-party plugin or theme in place** — the same three cases apply. Fork it
   properly or override through the provided hooks.
-- Keep core, themes and plugins **updated** wherever an update path exists. On a public CMS the
-  overwhelming majority of compromises arrive through a known vulnerability in an out-of-date
-  component, not through bespoke code. Treat a pending security update as urgent work.
+- Keep core, themes and plugins **updated** wherever an update path exists — most compromises of
+  a public CMS arrive through a known vulnerability in an out-of-date component, not bespoke
+  code. A pending security update is urgent work.
 - Remove what is unused. A deactivated-but-installed plugin is still code on disk and still a
   candidate for exploitation.
 
@@ -88,6 +74,22 @@ pressure, and each one skipped is a real hole rather than a style lapse.
   compromise into arbitrary code execution.
 - Turn display of errors off in production; log instead. A stack trace in a page reveals paths
   and versions.
+
+### Design priorities
+
+Prefer the design that is easier to read, then easier to change, then easier to extend, then
+cheaper in memory and time — in that order. Efficiency is last, not absent: weigh it at the scale
+the data actually has, and give an optimisation that costs readability a measured reason.
+
+### Long-running work
+
+Work the user need not wait for does not run on the path they wait on. On a site that path is the
+request: an export, a bulk recalculation, a call to an outside service — anything that may outlast
+a page load — goes to the CMS's scheduled-event API (`wp_schedule_single_event()` or Action
+Scheduler in WordPress); the request returns at once, and the user is told when it is done. Reuse
+that mechanism rather than adding another. Where the user genuinely cannot continue until the
+work finishes — a CLI command, a resource that must not be used mid-change — a progress indicator
+or a lock is the right tool.
 
 ### Style
 

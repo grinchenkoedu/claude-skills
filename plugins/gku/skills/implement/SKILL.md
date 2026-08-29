@@ -68,6 +68,9 @@ If it is a sentence or a loose brief, work out the plan now, inline: find the re
 decide the approach, write down the criteria and the ordered steps. Keep it short — this is
 the planning `/gku:plan` would have done, at the scale the task deserves. For anything substantial
 or unfamiliar, stop and suggest running `/gku:plan` first; a real plan is worth the separate pass.
+For an `http` or `hosted` runtime, decide where any long-running piece runs — the request, or the
+background mechanism the code already has — before building it; it is the question `/gku:plan`
+step 4 asks, and it is far cheaper to answer here than to move the work afterwards.
 
 Write the plan into the task file so `--continue` has something to resume from.
 
@@ -100,7 +103,9 @@ For each step, in order:
 1. **Read** the files it touches, and enough around them to not break something.
 2. **Make the change**, following the conventions in the profile's `standardsDoc`. Match the
    file you are editing — its naming, its structure, its comment style. Consistency with the
-   neighbours beats consistency with a style guide.
+   neighbours beats consistency with a style guide. When the doc and the neighbours are both
+   silent on a design choice, prefer the readable option, then the maintainable, then the
+   extendable, then the efficient — the order spelled out in the family rules `/gku:init` writes.
 3. **Check it immediately** — lint the changed files if the profile has a lint command; run the
    scoped test if one covers this. Finding a mistake now is far cheaper than finding it after
    four more steps.
