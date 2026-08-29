@@ -311,7 +311,8 @@ list of anything it could not check.
 `CLAUDE.md` is read at the start of every session in a repository, so it is where the build and
 test commands and the handful of rules that actually get broken here belong. `/gku:init` detects the
 project family — Moodle plugin, PHP app, CMS, Python — fills in the real commands, and adds that
-family's conventions and security rules.
+family's conventions, security rules, design priorities (readable before maintainable before
+extendable before efficient) and where long-running work belongs.
 
 The shared part sits inside markers:
 
@@ -348,7 +349,8 @@ different answers — then reads the code and checks its assumptions against rea
 proposing anything.
 
 Output goes to `.tasks/<name>.md`: the cause or design, acceptance criteria, ordered steps,
-and how to check the result.
+and how to check the result. For a web application the design also says which steps run in the
+background rather than in the request, using the mechanism the project already has.
 
 `--review` is for when the file *already* proposes a solution: it judges that proposal rather
 than inventing a different one.
@@ -749,7 +751,10 @@ a limited plan:
 - answer in the chat; write a file only on a blocker or on request, and write it to
   `.gku/reports/` under the shared naming scheme, never to the repository root;
 - no absolute paths from your own machine in `SKILL.md`;
-- nothing specific to one repository — read the project's own conventions instead.
+- nothing specific to one repository — read the project's own conventions instead;
+- a rule about the *code the skills write* (a design priority, where long work runs) goes in the
+  family templates under `plugins/gku/templates/`, so it reaches a project through its `CLAUDE.md`;
+  a rule about the *skills' own cost* goes in `reference/`.
 
 The shared detection logic lives in `plugins/gku/reference/repo-profile.md`. If your skill
 needs to know something about the project, add it there rather than detecting it separately.
