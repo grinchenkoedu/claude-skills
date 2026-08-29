@@ -60,10 +60,10 @@ sets, avoid N+1 queries, and give any optimisation that costs readability a meas
 Work the user need not wait for does not run on the path they wait on. On a page that path is the
 request: an export, a bulk recalculation, a call to an outside service — anything that may outlast
 a page load — goes to an adhoc task (`\core\task\manager::queue_adhoc_task()`) or a scheduled task
-in `db/tasks.php`; the request returns at once, and the user is told when it is done. Reuse the task
-the plugin already has rather than adding another, and a new task class needs the `version.php` bump
-below. Where the user genuinely cannot continue until the work finishes — a CLI script, a resource
-that must not be used mid-change — a progress indicator or a lock is the right tool.
+in `db/tasks.php`; the request returns at once, and the user is told when it is done. Use the task
+API rather than adding another mechanism, and remember a new task class needs the `version.php`
+bump below. Where the user genuinely cannot continue until the work finishes — a CLI script, a
+resource that must not be used mid-change — a progress indicator or a lock is the right tool.
 
 ### Security — the parts that are easy to skip
 
