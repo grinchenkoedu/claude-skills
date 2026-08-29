@@ -218,8 +218,9 @@ which refusals were confirmed and which were not checked.
 skipped checks is worse than useless — it is misleading.
 
 Write a report file only with `--report` or when the verdict is "does not work". It goes to
-`.gku/reports/verify-<branch-slug>-<timestamp>.md` — never the repository root — per
-`reference/reports.md` in this plugin. Print its absolute path.
+`.gku/reports/verify-<slug>-<timestamp>.md` — never the repository root — where the slug is the
+branch, or `pr-<n>` when the run was aimed at a pull request, per `reference/reports.md` in this
+plugin. Print its absolute path.
 
 ## Rules
 
