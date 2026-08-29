@@ -96,6 +96,22 @@ and say what would change your mind. **Do not spawn a panel of agents to argue a
 Two or three options reasoned about honestly is worth more than a committee, and costs a
 fraction as much.
 
+**Breaking a tie.** Where the profile's `standardsDoc` states design priorities, apply them.
+Where it is silent, prefer the design that is easier to read, then the one that is easier to
+change, then the one that is easier to extend, then the one that is cheaper to run — and say
+which of those decided it. Efficiency is the last of the four, not an absent one: a plan that
+loads a whole table to count it is still wrong.
+
+**Where does the long work run?** When the profile's `runtime.kind` is `http` or `hosted`,
+there is a person waiting on a page. For every step that may take longer than a page should —
+an export, a bulk write or recalculation, a call to an outside service, sending mail — ask
+whether that person has to wait for it. If not, the design puts it on the background mechanism
+the code already has: grep for it (`queue`, `task`, `job`, `cron`, `worker`), name the class or
+command you found, and say how the user learns the work is done. No mechanism found is an open
+question for the plan, not a reason to invent one. For a `cli` or `library` runtime the
+question does not arise — the caller is the one waiting, and a visible progress indicator or a
+lock on a resource that must not be used mid-change is the right tool.
+
 The plan must be concrete: real file paths, real function and class names, an order, and an
 explicit list of what **not** to touch.
 
@@ -115,10 +131,12 @@ project deliberately commits briefs). Overwrite an existing plan for the same sl
 
 ## <Cause | Design | Answer | Strategy>
 <The actual deliverable. For a bug: what is wrong and why, with evidence.
-For a feature: where it hooks in and what it touches. For a question: the answer.>
+For a feature: where it hooks in and what it touches — and, in a web runtime, for each
+long-running piece, where it runs and how the user learns it finished. For a question: the answer.>
 
 ## Acceptance criteria
 - [ ] <checkable, specific — this is what /gku:implement builds against and what /gku:verify checks>
+- [ ] <for background work: "the request returns without waiting for <the work>", and how the result is reached>
 
 ## Steps
 1. <ordered, file-level, buildable one at a time>
@@ -148,6 +166,8 @@ Judge what is proposed:
 - **Is it sufficient?** Does it meet every stated criterion, including the ones easy to skip?
 - **Is it more than necessary?** A simpler approach that meets the criteria is a finding too.
 - **Does it fit this codebase's conventions?**
+- **Does it make the user wait?** In a web runtime, long work run inline in the request when
+  the project already has a background mechanism is a finding (step 4).
 - **What happens when it fails?** Partial writes, re-runs, unexpected data.
 
 Then a verdict: **sound** / **sound with changes** / **needs rework** / **cannot judge — need
