@@ -81,7 +81,11 @@ holds:
   same commit.
 
 Otherwise the default order below stands: build, then cover. Say in one line which order you are
-using and why, and record it in the task file so `--continue` keeps the same one.
+using and why, and write it into the task file above the steps so `--continue` finds it:
+
+```markdown
+Test order: test-first — required by CLAUDE.md
+```
 
 ## Step 3 — Build, step by step
 
