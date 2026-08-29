@@ -41,9 +41,8 @@ time:
 - For the guard checks in step 5b: are there two local test accounts — one with the permission
   the change relies on and one without — or can they be created and removed? If not, that is a
   `DATA` blocker for those rows, named now rather than discovered at step 5b.
-- For `<pr-number>` with `exec.kind: host`: step 4 would run a tree you did not write on this
-  machine, with your credentials — say so and ask before running it
-  (`reference/untrusted-input.md`).
+- For `<pr-number>` with `exec.kind: host`: step 4 would run a tree you did not write on the
+  developer's machine — say so and ask before running it (`reference/untrusted-input.md`).
 
 **Everything that exercises the project runs through the profile's `exec.prefix`** — its
 container, not your machine. The stored `test`, `lint` and `runtime` commands already carry it;
