@@ -89,6 +89,22 @@ pressure, and each one skipped is a real hole rather than a style lapse.
 - Turn display of errors off in production; log instead. A stack trace in a page reveals paths
   and versions.
 
+### Design priorities
+
+Prefer the design that is easier to read, then easier to change, then easier to extend, then
+cheaper in memory and time — in that order. Efficiency is last, not absent: iterate large result
+sets, avoid N+1 queries, and give any optimisation that costs readability a measured reason.
+
+### Long-running work
+
+Work the user need not wait for does not run on the path they wait on. On a site that path is the
+request: an export, a bulk recalculation, a call to an outside service — anything that may outlast
+a page load — goes to the CMS's scheduled-event API (`wp_schedule_single_event()` or Action
+Scheduler in WordPress); the request returns at once, and the user is told when it is done. Reuse
+that mechanism rather than adding another. Where the user genuinely cannot continue until the
+work finishes — a CLI command, a resource that must not be used mid-change — a progress indicator
+or a lock is the right tool.
+
 ### Style
 
 - Follow the CMS's own coding standards rather than a general PHP guide — its linter and its

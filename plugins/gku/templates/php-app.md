@@ -34,6 +34,12 @@ when the developer knows which call does the handling.
 - Prefer composition over inheritance. Keep models thin — business logic belongs in services,
   and services should not hold request-scoped state.
 
+### Design priorities
+
+Prefer the design that is easier to read, then easier to change, then easier to extend, then
+cheaper in memory and time — in that order. Efficiency is last, not absent: iterate large result
+sets, avoid N+1 queries, and give any optimisation that costs readability a measured reason.
+
 ### Database
 
 - **Placeholders for every variable.** Never interpolate into SQL, not even an integer you
@@ -42,6 +48,15 @@ when the developer knows which call does the handling.
   it still uses bound parameters.
 - Iterate large result sets rather than loading them whole.
 - Watch for **N+1 queries** inside loops over user-scale data.
+
+### Long-running work
+
+Work the user need not wait for does not run on the path they wait on. In a web application that
+path is the request: an export, a bulk recalculation, a call to an outside service — anything that
+may outlast a page load — goes to the queue, worker or cron-driven CLI command the project already
+has; the request returns at once, and the user is told when it is done. Reuse that mechanism rather
+than adding another. Where the user genuinely cannot continue until the work finishes — a CLI, a
+resource that must not be used mid-change — a progress indicator or a lock is the right tool.
 
 ### Security
 

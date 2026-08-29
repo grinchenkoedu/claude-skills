@@ -24,6 +24,12 @@ the markers.
 - **Never use a mutable default argument** (`def f(items=[])`) — it is shared across calls and
   the resulting bug is reproducible only in sequence.
 
+### Design priorities
+
+Prefer the design that is easier to read, then easier to change, then easier to extend, then
+cheaper in memory and time — in that order. Efficiency is last, not absent: iterate large result
+sets, avoid N+1 queries, and give any optimisation that costs readability a measured reason.
+
 ### Database
 
 - **Parameterised queries only.** Pass parameters to the driver; never build SQL by
@@ -58,6 +64,15 @@ the markers.
   `Markup(...)` and `mark_safe(...)` disable escaping for that value; each use needs a reason
   that survives review.
 - Authorisation is checked in the route handler, not only in the template that draws the link.
+
+### Long-running work
+
+Work the user need not wait for does not run on the path they wait on. In a web application that
+path is the request: an export, a bulk recalculation, a call to an outside service — anything that
+may outlast a page load — goes to the task queue or scheduled command the project already has
+(Celery, RQ, a cron-driven management command); the request returns at once, and the user is told
+when it is done. Reuse that mechanism rather than adding another. In a CLI the caller is the one
+waiting: a progress indicator, or a lock on a resource that must not be used mid-change, is right.
 
 ### Changing data in bulk
 

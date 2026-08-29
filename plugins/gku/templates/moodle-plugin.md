@@ -49,6 +49,22 @@ path.
 - Use `get_recordset_*` and iterate when the result set can be large — `get_records_*` loads
   everything into memory.
 
+### Design priorities
+
+Prefer the design that is easier to read, then easier to change, then easier to extend, then
+cheaper in memory and time — in that order. Efficiency is last, not absent: iterate large result
+sets, avoid N+1 queries, and give any optimisation that costs readability a measured reason.
+
+### Long-running work
+
+Work the user need not wait for does not run on the path they wait on. On a page that path is the
+request: an export, a bulk recalculation, a call to an outside service — anything that may outlast
+a page load — goes to an adhoc task (`\core\task\manager::queue_adhoc_task()`) or a scheduled task
+in `db/tasks.php`; the request returns at once, and the user is told when it is done. Reuse the task
+the plugin already has rather than adding another, and a new task class needs the `version.php` bump
+below. Where the user genuinely cannot continue until the work finishes — a CLI script, a resource
+that must not be used mid-change — a progress indicator or a lock is the right tool.
+
 ### Security — the parts that are easy to skip
 
 Each of these is a **blocker**, because bypassing them produces code that looks correct and
