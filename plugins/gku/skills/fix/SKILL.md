@@ -34,9 +34,8 @@ and symptoms are traced to a cause you can quote, before anything changes.
 - **A sentence** — `/gku:fix the export blows up when a department has no head`. A symptom, not
   a location: it gets investigated (step 3), then fixed. Nothing else is touched.
 - **A file** — `/gku:fix .gku/reports/review-my-branch-20260824-143201.md`, or any markdown
-  holding a list of findings. `/gku:review --report` writes its reports under `.gku/reports/`
-  (see `reference/reports.md`); `ls -t .gku/reports/review-*.md 2>/dev/null | head -1` is the
-  last one.
+  holding a list of findings. `/gku:review --report` writes its reports under `.gku/reports/`;
+  `reference/reports.md` has the command that finds the last one.
 - `--nits` — apply nits too. Off by default: nits are matters of taste and they bury the real
   changes in a diff somebody has to read.
 - `--blockers-only` — apply blockers, list everything else.

@@ -76,10 +76,13 @@ already exists, append `-2`, `-3`, … rather than replacing it.
 `/gku:fix <path>` reads exactly the path it was given, wherever it sits, and stops with "no such
 file" when it is not there — it never guesses at a different report.
 
-To offer the developer the last report for the branch, the newest matching prefix is the one:
+To offer the developer the last report for the branch, the newest matching prefix is the one.
+The timestamp is the end of the name, so sorting by name is sorting by time — no `ls -t`, whose
+glob aborts the whole command in zsh when the directory is empty, and whose relative path finds
+nothing from a subdirectory:
 
 ```bash
-ls -t .gku/reports/review-*.md 2>/dev/null | head -1
+find "$root/.gku/reports" -name 'review-*.md' 2>/dev/null | sort -r | head -1
 ```
 
 Check its age before leaning on it. A report written before the last few commits describes code
