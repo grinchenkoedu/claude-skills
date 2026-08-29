@@ -75,8 +75,12 @@ Assign every finding one of three severities:
   `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a value that can be null and is not checked; a
-  loop that can run forever on unexpected data; a comment explaining *what* instead of *why*.
-- **NIT** — optional. Naming, ordering, a clearer way to say the same thing.
+  loop that can run forever on unexpected data; a comment explaining *what* instead of *why*;
+  work that may outlast a page load — a loop over user-scale data, an export, a call to an
+  outside service — run inline in a web request when the project already has a background
+  mechanism.
+- **NIT** — optional. Naming, ordering, a clearer way to say the same thing; an optimisation
+  that costs readability with no stated reason.
 
 **Back every BLOCKER and WARNING with the line that proves it.** If you cannot quote the
 offending code, drop it one severity and mark it `[unverified]`. Nits can be looser — they

@@ -42,7 +42,8 @@ real defect: report the wrong value it produces, not the style rule it breaks.
   passed, tests deleted or skipped, coverage that exercises the old path.
 - **Design smell** — logic at the wrong level (business rules in a page script), copy-paste
   divergence from an existing pattern, dead code left wired up, an abstraction that will force
-  the next change to touch five files.
+  the next change to touch five files, long-running work on the request path when the project
+  already has a background mechanism.
 
 ## Step 1 — Fetch it
 
