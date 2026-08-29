@@ -71,7 +71,25 @@ or unfamiliar, stop and suggest running `/gku:plan` first; a real plan is worth 
 
 Write the plan into the task file so `--continue` has something to resume from.
 
+**Decide the test order now.** Tests come first — before the code they cover — when any of these
+holds:
+
+- the developer asked for TDD, or for a failing test first;
+- the task file or the brief says so;
+- the repository requires it — the profile's `standardsDoc` (`CLAUDE.md` and friends), a
+  `CONTRIBUTING.md`, or a visible convention such as every feature landing with its test in the
+  same commit.
+
+Otherwise the default order below stands: build, then cover. Say in one line which order you are
+using and why, and record it in the task file so `--continue` keeps the same one.
+
 ## Step 3 — Build, step by step
+
+**When the order is test-first**, each step starts with its test: write the test for what the
+step must do and run it — it has to fail, and fail for the right reason. A test that passes
+against code you have not written yet is testing nothing; find out why before continuing. Then
+make it pass with the smallest change that does. The step is not done until its test is green,
+and step 4 is left only filling the gaps the steps did not reach.
 
 For each step, in order:
 
@@ -98,7 +116,11 @@ change becomes an unreviewable one.
 
 ## Step 4 — Write the tests
 
-Once the steps are done, cover what you built:
+If you worked test-first, most of this already exists — walk the list below against what the
+steps produced and add what is missing, particularly the error paths and edges that a
+step-by-step build tends to skip.
+
+Otherwise, now that the steps are done, cover what you built:
 
 - The main path, asserted properly — not just that it runs.
 - **The error paths**, which are the ones that get skipped: bad input, missing record, failed
