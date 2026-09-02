@@ -575,6 +575,10 @@ reads from your recent merged pull requests. The testing section says what was a
 **admits it when nothing was**. Updating an existing pull request never silently overwrites a
 description somebody wrote by hand.
 
+On a public repository the description carries no Claude Code session link. Such a link opens
+only for the account that owns it; to everyone else it is a dead link that says which tool wrote
+the change. The co-author trailer in the commits is the attribution, and it stays.
+
 ### `/gku:pr-review` — review someone else's pull request
 
 ```
