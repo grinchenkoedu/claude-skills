@@ -1,6 +1,7 @@
 # Report files — shared by every skill in this toolkit
 
-Some skills write a markdown report: `/gku:review`, `/gku:verify`, `/gku:pr-review`. Those
+Some skills write a markdown report: `/gku:review`, `/gku:verify`, `/gku:pr-review`, and
+`/gku:research` on `--report`. Those
 reports are working notes about one run, not part of the project. They never belong at the
 repository root, where they land in `git status`, get committed by accident, and overwrite
 each other — a second review of the same branch used to destroy the first one.
@@ -49,9 +50,11 @@ anyway and say in one line that the directory is not ignored yet.
 .gku/reports/<kind>-<slug>-<timestamp>.md
 ```
 
-- **`<kind>`** — the prefix that says which skill wrote it: `review`, `verify`, `pr-review`.
+- **`<kind>`** — the prefix that says which skill wrote it: `review`, `verify`, `pr-review`,
+  `research`.
 - **`<slug>`** — what it is about: the branch name, or `pr-<n>` when the run was aimed at a pull
-  request (`/gku:pr-review` always, `/gku:verify <pr-number>`). Lowercase; replace anything
+  request (`/gku:pr-review` always, `/gku:verify <pr-number>`); for `research`, which has no
+  branch or pull request to name it after, the first words of the request. Lowercase; replace anything
   outside `a-z0-9` with `-`, collapse runs of `-`, trim to 40 characters. A branch like
   `feature/EXPORT-42_fix` becomes `feature-export-42-fix`. **That rewrite is a guard, not
   tidiness** — a branch name comes from whoever opened the pull request, and one shaped like
@@ -64,6 +67,7 @@ anyway and say in one line that the directory is not ignored yet.
 .gku/reports/review-security-pass-20260824-171045.md
 .gku/reports/verify-security-pass-20260824-172230.md
 .gku/reports/pr-review-pr-118-20260824-093700.md
+.gku/reports/research-which-sso-provider-for-the-20260824-101512.md
 ```
 
 **Never overwrite an existing report.** The timestamp makes that a non-issue; if a name somehow

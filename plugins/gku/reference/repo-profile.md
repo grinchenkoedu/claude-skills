@@ -280,5 +280,8 @@ limits. If you are extending a skill, keep them.
   diff — and its cap is ten files, each named in the task file it writes.
 - **Chat first.** A markdown report is written only when there is a blocker, or when the user
   asks with `--report`. Most runs should end in the conversation.
+- **The internet is not read by default.** `/gku:research` is the one skill that searches and
+  fetches on its own; `/gku:audit --provenance` does so behind a flag. Both send public names
+  and stripped error text only, cap what they send, and report the count.
 - **Exit early.** Nothing to do means two lines and a stop, not a report explaining that there
   was nothing to do.

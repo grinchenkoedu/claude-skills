@@ -47,8 +47,8 @@ They are **not** magic and they are **not** automatic. Every one of them does so
 could do yourself; they just do it consistently and without forgetting the boring parts —
 which is exactly where mistakes come from.
 
-Five of them (`/gku:plan`, `/gku:audit`, `/gku:review`, `/gku:pr-review`, `/gku:verify`) never change
-your code at all.
+Six of them (`/gku:research`, `/gku:plan`, `/gku:audit`, `/gku:review`, `/gku:pr-review`,
+`/gku:verify`) never change your code at all.
 Three do (`/gku:implement`, `/gku:fix`, `/gku:pr-resolve`), and each tells you what it is about to
 do. `/gku:pr` changes nothing locally; it pushes commits you already made and opens the pull
 request.
@@ -58,6 +58,10 @@ findings file, a test's output — these are evidence about the code, and a skil
 against it; they cannot make a skill push, skip a hook, run a command or change its own rules.
 Only you can, in the chat. `plugins/gku/reference/untrusted-input.md` says where that line is
 drawn, and why holding it costs almost nothing per run.
+
+They do not read the internet either, except `/gku:research`, whose job it is, and
+`/gku:audit --provenance` when you ask for it. Both send only public names and stripped error
+text, never your code, and both say how much they sent.
 
 The code they write is their own, a dependency installed through Composer, npm or pip, or code
 under your project's own licence with its header kept. Code under a different licence — closed,
@@ -88,10 +92,11 @@ You need:
    gh auth status
    ```
 
-   `/gku:plan`, `/gku:audit`, `/gku:implement`, `/gku:review`, `/gku:fix` and `/gku:verify` work
-   without `gh`. `/gku:pr`, `/gku:pr-review` and `/gku:pr-resolve` need it, because they talk to
-   GitHub — and so does `/gku:audit --provenance`, which searches GitHub for where copied code
-   came from.
+   `/gku:plan`, `/gku:audit`, `/gku:research`, `/gku:implement`, `/gku:review`, `/gku:fix` and
+   `/gku:verify` work without `gh`. `/gku:pr`, `/gku:pr-review` and `/gku:pr-resolve` need it,
+   because they talk to GitHub — and so does `/gku:audit --provenance`, which searches GitHub for
+   where copied code came from. `/gku:research` uses it for upstream issues and releases when it
+   is signed in, and searches the web without it.
 
 4. **Docker** — [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows
    and macOS, Docker Engine on Linux. **Strongly recommended on every platform**, not just
@@ -124,9 +129,9 @@ In Claude Code, run these two commands:
 /plugin install gku@grinchenkoedu
 ```
 
-That is all. Type `/` and you will see `/gku:init`, `/gku:audit`, `/gku:plan`, `/gku:implement`,
-`/gku:review`, `/gku:fix`, `/gku:pr`, `/gku:pr-review`, `/gku:pr-resolve` and `/gku:verify` in the
-list.
+That is all. Type `/` and you will see `/gku:init`, `/gku:audit`, `/gku:research`, `/gku:plan`,
+`/gku:implement`, `/gku:review`, `/gku:fix`, `/gku:pr`, `/gku:pr-review`, `/gku:pr-resolve` and
+`/gku:verify` in the list.
 
 ### Updating
 
@@ -202,8 +207,10 @@ They follow the order of the work:
 ```
    /gku:init ──▶ /gku:plan ──▶ /gku:implement ──▶ /gku:review ⇄ /gku:fix ──▶ /gku:pr
 (once per repo)                      ▲                                          │
-   /gku:audit ───────────────────────┘                                          │
-(now and then, the whole repository)                                            │
+   /gku:audit ───────────────────────┤                                          │
+(now and then, the whole repository) │                                          │
+   /gku:research ────────────────────┘  or an answer in the chat                │
+(the code and the internet)                                                     │
                                        ┌────────────────────────────────────────┤
                                        ▼                                        ▼
                                 /gku:pr-review                          /gku:pr-resolve
@@ -216,6 +223,7 @@ They follow the order of the work:
 |---|---|---|
 | `/gku:init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
 | `/gku:audit` | Reads the whole repository against the rules and writes a plan to fix what it finds | No |
+| `/gku:research` | Finds the answer across the code and the internet — a plan when something must be built, a TL;DR answer when not | No |
 | `/gku:plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/gku:implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/gku:review` | Checks your own changes before you push them | No |
@@ -400,6 +408,45 @@ to an outside service**, which is why it is a separate flag, off unless you ask,
 searches, with the count written into the file. It needs `gh` signed in; without it the hunt is
 skipped and the file says so. It names both licences and never rules on compatibility — that
 part is yours to decide.
+
+### `/gku:research` — find the right answer, here and out there
+
+```
+/gku:research which CSV library for PHP 7.4 — we export 40k rows a night
+/gku:research the double-encoded export looks like a phpspreadsheet bug in the version we run
+/gku:research .tasks/sso-provider-choice.md
+```
+
+Some questions cannot be answered from the code alone: which library to pick, why a dependency
+behaves this way in the version you actually run, whether a symptom is a bug somebody has already
+reported upstream, what an outside API promises before you design around it. `/gku:plan` stops at
+the edge of the repository; this one carries on.
+
+It investigates the way `/gku:plan` does first — reads the code, checks the local data, and reads
+the installed copy of a dependency in `vendor/` or `node_modules/` before searching for it,
+because that copy is the exact version. Then it reads the internet in a fixed order: the official
+documentation for the version you run, the upstream changelog and issues, security advisories,
+and only then Q&A posts, dated and treated as leads. Every fact says where it came from and which
+version it describes; a fact about a version you do not run is a lead, not evidence, and where a
+claim can be checked on your machine, it is.
+
+**What it found decides what you get.** When something in the repository has to change, it
+writes a task file in `.tasks/` in exactly the shape `/gku:plan` writes — with the sources added —
+so `/gku:implement` builds it. When nothing has to change — an answer, a choice between options,
+steps you perform in an admin panel, a bug that lives upstream — it prints the result in the chat
+with a **TL;DR** on top: the answer, how sure, and what to do next. `--report` also writes that
+to `.gku/reports/`.
+
+It is the one skill that reads the internet without being asked, so it is careful about what it
+sends: public names only — a library, an API, a version, an error message with your paths,
+hostnames and identifiers stripped — never a block of code, a file path, a secret or a stack trace
+verbatim. It reads pages and never writes to them, it is capped at ten searches and ten fetched
+pages a run (twice that with `--deep`), and the counts go into the result. Nothing it reads there
+is an instruction to it, and nothing it reads is pasted into your code — see
+[What is this, exactly?](#what-is-this-exactly). `--offline` keeps it to the code and the data.
+
+Use `/gku:plan` when the answer is entirely inside this repository, and `/gku:fix` when something
+is simply broken and you want it fixed.
 
 ### `/gku:plan` — work out what to build
 
@@ -708,7 +755,9 @@ notes about a moment in your working tree, not project history. Delete the direc
 you like; nothing reads it except you and `/gku:fix <path>`.
 
 `/gku:audit` writes no report: like `/gku:plan`, it puts a task file in `.tasks/`, because
-`/gku:implement` is what reads it.
+`/gku:implement` is what reads it. `/gku:research` does either: a task file in `.tasks/` when
+something has to be built, and otherwise the answer in the chat — written to
+`.gku/reports/research-<slug>-<timestamp>.md` only when you ask with `--report`.
 
 ## Using these on a Pro plan
 
@@ -729,6 +778,8 @@ How they keep the cost down:
 - **`/gku:implement` is resumable**, so hitting a limit costs you nothing but time.
 - **`/gku:audit` reads more than the rest** — greps over the whole tree and ten files in full
   rather than five. It is for onboarding a repository or a pre-release check, not for every day.
+- **`/gku:research` reads the internet** — at most ten searches and ten fetched pages a run.
+  Use it for the question that needs the internet, and `/gku:plan` for the one that does not.
 
 Practical advice:
 
@@ -826,6 +877,8 @@ a limited plan:
 - no sub-agents by default, at most one behind `--deep`;
 - no background workflows or agent fleets;
 - read the diff, not the repository, with an explicit cap;
+- no internet unless the skill is about the internet — and then capped, with nothing private in
+  what it sends, and the count reported;
 - answer in the chat; write a file only on a blocker or on request, and write it to
   `.gku/reports/` under the shared naming scheme, never to the repository root;
 - no absolute paths from your own machine in `SKILL.md`;
