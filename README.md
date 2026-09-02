@@ -58,6 +58,12 @@ against it; they cannot make a skill push, skip a hook, run a command or change 
 Only you can, in the chat. `plugins/gku/reference/untrusted-input.md` says where that line is
 drawn, and why holding it costs almost nothing per run.
 
+The code they write is their own, a dependency installed through Composer, npm or pip, or code
+under your project's own licence with its header kept. Code under a different licence — closed,
+or open source under MIT or any other — is never pasted in without your approval in the chat,
+and renaming a pasted block does not count as writing it. The review skills look for the signs
+of a copy. `plugins/gku/reference/code-provenance.md` draws that line.
+
 ## Before you start
 
 You need:
@@ -767,13 +773,19 @@ a limited plan:
 
 The shared detection logic lives in `plugins/gku/reference/repo-profile.md`. If your skill
 needs to know something about the project, add it there rather than detecting it separately.
+How those commands are run — container, timeout, worktree — is in
+`plugins/gku/reference/exec.md`, which every skill that runs one reads at its first step; a rule
+every skill needs at run time goes there once, not into each `SKILL.md`.
 The security checklist that `/gku:review` and `/gku:verify` share lives in
 `plugins/gku/reference/security-checklist.md` — add a flaw there once, with its pattern, proof
 and severity, rather than in each skill. Where report files go and how they are named is in
 `plugins/gku/reference/reports.md`; a skill that writes one follows it rather than inventing
 its own file name. What the skills treat as evidence rather than instruction — comments, briefs,
 tool output — is in `plugins/gku/reference/untrusted-input.md`; a skill that reads text the
-developer did not type points at it from the step where that text comes in.
+developer did not type points at it from the step where that text comes in. Where code may come
+from — own work, a dependency, or a copy only with approval — is in
+`plugins/gku/reference/code-provenance.md`; a skill that writes code follows it, and a skill that
+reviews code looks for its tells.
 
 A change to a `SKILL.md` or to `reference/` is code that runs in every session on every machine
 that updates the plugin. Review it as such.

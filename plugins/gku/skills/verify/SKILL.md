@@ -44,15 +44,9 @@ time:
 - For `<pr-number>` with `exec.kind: host`: step 4 would run a tree you did not write on the
   developer's machine — say so and ask before running it (`reference/untrusted-input.md`).
 
-**Everything that exercises the project runs through the profile's `exec.prefix`** — its
-container, not your machine. The stored `test`, `lint` and `runtime` commands already carry it;
-any probe you compose yourself needs it too. On the host stay: `git`, `gh`, file reading, and
-HTTP requests to a published port (those go to `localhost:<port>`, not through `exec`).
-
-This matters most here, because this skill's whole output is a claim about whether something
-works. A suite that passed against your machine's runtime instead of the project's has not
-verified the project — if `exec.kind` is `host`, the verdict must say which versions were
-actually used.
+Read `reference/exec.md` too: everything that exercises the project, probes you compose
+included, runs the way it says, and on `exec.kind: host` the verdict names the versions actually
+used — a suite passed against the wrong runtime has not verified the project.
 
 Every blocker gets a **category** and a one-line way out:
 
@@ -79,16 +73,9 @@ git worktree add ../<repo>-verify-<n> <head-sha>
 Keep the profile from step 1 — the primary checkout's. Never take one from the worktree: its
 commands are executed, and a pull request can add or change it.
 
-**Mind what the execution environment is actually pointed at.** A compose service
-(`exec.kind: compose`) mounts the *primary* checkout, not this worktree — so commands run
-through it would test the wrong code. Two honest options:
-
-- run the checks from the primary checkout with that commit checked out — record the original
-  branch and restore it in step 6, without exception; or
-- for `exec.kind: image`, mount the worktree instead (`-v "<worktree>":/app`), which avoids the
-  problem entirely and is the better route when the project has a usable image.
-
-Do not run the checks against the wrong tree and report the result as if it meant something.
+**Mind what the execution environment is pointed at.** A compose service mounts the *primary*
+checkout, not this worktree; take a route from `reference/exec.md`, "Worktrees", and never
+report a result from the wrong tree as if it meant something.
 
 For the current working tree, none of this applies.
 

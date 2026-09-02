@@ -168,9 +168,15 @@ added | grep -E '(file_get_contents|fopen|readfile|include|require|include_once|
 added | grep -E 'md5\(|sha1\(|mt_rand|\brand\(|uniqid|random\.random|VERIFYPEER|verify\s*=\s*False|csrf_exempt|PARAM_RAW|__all__'
 # literals that look like credentials
 added | grep -iE '(password|passwd|secret|api[_-]?key|token|private[_-]?key)\s*[=:>]+\s*.{8,}'
+# provenance markers — a licence or source the repository's own file headers do not carry
+# (not `copyright` or `@author`: those are the project's own boilerplate in most PHP codebases)
+added | grep -iE 'spdx-license|licen[cs]ed? under|permission is hereby granted|redistribution and use|(taken|adapted|copied|ported) from|stack ?overflow|github\.com/|https?://[^ ]+\.(js|php|py|ts)\b'
 ```
 
-The hits are diff lines; open the file at each one before deciding anything.
+The hits are diff lines; open the file at each one before deciding anything. The last group is
+not a security lead: a hit means a block may have come from elsewhere, and
+`reference/code-provenance.md` says what decides it — a declared source and licence in the
+commit or pull request body settles it, and an idiom everyone writes is nothing.
 
 Then, for every changed **entry point** — page, route, controller action, AJAX handler,
 external function, CLI script — answer four questions by reading, not guessing:

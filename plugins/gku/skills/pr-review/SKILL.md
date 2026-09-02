@@ -40,6 +40,11 @@ real defect: report the wrong value it produces, not the style rule it breaks.
   dropped requirements and behaviour changes hidden inside a "refactor".
 - **Honest tests** — tests that mock away exactly what changed, assertions weakened until they
   passed, tests deleted or skipped, coverage that exercises the old path.
+- **Provenance** — a block that reads as lifted from elsewhere: style diverging from its
+  neighbours, a source or licence in a comment, a vendored file with its notice gone. The
+  project's own licence, or a source and licence declared in the commit or body, is no finding;
+  a different licence undeclared is a blocker, origin unknown a smell
+  (`reference/code-provenance.md`).
 - **Design smell** — logic at the wrong level (business rules in a page script), copy-paste
   divergence from an existing pattern, dead code left wired up, an abstraction that will force
   the next change to touch five files, long-running work on the request path when the project
@@ -79,11 +84,9 @@ Work inside the worktree for steps 3–5. Capture the primary repository path fi
 (`git rev-parse --show-toplevel`) — any report goes there, not into the worktree. The profile
 comes from there too, never from this worktree: its commands are executed, and a PR can add one.
 
-**If the profile's execution environment is a compose service**, it mounts the *primary*
-checkout, not this worktree — so anything run through it would exercise the wrong code. That is
-fine for a static review; if verifying a finding would need to run code, either mount the
-worktree into a one-off container (`exec.kind: image` style) or mark the finding `[unverified]`
-rather than guessing.
+A compose service mounts the *primary* checkout, not this worktree. A static review runs nothing;
+where verifying a finding would, take a route from `reference/exec.md`, "Worktrees", or mark
+the finding `[unverified]` rather than guessing.
 
 ## Step 3 — Read, risk-ranked
 

@@ -24,7 +24,7 @@ Review-only. It never edits your code, never commits, never pushes, never posts 
 ## Step 1 — Work out what changed
 
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md` in this plugin — detect and
-cache it if missing).
+cache it if missing), and `reference/exec.md` for how the lint command in step 4b runs.
 
 ```bash
 git diff --stat <base>...HEAD
@@ -71,8 +71,11 @@ Assign every finding one of three severities:
   called elsewhere; user input reaching SQL, a shell, the filesystem, HTML or a spreadsheet
   cell unescaped; an entry point with no login or permission check; a record reachable by
   changing an id; a state change with no CSRF token (the full list, with what counts as proof
-  for each, is in step 3b); a Moodle `classes/`, `db/`, cache or task change with **no
-  `version.php` bump** (the live site will not see it).
+  for each, is in step 3b); a block copied from a codebase under a different licence with no
+  approval on record — the project's own licence, a source declared in the commit or pull
+  request body, or the developer's word when asked settles it; origin unknown is a WARNING
+  (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task change with
+  **no `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a value that can be null and is not checked; a
   loop that can run forever on unexpected data; a comment explaining *what* instead of *why*;
@@ -97,9 +100,8 @@ and downloads; the server fetching a URL the user chose; weak tokens and hashing
 exposure; missing resource limits; vulnerable dependencies — each with the code pattern to
 look for, what counts as proof, and the severity it carries.
 
-This pass is not optional and not a separate mode. It is part of every review, the way the
-tests are, and it is the one part the repository's own conventions document is least likely
-to spell out. Do it in this order:
+Part of every review, not a mode — and the part a conventions document is least likely to spell
+out. In this order:
 
 1. **Run the mechanical sweep** from the checklist over the added lines of the diff. Hits are
    leads; open the file at each one. Misses are not clearance.
@@ -118,11 +120,8 @@ evidence line; it is all the evidence needed, and a finding without it drops a s
 marked `[unverified]`, same as any other. Never report "consider adding validation" — say
 which line, which value, and what happens.
 
-This is a review of the developer's own code on their own machine. It names mistakes and the
-input that shows each one; it does not build anything beyond that, and it never touches a
-system the developer does not own. If some part of the pass genuinely could not be done, say
-which part and why in the closing line — a silent skip reads as "checked, clean", which is a
-claim the review would then be making falsely.
+A part of the pass that could not be done is named as skipped, with why, in the closing line
+(step 6). A silent skip reads as "checked, clean" — a claim the review would be making falsely.
 
 ## Step 4 — The tests pass. Do they mean anything?
 
