@@ -72,9 +72,8 @@ Where a claim rests on data — how many rows, what states exist, whether this a
 what the schema really looks like — check it. Use whatever the profile says this project has:
 a database in the local container, a fixture set, a small read-only script.
 
-**Run those queries and scripts through the profile's `exec.prefix`**, inside the project's
-container — that is where its database and its runtime live. `git` and file reading stay on the
-host.
+Run queries and scripts the way `reference/exec.md` says — through the profile's `exec.prefix`,
+where the project's database lives. Read that file now if you have not.
 
 - **Local data only.** Never point anything at a live production system. If a question can
   only be answered against production, write the read-only script, leave it untracked, and put

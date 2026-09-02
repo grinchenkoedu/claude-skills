@@ -212,28 +212,9 @@ The reason is correctness before convenience:
 - **The database comes with it.** `hasDatabase` work needs a database; compose already defines
   one.
 
-### What runs where
-
-| Through `exec.prefix` (the container) | On the host |
-|---|---|
-| `composer`, `npm`, `pip` — installing dependencies | `git` — status, diff, branches, worktrees, commits |
-| `php`, `python`, `node` — including a single-file lint | `gh` — pull requests, comments, replies |
-| the test runner — full or scoped | reading and editing files |
-| the project's CLI entry point (`./run`, `cli/*.php`, `main.py`) | HTTP requests to a published port (`localhost:<port>`) |
-| database queries and one-off read-only scripts | `docker` itself, obviously |
-
-The rule of thumb: **if it needs the project's language or its dependencies, it goes in the
-container.** If it operates on the repository as files, or talks to the outside world, it stays
-on the host.
-
-This applies to commands a skill composes on the fly, not just the ones stored in the profile.
-An ad-hoc query, a quick lint of one changed file, a throwaway probe script — all of them go
-through the prefix. Reaching for a bare `php` or `pytest` because it is one quick check is
-exactly how a run ends up testing against the wrong version.
-
-When you fall back to the host, record why in `exec.note` — and if the host toolchain version
-differs from the project's target, say that explicitly in the report. It is the difference
-between "the tests passed" and "the tests passed against the wrong runtime".
+What goes through the prefix and what stays on the host, the host fallback, timeouts and the
+worktree caveat are in `reference/exec.md` — the short file every skill reads at its first step,
+so it is not repeated here. When you fall back to the host, record why in `exec.note`.
 
 ### Platform specifics
 

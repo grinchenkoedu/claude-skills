@@ -40,6 +40,14 @@ Prefer the design that is easier to read, then easier to change, then easier to 
 cheaper in memory and time — in that order. Efficiency is last, not absent: weigh it at the scale
 the data actually has, and give an optimisation that costs readability a measured reason.
 
+### Code provenance
+
+New code is written here, installed as a dependency through the package manager, or taken from
+code under this project's own licence with its header kept. Code from a codebase under a
+different licence — closed, or open source, MIT included — needs the developer's approval
+first and its source and licence named in the commit; renaming a pasted block does not make it
+original, and a library the project could depend on is not vendored piecemeal.
+
 ### Database
 
 - **Placeholders for every variable.** Never interpolate into SQL, not even an integer you
