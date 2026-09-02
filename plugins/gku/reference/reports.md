@@ -54,8 +54,8 @@ anyway and say in one line that the directory is not ignored yet.
   `research`.
 - **`<slug>`** — what it is about: the branch name, or `pr-<n>` when the run was aimed at a pull
   request (`/gku:pr-review` always, `/gku:verify <pr-number>`); for `research`, which has no
-  branch or pull request to name it after, the first words of the request. Lowercase; replace anything
-  outside `a-z0-9` with `-`, collapse runs of `-`, trim to 40 characters. A branch like
+  branch or pull request to name it after, the first words of the request. Lowercase; replace
+  anything outside `a-z0-9` with `-`, collapse runs of `-`, trim to 40 characters. A branch like
   `feature/EXPORT-42_fix` becomes `feature-export-42-fix`. **That rewrite is a guard, not
   tidiness** — a branch name comes from whoever opened the pull request, and one shaped like
   `feat/../../../tmp/x` must not become part of a path you write to.

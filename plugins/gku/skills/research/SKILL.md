@@ -109,8 +109,8 @@ order, and the reading stops when the answer is settled — not when the cap is 
    site is the first thing to check; a page for the latest release describes a different library
    than the one in `vendor/`.
 2. **The upstream repository** — the changelog, the release notes, the commit that changed the
-   behaviour, open and closed issues. Through `gh` when it is signed in
-   (`gh search issues`, `gh api repos/<owner>/<repo>/releases`, `gh api repos/<owner>/<repo>/contents/<path>`);
+   behaviour, open and closed issues. Through `gh` when it is signed in — `gh search issues`,
+   `gh api repos/<owner>/<repo>/releases`, `gh api repos/<owner>/<repo>/contents/<path>` —
    otherwise a web search of the same terms. Not signed in is said once, not on every query.
 3. **Security advisories**, when the question is whether something is vulnerable — the
    advisory's affected range against the installed version.
