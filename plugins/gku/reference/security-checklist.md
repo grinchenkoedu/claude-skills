@@ -1,9 +1,10 @@
-# Security checklist — shared by `/gku:review` and `/gku:verify`
+# Security checklist — shared by `/gku:review`, `/gku:verify` and `/gku:audit`
 
 The well-known security flaws are well known because the same handful of mistakes keep
 being made. This is that handful, written as a reviewer's checklist: the code
 pattern that signals each one, what counts as proof, and the severity it carries. `/gku:review`
-reads code against it; `/gku:verify` confirms the guards hold against a minimal probe. The
+reads code against it; `/gku:verify` confirms the guards hold against a minimal probe;
+`/gku:audit` reads a whole tree against it rather than a diff. The
 per-family rules in `templates/` (`s()`, `require_capability()`, nonces, `|safe`…) say *how
 this repository* is supposed to do each of these; this file says *what to check*.
 
@@ -177,6 +178,20 @@ The hits are diff lines; open the file at each one before deciding anything. The
 not a security lead: a hit means a block may have come from elsewhere, and
 `reference/code-provenance.md` says what decides it — a declared source and licence in the
 commit or pull request body settles it, and an idiom everyone writes is nothing.
+
+### The same sweep over a whole tree
+
+`/gku:audit` has no diff. Define the source over every tracked file instead and run the same
+groups; a hit then carries `path:line` directly, so there is nothing to map back:
+
+```bash
+tracked() { git ls-files -z -- . ':!vendor' ':!node_modules' | xargs -0 grep -nHE -e "$1"; }
+tracked '\$_(GET|POST|REQUEST|COOKIE|SERVER)|optional_param|required_param|request\.(args|form|json|GET|POST|files)|\$request->'
+```
+
+Two checks only a tree shows: a tracked file that should never be — `git ls-files '.env' '*.pem'
+'id_rsa*'` — and a private-key block anywhere, `tracked '-----BEGIN .*PRIVATE KEY'`. A hit in
+either is a BLOCKER in section 6's terms; report the path and the key name, never the value.
 
 Then, for every changed **entry point** — page, route, controller action, AJAX handler,
 external function, CLI script — answer four questions by reading, not guessing:

@@ -19,13 +19,14 @@ step. Nothing is rebuilt.
 ## Arguments
 
 - **A plan or brief** — `/gku:implement .tasks/individual-plan-export.md`. Preferred: a file from
-  `/gku:plan` already has criteria and ordered steps.
+  `/gku:plan` or `/gku:audit` already has criteria and ordered steps.
 - **A sentence** — `/gku:implement add a CSV option to the student export`. Plan it inline
   first (step 2).
 - **Nothing** — ask what to build. Never fall back to a leftover file; building the wrong task
   is worse than asking.
 - `--continue` — resume, skipping steps already marked done.
-- `--step <n>` — run one step only, then stop.
+- `--step <n>` — run one step only, then stop. A range, `--step 3-5`, runs those steps in order
+  and then stops — the way to build one round of an audit file on one branch.
 
 **Telling a file from a sentence:** strip any surrounding quotes, then check whether what
 remains resolves to an existing file. It does → a task file. It does not → a request in prose.
@@ -213,3 +214,5 @@ Do not report success when tests are failing or a criterion is unmet. Say exactl
   `/gku:implement <file> --continue` resumes from the first unticked one.
 - **The task turns out to be much larger than described** — say so early, propose splitting it,
   and let the developer decide before you build half of it.
+- **An audit file's rounds are one branch each** — a run asked to cross a round boundary in one
+  go says so and continues; `/gku:pr` will ask to split the result later.
