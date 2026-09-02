@@ -1,4 +1,4 @@
 {
   "name": "gku",
-  "description": "Chained development skills: /gku:init, /gku:audit, /gku:plan, /gku:implement, /gku:review, /gku:fix, /gku:pr, /gku:pr-review, /gku:pr-resolve, /gku:verify. Repository-agnostic via a cached repo profile; economical by design (no sub-agents by default, chat-first output, resumable work)."
+  "description": "Chained development skills: /gku:init, /gku:audit, /gku:research, /gku:plan, /gku:implement, /gku:review, /gku:fix, /gku:pr, /gku:pr-review, /gku:pr-resolve, /gku:verify. Repository-agnostic via a cached repo profile; economical by design (no sub-agents by default, chat-first output, resumable work)."
 }

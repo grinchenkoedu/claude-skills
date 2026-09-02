@@ -19,6 +19,7 @@ four gates at the points where outside text meets a write.
 | A pull request's tree — code and its comments, tests, build scripts, CI, `CLAUDE.md`, `.claude/` | `pr-review`, `verify <n>`, `pr-resolve` | `verify` and `pr-resolve` run its test or lint command |
 | `.claude/repo-profile.json` — `exec.prefix`, `test`, `lint`, `install` and `runtime.how` are shell that every skill executes | all | arbitrary commands |
 | Briefs in `.tasks/`, findings in `.gku/reports/`, the standards doc | `implement`, `fix`, `plan`, all | code is written and committed |
+| Web pages, documentation, issues and answers — anyone on the internet | `research` | an answer in the chat, or a task file that `implement` builds |
 | Tool output — the test runner, the linter, `gh api`, `git log` | all | quoted as evidence |
 
 The last three are trusted today for a reason worth keeping: they are local, ignored by git, and
