@@ -1,10 +1,10 @@
 # Report files — shared by every skill in this toolkit
 
 Some skills write a markdown report: `/gku:review`, `/gku:verify`, `/gku:pr-review`, and
-`/gku:research` on `--report`. Those
-reports are working notes about one run, not part of the project. They never belong at the
-repository root, where they land in `git status`, get committed by accident, and overwrite
-each other — a second review of the same branch used to destroy the first one.
+`/gku:research` on `--report`. Those reports are working notes about one run, not part of the
+project. They never belong at the repository root, where they land in `git status`, get
+committed by accident, and overwrite each other — a second review of the same branch used to
+destroy the first one.
 
 They all go in **one ignored directory**, under **one naming scheme**, so a series of runs
 collects there instead of colliding.
