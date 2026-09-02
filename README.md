@@ -47,7 +47,8 @@ They are **not** magic and they are **not** automatic. Every one of them does so
 could do yourself; they just do it consistently and without forgetting the boring parts —
 which is exactly where mistakes come from.
 
-Four of them (`/gku:plan`, `/gku:review`, `/gku:pr-review`, `/gku:verify`) never change your code at all.
+Five of them (`/gku:plan`, `/gku:audit`, `/gku:review`, `/gku:pr-review`, `/gku:verify`) never change
+your code at all.
 Three do (`/gku:implement`, `/gku:fix`, `/gku:pr-resolve`), and each tells you what it is about to
 do. `/gku:pr` changes nothing locally; it pushes commits you already made and opens the pull
 request.
@@ -87,8 +88,10 @@ You need:
    gh auth status
    ```
 
-   `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:fix` and `/gku:verify` work without `gh`.
-   Only `/gku:pr`, `/gku:pr-review` and `/gku:pr-resolve` need it, because they talk to GitHub.
+   `/gku:plan`, `/gku:audit`, `/gku:implement`, `/gku:review`, `/gku:fix` and `/gku:verify` work
+   without `gh`. `/gku:pr`, `/gku:pr-review` and `/gku:pr-resolve` need it, because they talk to
+   GitHub — and so does `/gku:audit --provenance`, which searches GitHub for where copied code
+   came from.
 
 4. **Docker** — [Docker Desktop](https://www.docker.com/products/docker-desktop/) on Windows
    and macOS, Docker Engine on Linux. **Strongly recommended on every platform**, not just
@@ -121,8 +124,9 @@ In Claude Code, run these two commands:
 /plugin install gku@grinchenkoedu
 ```
 
-That is all. Type `/` and you will see `/gku:plan`, `/gku:implement`, `/gku:review`, `/gku:fix`,
-`/gku:pr`, `/gku:pr-review`, `/gku:pr-resolve` and `/gku:verify` in the list.
+That is all. Type `/` and you will see `/gku:init`, `/gku:audit`, `/gku:plan`, `/gku:implement`,
+`/gku:review`, `/gku:fix`, `/gku:pr`, `/gku:pr-review`, `/gku:pr-resolve` and `/gku:verify` in the
+list.
 
 ### Updating
 
@@ -197,7 +201,9 @@ They follow the order of the work:
 
 ```
    /gku:init ──▶ /gku:plan ──▶ /gku:implement ──▶ /gku:review ⇄ /gku:fix ──▶ /gku:pr
-(once per repo)                                                                 │
+(once per repo)                      ▲                                          │
+   /gku:audit ───────────────────────┘                                          │
+(now and then, the whole repository)                                            │
                                        ┌────────────────────────────────────────┤
                                        ▼                                        ▼
                                 /gku:pr-review                          /gku:pr-resolve
@@ -209,6 +215,7 @@ They follow the order of the work:
 | Command | What it does | Changes your code? |
 |---|---|---|
 | `/gku:init` | Writes this repository's `CLAUDE.md` — commands plus its family's rules | **Yes** (one file) |
+| `/gku:audit` | Reads the whole repository against the rules and writes a plan to fix what it finds | No |
 | `/gku:plan` | Turns a request into a concrete plan, checked against the real code | No |
 | `/gku:implement` | Builds the plan, step by step, ticking off progress as it goes | **Yes** |
 | `/gku:review` | Checks your own changes before you push them | No |
@@ -346,6 +353,53 @@ without a second copy that drifts. A stub rather than a symlink, because git che
 as plain text files on Windows.
 
 Run it once per repository, and again when the family rules improve.
+
+### `/gku:audit` — audit the whole repository
+
+```
+/gku:audit
+/gku:audit --area security --area agents
+/gku:audit --provenance
+```
+
+Everything else here looks at a change. This looks at the repository as it stands — the one you
+just inherited, the one you are about to publish, the one nobody has ever read as a whole — and
+reads it against the same rules the other skills apply to a diff:
+
+- **Security** — the checklist `/gku:review` uses, over every file: request input reaching SQL,
+  a shell, the filesystem or the page unescaped; entry points with no login or permission check;
+  committed secrets; a dependency with a published advisory; an end-of-life runtime.
+- **Licensing** — is there a `LICENSE`, does the manifest agree with it, do the files carry the
+  header the family requires (a Moodle plugin is GPL), is a library vendored with its notice
+  stripped, and does any block read as copied from somewhere under a different licence.
+- **Code quality** — lint over the tree, whether the tests assert anything, whether a
+  bulk-writing script has a dry run, whether long work runs inside a web request when the
+  project already has a queue. Style is sampled from the files it reads, not swept.
+- **Agent readiness** — whether `CLAUDE.md` and `AGENTS.md` exist and still tell the truth (the
+  judgement `/gku:init` makes), whether the repo profile is ignored rather than tracked, whether
+  a test command can be detected, and whether anything under `.claude/` asks for something a
+  skill must never do.
+
+The output is not a review in the chat but **a task file in `.tasks/`, in the shape `/gku:plan`
+writes**: findings with severities and evidence, then steps grouped into **rounds**, each sized
+for one branch and one pull request — secrets first, then security blockers, warnings,
+dependencies, licensing, readiness, quality. `/gku:implement .tasks/audit-<date>.md --step 1-2`
+builds the first round; the whole file on one branch builds everything, and `/gku:pr` will then
+ask you to split it. A finding whose fix is a decision — which licence, whether a copyleft
+dependency may stay — becomes a question in the file, not a step.
+
+It reads more than `/gku:review`: greps over every file, then up to ten files in full, all named
+in the file it writes. Run it on onboarding, before a release, or after a long gap — not daily.
+
+`--provenance` goes one step further on licensing. Where a block looks copied — a comment voice
+unlike its neighbours, a licence the repository does not carry, a function you recognise from a
+library — it takes a few distinctive lines, searches GitHub for them with `gh`, fetches what it
+finds, and compares the two side by side: licence against licence, and dates against dates to
+tell who copied whom. **That is the one thing in this toolkit that sends fragments of your code
+to an outside service**, which is why it is a separate flag, off unless you ask, capped at thirty
+searches, with the count written into the file. It needs `gh` signed in; without it the hunt is
+skipped and the file says so. It names both licences and never rules on compatibility — that
+part is yours to decide.
 
 ### `/gku:plan` — work out what to build
 
@@ -521,6 +575,10 @@ reads from your recent merged pull requests. The testing section says what was a
 **admits it when nothing was**. Updating an existing pull request never silently overwrites a
 description somebody wrote by hand.
 
+On a public repository the description carries no Claude Code session link. Such a link opens
+only for the account that owns it; to everyone else it is a dead link that says which tool wrote
+the change. The co-author trailer in the commits is the attribution, and it stays.
+
 ### `/gku:pr-review` — review someone else's pull request
 
 ```
@@ -649,6 +707,9 @@ The skills add `.gku/` to your `.gitignore` the first time they write one — th
 notes about a moment in your working tree, not project history. Delete the directory whenever
 you like; nothing reads it except you and `/gku:fix <path>`.
 
+`/gku:audit` writes no report: like `/gku:plan`, it puts a task file in `.tasks/`, because
+`/gku:implement` is what reads it.
+
 ## Using these on a Pro plan
 
 Claude Code on a Pro subscription has usage limits that reset periodically. These skills were
@@ -666,6 +727,8 @@ How they keep the cost down:
   there is a blocker, or when you ask with `--report` — and it goes to `.gku/reports/`, never
   the repository root (see [Where the reports go](#where-the-reports-go)).
 - **`/gku:implement` is resumable**, so hitting a limit costs you nothing but time.
+- **`/gku:audit` reads more than the rest** — greps over the whole tree and ten files in full
+  rather than five. It is for onboarding a repository or a pre-release check, not for every day.
 
 Practical advice:
 

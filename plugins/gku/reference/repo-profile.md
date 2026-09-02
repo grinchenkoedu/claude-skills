@@ -276,7 +276,8 @@ limits. If you are extending a skill, keep them.
   to a small fast model since its job is mechanical scanning.
 - **Never spawn background agent fleets or workflow runs.** A single session does the work.
 - **Read the diff, not the repository.** Full-file reads are capped at the five highest-risk
-  files; everything else is judged from the diff.
+  files; everything else is judged from the diff. `/gku:audit` is the one exception — it has no
+  diff — and its cap is ten files, each named in the task file it writes.
 - **Chat first.** A markdown report is written only when there is a blocker, or when the user
   asks with `--report`. Most runs should end in the conversation.
 - **Exit early.** Nothing to do means two lines and a stop, not a report explaining that there
