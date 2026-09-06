@@ -3,6 +3,12 @@ name: pr
 description: Open a pull request for the current branch, or update the one already linked to it — with a title and description written from the actual diff and the repository's own template. Checks first that the branch reads as one coherent change, and asks before opening a pull request that is really two. Never merges, never force-pushes, never commits on your behalf.
 argument-hint: "[<title>] [--base <branch>] [--draft] [--dry-run]"
 user-invocable: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard.sh"
 ---
 
 # /gku:pr — open or update the pull request for this branch

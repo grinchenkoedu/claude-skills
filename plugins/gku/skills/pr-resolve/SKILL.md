@@ -3,6 +3,12 @@ name: pr-resolve
 description: Work through the review comments on your own pull request, from any directory — pass a URL and it resolves the repository, reusing a local clone or making one. Every finding gets a verdict before any code changes (agree, disagree with evidence, or ask you), then fixes land one commit per finding, get pushed, and each thread gets a reply. Never fixes blindly; reviewers and bots are sometimes wrong.
 argument-hint: "<pr-url | pr-number> [--repo <owner/name>] [--in <path>] [--dry-run]"
 user-invocable: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard.sh"
 ---
 
 # /gku:pr-resolve — act on the comments on your pull request
