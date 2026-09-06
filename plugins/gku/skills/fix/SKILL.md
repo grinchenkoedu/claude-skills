@@ -281,11 +281,18 @@ stands:
 3. **Check it immediately** — lint the changed file if the profile has a lint command, and run
    the scoped test if one covers it. A failure here means the fix is wrong; fix the fix before
    moving on.
-4. **Commit** (when step 1 said to), staging only that finding's paths:
+4. **Commit** (when step 1 said to), staging only that finding's paths, and put any ruling you
+   made on your own in the body — a finding often admits more than one fix, and the one you
+   chose is a decision the next reader inherits:
 
    ```
    Fix: <the finding, in one line>
+
+   Ruling: <what you decided> — <why> — <what it costs if wrong>
    ```
+
+   Only for what you decided yourself. A fix the finding spelled out needs no ruling, and
+   neither does anything the batched question in step 5 already answered.
 
 5. Say in one line what changed. Do not go quiet for eight findings.
 
