@@ -1,4 +1,9 @@
 {
   "name": "gku",
-  "description": "Chained development skills: /gku:init, /gku:audit, /gku:research, /gku:plan, /gku:implement, /gku:review, /gku:fix, /gku:pr, /gku:pr-review, /gku:pr-resolve, /gku:verify. Repository-agnostic via a cached repo profile; economical by design (no sub-agents by default, chat-first output, resumable work)."
+  "version": "1.0.0",
+  "description": "Chained development skills: /gku:init, /gku:audit, /gku:research, /gku:plan, /gku:implement, /gku:review, /gku:fix, /gku:pr, /gku:pr-review, /gku:pr-resolve, /gku:verify. Repository-agnostic via a cached repo profile; economical by design (no sub-agents by default, chat-first output, resumable work).",
+  "author": {
+    "name": "Borys Grinchenko Kyiv Metropolitan University",
+    "url": "https://github.com/grinchenkoedu/claude-skills"
+  }
 }
