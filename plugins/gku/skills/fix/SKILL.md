@@ -347,6 +347,11 @@ Then, in order:
   second look, `/gku:verify` when the fix needs proving rather than re-reading, `/gku:pr` when it
   is ready to go out.
 
+**And at most one line for the next run.** Where the investigation turned up something about
+the repository that the next run would otherwise rediscover — not a finding, not this fix —
+append it to `.gku/learned.md` and prune to the last 20 lines, as `reference/reports.md` says.
+Most runs have nothing to add.
+
 **Do not re-run the review yourself.** Fix, review, fix, review is a loop that spends a plan's
 worth of usage on diminishing returns. Name the next command and let the developer choose it.
 
