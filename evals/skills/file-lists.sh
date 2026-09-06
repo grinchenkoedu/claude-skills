@@ -22,11 +22,14 @@ note() { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
 # phrase is what matters, not how markdown dressed it.
 flat() { tr '\n' ' ' < "$1" | tr -d '`' | tr -s ' '; }
 
-# The writers: every skill that produces a task file gives its steps the three lines.
+# The writers: every skill that produces a task file gives its steps the three
+# lines — and each on its own line, indented under the step. One packed line
+# would satisfy a search for the three words while giving the readers a second
+# shape to parse, which is exactly what happened before this was asserted.
 for s in plan research audit; do
   f="$skills/$s/SKILL.md"
   for part in 'Create:' 'Modify:' 'Test:'; do
-    grep -q "$part" "$f" || note "$s: its Steps template has no $part line"
+    grep -qE "^ +- $part" "$f" || note "$s: its Steps template has no indented $part line of its own"
   done
 done
 
