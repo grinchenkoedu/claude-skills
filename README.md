@@ -29,6 +29,7 @@ MIT licensed.
 - [Each skill in detail](#each-skill-in-detail)
 - [Writing a task file](#writing-a-task-file)
 - [Where the reports go](#where-the-reports-go)
+- [What runs underneath](#what-runs-underneath)
 - [Using these on a Pro plan](#using-these-on-a-pro-plan)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -773,10 +774,48 @@ The skills add `.gku/` to your `.gitignore` the first time they write one — th
 notes about a moment in your working tree, not project history. Delete the directory whenever
 you like; nothing reads it except you and `/gku:fix <path>`.
 
+One file beside them is not a report: `.gku/learned.md`, where `/gku:implement` and `/gku:fix`
+leave a line about the repository that the next run would otherwise rediscover, and which
+`/gku:plan` and `/gku:research` read before they start. It is capped at twenty lines, so it
+cannot grow into a tax on every run.
+
 `/gku:audit` writes no report: like `/gku:plan`, it puts a task file in `.tasks/`, because
 `/gku:implement` is what reads it. `/gku:research` does either: a task file in `.tasks/` when
 something has to be built, and otherwise the answer in the chat — written to
 `.gku/reports/research-<slug>-<timestamp>.md` only when you ask with `--report`.
+
+## What runs underneath
+
+Most of this is prose, and prose is a rule the model can misread. A few things are mechanism
+instead:
+
+- **A guard on the four skills that write.** `/gku:implement`, `/gku:fix`, `/gku:pr` and
+  `/gku:pr-resolve` register a `PreToolUse` hook while they run. It reads the command about to
+  execute and refuses `--force`, `--force-with-lease`, `--no-verify`, `git commit --amend`, and a
+  push to the base branch — including the spellings that hide one: `+main`, `HEAD:refs/heads/main`.
+  Talk about a flag in a commit message is not use of it.
+- **Frontmatter that matches the descriptions.** The six skills that write carry
+  `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
+  The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a
+  task file or a report, and may never change a file that was already there. `/gku:audit` is in
+  both lists — it writes a task file and must never edit anything else — which is why six and
+  six cover eleven skills.
+- **Facts arrive as data.** `gku-survey` gathers every marker the profile detection needs in one
+  read-only pass, and the six skills that care about the tree get the branch and a short status
+  injected before their first turn, rather than spending tool calls asking git what it already
+  knows. A Docker daemon that hangs costs five seconds, not the run.
+- **A claim needs output from this turn.** "Tests pass" without the runner's line is not a
+  claim, and a green suite is not proof that a reported bug is gone — the suite never had a test
+  for it, which is why the bug existed. One rule, in the file every skill reads first.
+- **Decisions get written down.** When a skill decides something on its own — which of two
+  places a class goes, which of two fixes a finding admits — it records a `Ruling:` line: what,
+  why, and what it costs if wrong. `/gku:review` reads them back and checks each against the diff.
+- **One line for the next run.** `.gku/learned.md` holds what a run had to find out about the
+  repository — the suite needs the container up, a cache has to be purged. Capped at twenty
+  short lines, read by `/gku:plan` and `/gku:research`, ignored like the reports.
+- **Every planned step names its files.** `Create:`, `Modify: path:lines (symbol)`, `Test:` — so
+  `/gku:implement` opens exactly those files instead of searching, and `/gku:review` greps them
+  for symbols that moved.
 
 ## Using these on a Pro plan
 
@@ -939,6 +978,12 @@ reach for one of them:
   is for what the harness resolves itself, such as the guard a `hooks:` block names.
 - **`allowed-tools` is a whitelist, not an addition.** A skill that lists one tool has only that
   tool. Leave it out unless you are prepared to enumerate everything the skill uses.
+
+**The checks.** `bash evals/run-all.sh` runs every suite under `evals/` — one script per rule,
+each printing a summary line and exiting non-zero the moment its rule stops holding. CI runs the
+same command on every push and pull request, with `shellcheck` over the shell and
+`claude plugin validate` over the plugin. A change to a skill that quietly drops one of these
+conventions fails there rather than in somebody's session.
 
 A change to a `SKILL.md` or to `reference/` is code that runs in every session on every machine
 that updates the plugin. Review it as such.
