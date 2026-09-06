@@ -107,7 +107,7 @@ say host-runtimes "$(for c in php python3 node ruby go composer npm; do command 
 
 # 6/8. Runtime surface and whether a database is in play
 say entry-points "$(present run bin cli main.py app.py index.php public/index.php)"
-say database-markers "$(present schema.sql migrations alembic db/install.xml db/upgrade.php db/tables)$(bound 10 git grep -l -E '\$DB->|get_records?\(|PDO|sqlalchemy|knex|\bSELECT\b' -- ':!vendor' ':!node_modules' ':!*.md' ':!*.txt' 2>/dev/null | head -3 | tr '\n' ' ')"
+say database-markers "$(present schema.sql migrations alembic db/install.xml db/upgrade.php db/tables)$(bound 10 git grep -l -E '\$DB->|get_records?\(|PDO|sqlalchemy|knex|\bSELECT\b' -- '*.php' '*.py' '*.js' '*.ts' '*.rb' '*.go' '*.java' '*.sql' ':!vendor' ':!node_modules' 2>/dev/null | head -3 | tr '\n' ' ')"
 
 # 7. timeoutTool — decided at the top, by behaviour
 say timeout-tool "${TO:-none}"
