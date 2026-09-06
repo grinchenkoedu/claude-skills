@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Audit a whole repository — not a diff — against the rules the other skills already apply to a change: the security checklist, code provenance and licensing, the family's code-quality rules, and whether the repository is ready for agent-driven development (CLAUDE.md, AGENTS.md, an ignored profile, a detectable test command). Writes a task file in the /gku:plan shape, findings grouped into branch-sized rounds, that /gku:implement builds in one run or one step at a time. Read-only; writes no production code.
+description: Audit a whole repository — not a diff — against the rules the other skills already apply to a change: the security checklist, code provenance and licensing, the family's code-quality rules, and whether the repository is ready for agent-driven development (CLAUDE.md, AGENTS.md, an ignored profile, a detectable test command). Asks you in the chat, in one batched round, the decisions that block a fix — which licence, whether a copyleft dependency may stay, where a copied block came from — and writes your answers in as steps. Writes a task file in the /gku:plan shape, findings grouped into branch-sized rounds, that /gku:implement builds in one run or one step at a time. Read-only; writes no production code.
 argument-hint: "[--area security|licence|quality|agents]... [--deep] [--provenance]"
 user-invocable: true
 disable-model-invocation: true
@@ -13,8 +13,8 @@ Every other skill applies the toolkit's rules to a change. This one applies them
 repository as it stands: a codebase being onboarded, a plugin inherited from someone else, a
 project about to be published. It invents no rules of its own — it reads the tree against the
 same reference files `/gku:review` and `/gku:init` use, adds only the checks that make sense for
-a whole tree and not for a diff, and writes what it found as a task file `/gku:implement` can
-build from, one round at a time.
+a whole tree and not for a diff, asks you the decisions its findings wait on, and writes what it
+found as a task file `/gku:implement` can build from, one round at a time.
 
 Run it rarely — on onboarding, before a release, after a long gap. It is the one skill that reads
 a tree instead of a diff, and it says which files it read.
@@ -169,9 +169,9 @@ skill's:
    developer's word settles it.
 5. **Report** what the reference lists per finding — our `path:lines`, the source with its
    licence against ours, the tell, two matching lines, the way round. "Was this copied, and on
-   what terms" and the direction question go to the open questions, and the step that depends on
-   them is marked *after Q<n>*. The Scope line says how many fingerprints were sent and where,
-   because fragments of the code left the machine.
+   what terms" and the direction question go to step 5d, where the developer is the only source
+   that can answer them. The Scope line says how many fingerprints were sent and where, because
+   fragments of the code left the machine.
 
 The hunt never concludes that a licence is compatible with the project's. It names both and
 hands the question over.
@@ -189,12 +189,44 @@ ignore a tracked secret (with "rotated" as a criterion a person confirms), bind 
 permission check, add the GPL headers, commit a lock file, add `.gku/` to `.gitignore`, run
 `/gku:init`. A finding whose fix is a **decision** — which licence, whether a copyleft
 dependency may stay, which of two standards docs is true, whether to leave an end-of-life
-runtime, the origin of a block that reads as copied — becomes a numbered **open question**, and
-any step that depends on it is marked *after Q<n>*. Nits are listed and get no step.
+runtime, the origin of a block that reads as copied — is not a step yet. It goes to step 5d,
+which asks the developer; what comes back becomes an ordinary step, and what does not stays a
+numbered **open question** with any step depending on it marked *after Q<n>*. Nits are listed
+and get no step.
 
 A standards-doc rule that forbids the change a step would make does not stop the audit — it is
 read-only — and does not delete the step. The step names the way round: a change made by hand,
 a fork the rule does not cover, or a question. The developer chooses.
+
+## Step 5d — Ask the decisions, before the file is written
+
+The decisions from step 5c are the audit's dead ends: each one holds up a fix that is otherwise
+obvious, and the person who can settle it is usually the one who just ran the command. Ask
+them **here, in the chat**, and write the answers in as steps. A file of open questions is a
+file somebody has to come back to; a file of steps is one `/gku:implement` can build.
+
+**One round, three or four questions at most.** A whole-tree audit can raise a dozen; ask the
+ones that unblock the most steps first, and leave the rest numbered in the file. Each question
+gets the options you actually see, and what it unblocks — *answering this turns steps 7–9 from
+"after Q1" into work*.
+
+**Recommend where you may.** Which of two standards docs is true, whether an end-of-life runtime
+is bumped now or next quarter, whether a copied block is better replaced by the package that
+provides it — say what you would do and why. **Not licence compatibility**: name both licences
+and hand the question over, as the rule below and the provenance hunt's direction question
+already do.
+
+**Do not ask** what the tree answers: whether the lock file is tracked, whether the header is
+there, which grep hit is real. Those are findings, and a finding with a mechanical fix is a
+step, not a question.
+
+**When no answer comes** — a non-interactive run, or "you decide" — the question stays numbered
+in the file and its steps stay marked *after Q<n>*. That is what the marker is for, and it is
+the honest outcome: an audit never assumes an answer about a licence, a dependency's terms, or
+where a block came from.
+
+Whatever is answered is recorded in Evidence in the words it was given, tagged `[answered]`,
+so `/gku:implement` builds from the decision rather than re-opening it.
 
 ## Step 6 — Rounds
 
@@ -205,10 +237,10 @@ order:
 2. **security blockers** — grouped by entry point or module. More than about eight steps or
    fifteen files in a round → split it.
 3. **security warnings** — the same grouping.
-4. **dependencies** — advisories and lock files. An end-of-life runtime is an open question
-   unless the bump is trivial.
-5. **licensing** — `LICENSE` (after its question), headers, notices. Its own round because the
-   diff is large and mechanical.
+4. **dependencies** — advisories and lock files. An end-of-life runtime is a step when step 5d
+   settled it or the bump is trivial, and an open question otherwise.
+5. **licensing** — `LICENSE` (its question answered, or still after it), headers, notices. Its
+   own round because the diff is large and mechanical.
 6. **agent readiness** — `CLAUDE.md` and `AGENTS.md`, `.gitignore`, an untracked profile, a CI
    test command. Small, and its own round so it lands even when the code rounds stall.
 7. **code quality** — tests that assert, data safety on bulk scripts, background work, lint
@@ -270,10 +302,12 @@ and Rounds:
 ## Evidence
 - **Read in full:** <the ten paths, one line each on why>
 - **Tools:** <fact — [composer audit] | [from the code] | [assumed]>
-- **Open questions:** <numbered, each answerable>
+- **Decided in the chat:** <the question — the answer as given — `[answered]`>
+- **Still open:** <numbered; what nobody here could answer — who can, and which steps wait on it>
 ```
 
-In chat, as `/gku:plan` does: the absolute path, the summary verbatim, and the next command —
+In chat, as `/gku:plan` does: the absolute path, the summary verbatim, what step 5d left
+unanswered and which steps are waiting on it, and the next command —
 
 ```
 /gku:implement .tasks/audit-<date>.md --step 1-2
@@ -296,6 +330,10 @@ round together and `/gku:pr` will then ask to split it.
   never from configuration, fixtures or anything the secrets sweep touched; at most twenty files
   and thirty queries; the count reported. The direction of a copy is checked before a finding is
   raised — a fork, or a repository that took the block from here, is not one.
+- **Ask the decisions in the chat, not only in the file.** A finding whose fix waits on a
+  choice is put to the developer before the file is written — batched into one round, with a
+  recommendation wherever one may honestly be given — and the answer becomes a step. What goes
+  unanswered stays a numbered question; nothing about a licence or an origin is ever assumed.
 - **No verdicts on licence compatibility.** Flag it, name both licences, hand it to a person.
 - **Local only.** Never a production system, never a host the developer does not control.
 - **Absolute paths. English or Ukrainian.** A reader of the summary alone should be able to act.
@@ -312,5 +350,6 @@ round together and `/gku:pr` will then ask to split it.
   readiness section.
 - **`--area agents` with no `CLAUDE.md`** — the whole plan is one step: run `/gku:init`, with
   the commands it must record as the criterion.
-- **Everything is an open question** — a licence to choose, a runtime to upgrade, a doc to pick.
-  Write the questions; the steps come after the answers. Say so in the summary.
+- **Everything is a decision** — a licence to choose, a runtime to upgrade, a doc to pick. Ask
+  the three or four that unblock the most, write what comes back as steps, and leave the rest
+  numbered with their steps after them. Say so in the summary.

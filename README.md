@@ -253,9 +253,10 @@ same name.*
 > `/gku:implement "add a CSV export" --continue`.
 
 Claude finds the export code, reads it, checks the database to see whether same-named
-departments really exist, and writes a plan to `.tasks/export-department-collision.md` — with
-the cause, the fix, acceptance criteria and ordered steps. Read it. **If the plan is wrong,
-say so now** — it is much cheaper to fix a plan than a half-built change.
+departments really exist, asks you about anything neither of those can settle, and writes a
+plan to `.tasks/export-department-collision.md` — with the cause, the fix, acceptance criteria
+and ordered steps. Read it. **If the plan is wrong, say so now** — it is much cheaper to fix a
+plan than a half-built change.
 
 **2. Build it.**
 
@@ -396,7 +397,10 @@ for one branch and one pull request — secrets first, then security blockers, w
 dependencies, licensing, readiness, quality. `/gku:implement .tasks/audit-<date>.md --step 1-2`
 builds the first round; the whole file on one branch builds everything, and `/gku:pr` will then
 ask you to split it. A finding whose fix is a decision — which licence, whether a copyleft
-dependency may stay — becomes a question in the file, not a step.
+dependency may stay, where a copied block came from — **it asks you**, three or four at a time
+before the file is written, each with what your answer unblocks; what you settle becomes a step.
+What you cannot settle stays a numbered question with its steps waiting on it — nothing about a
+licence or an origin is ever assumed for you.
 
 It reads more than `/gku:review`: greps over every file, then up to ten files in full, all named
 in the file it writes. Run it on onboarding, before a release, or after a long gap — not daily.
@@ -432,6 +436,12 @@ and only then Q&A posts, dated and treated as leads. Every fact says where it ca
 version it describes; a fact about a version you do not run is a lead, not evidence, and where a
 claim can be checked on your machine, it is.
 
+**What only you can answer, it asks** — which version you actually target when the lock file
+and the host disagree, which of two libraries suits what your team already runs, whether to
+upgrade now or hold a patch until the fix is released — in one batched round before the result
+is written, each with the answer it recommends. Your answers go into the result. Only what
+nobody in the conversation could answer is left open, and it says who can.
+
 **What it found decides what you get.** When something in the repository has to change, it
 writes a task file in `.tasks/` in exactly the shape `/gku:plan` writes — with the sources added —
 so `/gku:implement` builds it. When nothing has to change — an answer, a choice between options,
@@ -466,6 +476,11 @@ proposing anything.
 Output goes to `.tasks/<name>.md`: the cause or design, acceptance criteria, ordered steps,
 and how to check the result. For a web application the design also says which steps run in the
 background rather than in the request, using the mechanism the project already has.
+
+**What the code cannot tell it, it asks you** — which of two behaviours you meant, a policy
+nobody wrote down, a number only you know — in one batched round before the plan is written,
+with a recommendation for each question. Your answers go into the plan. Only what nobody in
+the conversation could answer is left open, and it names who can answer it.
 
 `--review` is for when the file *already* proposes a solution: it judges that proposal rather
 than inventing a different one.
