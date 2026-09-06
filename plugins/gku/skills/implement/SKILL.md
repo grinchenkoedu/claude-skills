@@ -165,6 +165,8 @@ Run the profile's test command. Wrap it with the profile's `timeoutTool` where t
 rather than dropping the timeout silently.
 
 Quote the actual result line as evidence. Not "tests pass" — the line the runner printed.
+That is `reference/exec.md`'s rule on fresh evidence, and it covers every claim in step 6's
+report: the build, the lint, each criterion.
 
 If something fails, fix it and re-run, **up to three rounds**. After three, stop and report
 what is still failing and what you think it is. Do not keep grinding; a fourth attempt on a

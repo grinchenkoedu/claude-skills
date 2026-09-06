@@ -157,9 +157,10 @@ If that shows a convention — a `feat:` prefix, a ticket key, Ukrainian titles 
   from the task file if the branch has one in `.tasks/`.
 - **How** — two or three bullets, only where a reviewer would otherwise have to reverse-engineer
   the approach. Skip it for an obvious change.
-- **Testing** — what was actually run, quoted. **If nothing was run, say that.** Never write
-  "tests pass" as a formality; a description that claims verification which did not happen is
-  worse than one that admits the gap. Point at `/gku:verify`.
+- **Testing** — what was actually run, quoted, under `reference/exec.md`'s rule on fresh
+  evidence. **If nothing was run, say that.** Never write "tests pass" as a formality; a
+  description that claims verification which did not happen is worse than one that admits the
+  gap. Point at `/gku:verify`.
 - **Notes** — schema change, version bump, migration, config or secret needed, and anything
   deliberately left out of scope.
 

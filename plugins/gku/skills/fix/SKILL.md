@@ -301,7 +301,9 @@ it here. Carry on with the rest of the list.
 Run the profile's test command, wrapped in its `timeoutTool` where there is one. **A hang is a
 failure.** When there is no timeout tool, say so rather than dropping the bound silently.
 
-Quote the runner's actual result line as evidence. Not "tests pass" — the line it printed.
+Quote the runner's actual result line as evidence. Not "tests pass" — the line it printed;
+`reference/exec.md` says what counts as fresh evidence, including why a green suite is not
+proof that the reported bug is gone.
 
 Something fails, fix and re-run, **up to three rounds**. After three, stop and report what is
 still failing and what you think it is.

@@ -18,6 +18,13 @@ it too. A bare `php` or `pytest` for one quick check is how a run tests the wron
 | the project's CLI entry point (`./run`, `cli/*.php`, `main.py`) | HTTP requests to a published port (`localhost:<port>`) |
 | database queries and one-off read-only scripts | `docker` itself, obviously |
 
+## Claims need fresh evidence
+
+A claim about tests, lint, a build, a fixed bug or a met criterion is made **only with output
+run in this turn, quoted**; "should", "probably", "looks correct", "Done!" and "all green"
+without that line are not claims. The proof a bug is fixed is the original symptom re-run — a
+green suite is not it, since the suite had no test for the bug.
+
 ## Host fallback
 
 `exec.kind: host` means no container was proven; `exec.note` says why. Every reported result —
