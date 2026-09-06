@@ -154,7 +154,10 @@ long-running piece, where it runs and how the user learns it finished. For a que
 - [ ] <for background work: the request returns without waiting for it, and how the result is reached>
 
 ## Steps
-1. <ordered, file-level, buildable one at a time>
+1. <what the step does, in one line>
+   - Create: <paths this step adds>
+   - Modify: <path:lines this step changes>
+   - Test: <the test that proves this step, or "none — covered by step N">
 
 ## How to check it
 - `<the exact command from this project that proves it works>`
@@ -167,6 +170,12 @@ long-running piece, where it runs and how the user learns it finished. For a que
 - **Data:** <fact — [source tag]>
 - **Open questions:** <numbered, each answerable>
 ```
+
+**A step is the smallest thing with its own test cycle**, and its three lines say so
+mechanically: what it creates, what it changes down to the lines, and what proves it.
+`/gku:implement` opens exactly those files, and `/gku:review` greps the `Modify:` paths for
+symbols that moved. A step you cannot write those lines for is not one step — split it, or say
+plainly which paths you could not name and why.
 
 Omit acceptance criteria and steps for a pure question — the answer is the deliverable.
 

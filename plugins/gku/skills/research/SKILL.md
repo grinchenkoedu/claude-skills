@@ -216,7 +216,10 @@ a web runtime where each long-running piece runs.>
 - [ ] <checkable, specific — what /gku:implement builds against and /gku:verify checks>
 
 ## Steps
-1. <ordered, file-level, buildable one at a time>
+1. <what the step does, in one line>
+   - Create: <paths this step adds>
+   - Modify: <path:lines this step changes>
+   - Test: <the test that proves this step, or "none — covered by step N">
 
 ## How to check it
 - `<the exact command from this project that proves it works>`
