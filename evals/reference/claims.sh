@@ -20,18 +20,25 @@ skills="$root/plugins/gku/skills"
 
 fails=0
 note() { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
+# These files are prose wrapped at the width of the file, so a two-word phrase is
+# as likely to straddle a line break as not — and the continuation line may be
+# indented. Match against a copy with the newlines and runs of spaces squeezed out.
+flat() { tr '\n' ' ' < "$1" | tr -s ' '; }
 
 grep -q '^## Claims need fresh evidence' "$exec_md" || note 'exec.md has lost the evidence gate'
-grep -q 'output' "$exec_md" || note 'exec.md: the gate should say what counts as evidence'
+flat "$exec_md" | grep -q 'in this turn' || note "exec.md: the gate has lost its point — evidence is output from this turn"
 
 # Short on purpose: it is read at the first step of every skill that runs a command.
 lines="$(wc -l < "$exec_md" | tr -d ' ')"
 [ "$lines" -le 80 ] || note "exec.md is $lines lines; every skill reads it first, so keep it under 80"
 
+# The pointer, not the filename: three of these four read exec.md at step 1 and so
+# mention it whatever they do about claims, which would make a bare filename check
+# pass on prose that predates the gate entirely.
 for s in implement fix verify pr; do
   f="$skills/$s/SKILL.md"
   [ -f "$f" ] || { note "$s: no SKILL.md"; continue; }
-  grep -q 'exec.md' "$f" || note "$s: reports results but never points at reference/exec.md"
+  flat "$f" | grep -q 'fresh evidence' || note "$s: reports results without pointing at the gate ('fresh evidence')"
 done
 
 if [ "$fails" -eq 0 ]; then
