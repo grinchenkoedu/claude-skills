@@ -70,6 +70,20 @@ or open source under MIT or any other — is never pasted in without your approv
 and renaming a pasted block does not count as writing it. The review skills look for the signs
 of a copy. `plugins/gku/reference/code-provenance.md` draws that line.
 
+### The same skills for Google Antigravity
+
+If you also work in [Google Antigravity](https://antigravity.google/docs), the same set lives at
+[grinchenkoedu/antigravity-skills](https://github.com/grinchenkoedu/antigravity-skills) and is
+kept in step with this one: the same eleven skills, the same names (`/gku-review` there,
+`/gku:review` here — Antigravity separates with a hyphen), and the same rules underneath, from
+the cached repository profile to the security checklist, the untrusted-input line and the
+provenance rules.
+
+What differs is the harness, not the method. That one installs with `install.sh` rather than a
+plugin marketplace, writes `GEMINI.md` where this one writes `CLAUDE.md`, and its CI lints the
+shell and checks skill frontmatter, while this repository also runs its eval suites. When a rule
+changes in one, it changes in the other.
+
 ## Before you start
 
 You need:
