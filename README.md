@@ -3,7 +3,7 @@
 **🇬🇧 English** · [🇺🇦 Українська](README.uk.md)
 
 <p>
-  <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code" /> <img src="https://img.shields.io/badge/macOS_%7C_Linux_%7C_Windows-4A4A4A?style=for-the-badge" alt="macOS | Linux | Windows" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /> <a href="https://github.com/grinchenkoedu/claude-skills/actions/workflows/checks.yml"><img src="https://img.shields.io/github/actions/workflow/status/grinchenkoedu/claude-skills/checks.yml?branch=main&style=for-the-badge&label=CI&logo=githubactions&logoColor=white" alt="CI" /></a> <img src="https://img.shields.io/badge/License-MIT-3DA639?style=for-the-badge" alt="License: MIT" />
 </p>
 
 Skills for [Claude Code](https://claude.com/claude-code) that cover an ordinary
