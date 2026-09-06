@@ -21,6 +21,10 @@ skills="$root/plugins/gku/skills"
 count="$(ls -d "$skills"/*/ 2>/dev/null | wc -l | tr -d ' ')"
 [ "$count" -gt 0 ] || { printf 'no skills under %s\n' "$skills" >&2; exit 1; }
 
+# The three lists are the deliberate choices; a skill in none of them is judged
+# by the default rules alone — user-invocable, no when_to_use, model-invocable,
+# free to edit. A new skill that writes, reads or pushes belongs in a list, and
+# adding it here is part of adding the skill.
 WRITES="init implement fix pr pr-resolve audit"          # never model-invoked
 READS="plan research review verify pr-review audit"      # never edit an existing file
 HOOKED="implement fix pr pr-resolve"                     # register the guard
