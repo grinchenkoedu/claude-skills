@@ -3,6 +3,7 @@ name: verify
 description: Check that a change actually works — run the project's tests, then drive the real thing (the command, the page, the function) and confirm the effect, and confirm its guards hold (login, permission, CSRF token, escaping, paths) with one minimal local probe each. Reports a clear verdict, and says honestly what could not be checked and why, instead of quietly skipping it.
 argument-hint: "[<pr-number> | <branch>] [--tests-only] [--report]"
 user-invocable: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:verify — prove it works

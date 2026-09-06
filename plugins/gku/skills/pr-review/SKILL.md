@@ -3,6 +3,7 @@ name: pr-review
 description: Deep review of someone else's pull request in an isolated worktree — hunts the failures that automated review misses (broken error paths, infinite loops, races, blast radius, claim-vs-code drift), deduplicates against the bot's comments, and gives a short verdict in chat. Read-only; never edits, pushes or posts.
 argument-hint: "<pr-number-or-url> [--repo <owner/name>] [--deep] [--report]"
 user-invocable: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:pr-review — review someone else's pull request

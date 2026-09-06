@@ -3,6 +3,8 @@ name: audit
 description: Audit a whole repository — not a diff — against the rules the other skills already apply to a change: the security checklist, code provenance and licensing, the family's code-quality rules, and whether the repository is ready for agent-driven development (CLAUDE.md, AGENTS.md, an ignored profile, a detectable test command). Writes a task file in the /gku:plan shape, findings grouped into branch-sized rounds, that /gku:implement builds in one run or one step at a time. Read-only; writes no production code.
 argument-hint: "[--area security|licence|quality|agents]... [--deep] [--provenance]"
 user-invocable: true
+disable-model-invocation: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:audit — read the whole repository against the rules, then hand over a plan

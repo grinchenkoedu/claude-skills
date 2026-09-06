@@ -3,6 +3,7 @@ name: review
 description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, a security pass over the well-known flaws (injection, escaping, login and permission checks, CSRF, secrets, files, outbound requests), and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
 argument-hint: "[branch] [--target <base>] [--deep] [--report]"
 user-invocable: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:review — check your own work before anyone else sees it

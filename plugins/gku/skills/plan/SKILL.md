@@ -3,6 +3,7 @@ name: plan
 description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /gku:implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Plans only; writes no production code.
 argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep]"
 user-invocable: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:plan — work out what to build, before building it
