@@ -3,6 +3,7 @@ name: research
 description: Find the right answer across this repository and the internet — a question, a choice between libraries or approaches, a symptom that may be a known upstream bug, a feature that needs an outside API understood first. Investigates the way /gku:plan does, then reads the documentation, the upstream source, its issues and advisories for the versions this project actually runs. The result decides the shape — something to build here becomes a task file in /gku:plan's shape that /gku:implement reads; anything else is an answer in the chat with a TL;DR on top. Read-only; writes no code.
 argument-hint: "<question or request> | <path/to/brief.md> [--offline] [--deep] [--report]"
 user-invocable: true
+disallowed-tools: Edit, NotebookEdit
 ---
 
 # /gku:research — find the right answer, here and out there

@@ -3,6 +3,7 @@ name: init
 description: Write or refresh this repository's CLAUDE.md — detected build, test and run commands plus the conventions and security rules for its family (Moodle plugin, PHP app, CMS, Python). Reads an existing file first and reports it as already fine rather than churning it; regenerating replaces only a marked block, so hand-written sections survive. Also leaves AGENTS.md as a stub pointing at CLAUDE.md.
 argument-hint: "[--family <name>] [--refresh] [--dry-run]"
 user-invocable: true
+disable-model-invocation: true
 ---
 
 # /gku:init — give this repository a CLAUDE.md

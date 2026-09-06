@@ -3,6 +3,7 @@ name: implement
 description: Build a task step by step in the current session — from a plan file, a markdown brief, or a sentence. Works through ordered steps, ticking each one off in the task file as it lands, so an interrupted run resumes exactly where it stopped instead of starting over.
 argument-hint: "<path/to/task.md> | <what to build> [--continue] [--step <n>]"
 user-invocable: true
+disable-model-invocation: true
 hooks:
   PreToolUse:
     - matcher: "Bash"
