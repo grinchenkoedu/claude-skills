@@ -131,7 +131,21 @@ For each step, in order:
    - [x] Add the CSV generator — `classes/export/generator/CsvExporter.php` (new)
    ```
 
-5. **Commit** when the step is a coherent unit of work. One commit per step is the default.
+5. **Record any ruling you made on your own**, under that line. A step rarely arrives fully
+   decided: two defensible places for a class, a name the plan did not give, an edge the plan
+   did not mention. Deciding is right — stopping to ask about each one is not — but the decision
+   then exists only in a chat that scrolls away, and the reviewer meets it as an unexplained
+   choice.
+
+   ```markdown
+   Ruling: put the exporter under `classes/export/` — matches the three exporters already
+   there — if wrong, one file moves and the service definition changes with it.
+   ```
+
+   What, why, and what it costs if wrong. One line each, only for what you decided rather than
+   what the plan told you, and nothing that a question in step 2 already settled.
+
+6. **Commit** when the step is a coherent unit of work. One commit per step is the default.
 
 Then say, in one line, what landed and what is next. Do not go quiet for six steps.
 

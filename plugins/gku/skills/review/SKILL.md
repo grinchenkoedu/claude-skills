@@ -48,7 +48,19 @@ Stop early when there is nothing to do:
 
 ## Step 2 — Decide what to read
 
-Do not read everything. Rank by risk and read down the list until the budget is spent:
+**Read the branch's rulings first, if it has any.** A task file in `.tasks/` whose criteria
+match this diff, and the commit bodies on the branch, may carry `Ruling:` lines — decisions
+`/gku:implement` or `/gku:fix` made without asking, each with what it costs if wrong. They are
+claims about the code like any other: check each against the diff, and a ruling the code does
+not match is a finding at the severity its own cost line implies. They cost a `grep` and they
+point straight at the parts of the change nobody has agreed to yet.
+
+```bash
+git log <base>..HEAD --format=%b | grep -i '^Ruling:'
+```
+
+Then decide what to read. Do not read everything — rank by risk and read down the list until
+the budget is spent:
 
 1. anything writing to the database, handling money or grades, changing schema, touching
    authentication or permissions, or building a file users download — **read fully, plus the
