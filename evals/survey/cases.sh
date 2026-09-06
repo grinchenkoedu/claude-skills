@@ -16,8 +16,10 @@ survey="$root/plugins/gku/bin/gku-survey"
 [ -x "$survey" ] || { printf 'no survey at %s\n' "$survey" >&2; exit 1; }
 
 # Fixtures are temporary directories; clean them up however this run ends.
-fixtures=""
-cleanup() { [ -n "$fixtures" ] && rm -rf $fixtures; }
+# An array, not a string: a temporary directory can contain a space, and the
+# word splitting that would follow is an rm -rf of the wrong paths.
+fixtures=()
+cleanup() { [ "${#fixtures[@]}" -gt 0 ] && rm -rf "${fixtures[@]}"; }
 trap cleanup EXIT INT TERM
 
 fails=0
@@ -36,7 +38,7 @@ wantnot() { # wantnot <row> <substring>
 }
 
 # A library-shaped PHP fixture with a database call and a compose file.
-fix="$(mktemp -d)"; fixtures="$fixtures $fix"
+fix="$(mktemp -d)"; fixtures+=("$fix")
 mkdir -p "$fix/src" "$fix/tests" "$fix/.github/workflows"
 printf '{"name":"x/y","type":"library"}\n'          > "$fix/composer.json"
 printf '<phpunit/>\n'                                > "$fix/phpunit.xml"
@@ -63,14 +65,14 @@ case "$(row timeout-tool)" in timeout|gtimeout|none) ;; *) note "php library: ti
 ( cd "$fix" && [ -z "$(git status --porcelain)" ] ) || note 'the survey changed the tree it surveyed'
 
 # A directory that is not a repository at all.
-bare="$(mktemp -d)"; fixtures="$fixtures $bare"
+bare="$(mktemp -d)"; fixtures+=("$bare")
 out="$(cd "$bare" && bash "$survey" 2>/dev/null)" || note 'a non-repository directory made the survey exit non-zero'
 want root         'not a git repository' 'bare directory'
 want base-branch  'unknown'              'bare directory'
 want profile      'missing'              'bare directory'
 
 # A Moodle-shaped fixture.
-mood="$(mktemp -d)"; fixtures="$fixtures $mood"
+mood="$(mktemp -d)"; fixtures+=("$mood")
 mkdir -p "$mood/db" "$mood/lang/en" "$mood/classes"
 printf '<?php $plugin->component = "local_x"; $plugin->version = 2026010100;\n' > "$mood/version.php"
 printf '<?xml version="1.0"?>\n'                                                > "$mood/db/install.xml"
@@ -83,7 +85,7 @@ want database-markers 'db/install.xml' 'moodle plugin'
 # A command that hangs must not hang the skill this runs before. The fake docker
 # here sleeps for 30s; the survey has to give up on it and finish anyway — and on
 # a machine with no timeout tool, which is the ordinary macOS case.
-slow="$(mktemp -d)"; fixtures="$fixtures $slow"
+slow="$(mktemp -d)"; fixtures+=("$slow")
 printf '#!/bin/sh\nsleep 30\n' > "$slow/docker"; chmod +x "$slow/docker"
 started="$(date +%s)"
 out="$(cd "$bare" && PATH="$slow:$PATH" bash "$survey" 2>/dev/null)"
