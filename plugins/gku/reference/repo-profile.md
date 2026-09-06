@@ -57,6 +57,30 @@ it — a repository with no test command does not get a made-up one.
 
 ## Detection, in order
 
+**Start from the survey.** `gku-survey` gathers every marker below in one read-only pass and
+prints it as `key: value` lines. It ships in this plugin's `bin/`, which Claude Code puts on
+`PATH`, so it is called by name — `/gku:init` has its output injected before the skill runs;
+any other skill that must detect a profile runs it once. Read those rows first, and check by
+hand only what they did not settle:
+
+| Survey row | Answers |
+|---|---|
+| `platform`, `root`, `branch` | step 0 |
+| `base-branch`, `remotes` | step 1 |
+| `standards-doc` | step 2 |
+| `manifests`, `moodle`, `php-app`, `cms`, `library-layout`, `composer-type` | step 3 |
+| `containers`, `docker`, `host-runtimes` | step 4 — **except the mount check**, which nothing can answer for you |
+| `test-config`, `scripts`, `makefile-targets`, `ci`, `ci-run-lines` | step 5 |
+| `entry-points` | step 6 |
+| `timeout-tool` | step 7, already decided by behaviour rather than presence |
+| `database-markers` | step 8's file and grep checks |
+| `profile`, `profile-tracked`, `ignored` | the cache rules above |
+
+An empty value is an answer — nothing of that kind is there — and the rows below say what to do
+with each. What the survey cannot do is judge: which image a project means, whether a mount
+really works, whether a `Dockerfile` is a development runtime or a deployment artefact. Those
+are the steps that follow.
+
 Stop as soon as the family is clear. This should be a handful of file checks, not an audit.
 
 0. **Platform** — `uname -s`. `Darwin` → macos, `Linux` → linux, anything containing `MINGW`
@@ -151,9 +175,9 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
      honestly: it means runtime verification is limited to lint plus whatever the host's own
      CLI offers, and skills must say so rather than pretend. A container does not fix this —
      the missing piece is the host application, not a runtime.
-7. **`timeoutTool`** — **verify by behaviour, never by presence.** Run `timeout 1 true` and
-   check it exits 0 promptly. If that fails, try `gtimeout 1 true` (macOS with coreutils).
-   If neither works, `null`.
+7. **`timeoutTool`** — **verify by behaviour, never by presence.** The survey's `timeout-tool`
+   row has already done exactly that: `timeout 1 true`, then `gtimeout 1 true`, then `none`.
+   Take it as it stands; re-run it by hand only if you have reason to doubt it.
 
    This matters because **Windows ships its own `timeout.exe` in `System32` that is a sleep,
    not a command wrapper** — `timeout 5 <command>` there pauses and ignores the command. A
@@ -164,7 +188,9 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
    disables them.** Do not decide it from one marker file. Check, in this order, and stop at the
    first hit:
 
-   - **Does the code query a database?** This is the reliable signal and the one to trust:
+   - **Does the code query a database?** This is the reliable signal and the one to trust, and
+     the survey's `database-markers` row is that grep, run over code only — prose about `$DB->`
+     in a reference file is not a database:
      `$DB->` or `get_record`/`get_records` (Moodle), an ORM or query builder, `PDO`, `sqlalchemy`,
      `knex`, a raw `SELECT` in a string. One grep answers it.
    - a `docker-compose.yml` service for a database engine;
