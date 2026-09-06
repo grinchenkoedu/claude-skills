@@ -192,7 +192,8 @@ pass was not done and why. A review with no security line is an unfinished revie
 to work out what to do with it, which is a step they should not have to take:
 
 - **blockers or warnings** → `/gku:fix` applies them, one commit each, re-checking every finding
-  against the code first. `/gku:fix --nits` takes the nits too.
+  against the code first. It asks how far down the list to go, nits included, so do not decide
+  that here.
 - **nits only, or clean** → `/gku:pr` opens the pull request; `/gku:verify` first if the change
   needs proving rather than re-reading.
 

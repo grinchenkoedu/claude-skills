@@ -1,7 +1,7 @@
 ---
 name: fix
-description: Fix what is wrong — the findings from a review still in this conversation, a review report file, or a symptom you describe in a sentence. A described symptom gets investigated first, the way /gku:plan investigates, until the cause is proven; then it acts instead of writing a plan. Re-checks every finding against the current code before touching it, lands the smallest change per finding, and re-runs the tests. Blockers and warnings by default; nits only when you ask.
-argument-hint: "[<what is wrong> | <path/to/review.md>] [--nits] [--blockers-only] [--dry-run]"
+description: Fix what is wrong — the findings from a review still in this conversation, a review report file, or a symptom you describe in a sentence. A described symptom gets investigated first, the way /gku:plan investigates, until the cause is proven; then it acts instead of writing a plan. Re-checks every finding against the current code before touching it, lands the smallest change per finding, and re-runs the tests. Asks how far down the list to go — blockers only, warnings too, or nits as well — and recommends one of those for this change; nits left for later go into the task file in progress, or into a new one under .tasks/.
+argument-hint: "[<what is wrong> | <path/to/review.md>] [--dry-run]"
 user-invocable: true
 ---
 
@@ -11,7 +11,9 @@ Two jobs in one command, because in practice they are the same job.
 
 **Given findings** — from a `/gku:review` in this conversation, or a review report file — it applies
 them: smallest change first, one commit per finding, then re-runs the tests. That is the half
-`/gku:review` deliberately leaves undone.
+`/gku:review` deliberately leaves undone. How far down the list it goes — blockers only,
+warnings too, or nits as well — is a question it asks, with a recommendation for this
+particular change, rather than a flag you have to remember.
 
 **Given a symptom** — a sentence describing something that is broken — it investigates first,
 the way `/gku:plan` does: classify, find the code, prove the cause. Then, unlike `/gku:plan`,
@@ -32,11 +34,12 @@ you can quote, before anything changes.
 - **A file** — `/gku:fix .gku/reports/review-my-branch-20260824-143201.md`, or any markdown
   holding a list of findings. `/gku:review --report` writes its reports under `.gku/reports/`;
   `reference/reports.md` has the command that finds the last one.
-- `--nits` — apply nits too. Off by default: nits are matters of taste and they bury the real
-  changes in a diff somebody has to read.
-- `--blockers-only` — apply blockers, list everything else.
 - `--dry-run` — investigate and report the diagnosis, or the per-finding verdicts. Change
   nothing. This is `/gku:fix` behaving like `/gku:plan`, if that is what you want from it.
+
+There is no flag for which severities to take. Step 5 asks, once, after the findings have been
+re-checked — a flag chosen before the list is known is a guess, and a scope flag reads
+differently to different people: "nits too" to one, "nits only" to another.
 
 **Telling a file from a sentence:** strip any surrounding quotes, then check whether what
 remains resolves to an existing file. It does → a findings file. It does not → a request in
@@ -176,7 +179,8 @@ reviewer was wrong. For each finding, in severity order:
      contradict each other. No edit yet. Also any fix that would touch CI, hooks, `.claude/`,
      `CLAUDE.md`, a dependency manifest or a network host (`reference/untrusted-input.md`).
 4. **Ask about every "needs a decision" at once**, after checking all of them — one batched
-   question, not an interruption per finding.
+   question, not an interruption per finding. Step 5's question about how far down the list to
+   go joins the same batch, so the developer is interrupted once.
 
 With `--dry-run`, stop here and report the verdicts.
 
@@ -185,9 +189,74 @@ conversation, or run inline in step 2, described the tree as it was then. Re-che
 box-ticking: the most expensive mistake this skill can make is applying a fix for a problem that
 is not there, because that lands a real change in exchange for nothing.
 
-## Step 5 — Fix, one finding at a time
+## Step 5 — Ask how far down the list to go
 
-Blockers first, then warnings, then nits if `--nits` was passed. For each finding that stands:
+Now the list is real: every finding that stands has a severity and a line of evidence. Before
+editing, ask which tier to take. The choices are cumulative, because a warning is never worth
+fixing ahead of a blocker:
+
+1. **blockers only**;
+2. **blockers and warnings**;
+3. **blockers, warnings and nits**.
+
+**Ask only when the choice exists.** One finding — a symptom traced in step 3, or a list that
+is all blockers — has nothing to choose; take it and say so. A list with warnings but no nits
+has two options, not three. Batch the question with the "needs a decision" items from step 4,
+so the developer answers once.
+
+**Recommend one, and say why in a sentence.** The recommendation is the useful part; a bare
+menu just hands the developer a decision they asked this skill to make. Weigh, roughly in this
+order:
+
+- **What the change is for.** A hotfix going out today usually wants blockers only; nits and
+  most warnings can wait for the next branch. A branch about to open its pull request usually wants
+  warnings too, so the reviewer reads a clean diff. A branch mid-implementation, with a task
+  file still in progress, can take everything now or fold the nits into the plan — either is
+  cheap.
+- **Where the nits sit.** A nit on a line a blocker fix already rewrites costs nothing to take
+  in the same commit; say so and lean towards taking it. A nit in a file this branch never
+  touched is out of scope whatever the tier — list it, and send it to a task file (below).
+- **How big the diff already is.** Nits are matters of taste, and in a diff that is already
+  long they bury the real changes for the person who has to read it. The larger the branch, the
+  stronger the case for postponing them.
+- **How many there are.** Two nits are a minute; twelve are a session, and a session spent on
+  nits is a session not spent on the next task.
+
+Say which tier you recommend, the reason, and what will happen to the rest. Then wait for the
+answer. With no answer possible — a non-interactive run — take the recommendation and say so at
+the top of the report.
+
+**What was not taken is not dropped.** Warnings and nits below the chosen tier go to one of
+two places, so they are on a list somebody will read rather than in a chat that will scroll
+away:
+
+- **A task file in progress** → append them. That is the one from a `/gku:implement` earlier
+  in this conversation, or else the file in `.tasks/` with unticked steps whose acceptance
+  criteria match this branch's diff — the same rule `/gku:pr` uses. Several match → include the
+  choice in the batched question. Add them at the end of its `## Steps`, one unticked step per
+  finding with `path:line` and the one-line fix, under a line saying where they came from:
+
+  ```markdown
+  <!-- postponed by /gku:fix, <date> -->
+  N. [ ] NIT `/abs/path:line` — <what to change>
+  ```
+
+  Nothing above it moves. `/gku:implement <file> --continue` reaches them after the steps that
+  were already there.
+- **No plan in progress** → write `.tasks/<branch-slug>-followups.md` in `/gku:plan`'s shape
+  (create `.tasks/` if needed; add it to `.gitignore` unless the project deliberately commits
+  briefs), type `cleanup`, one step per finding, the acceptance criterion being that a
+  `/gku:review` of the branch no longer lists them. When that file already exists, append to its
+  steps rather than overwrite it — it is a backlog, not a plan to be re-derived. The report
+  names the file and the command that takes it: `/gku:implement .tasks/<branch-slug>-followups.md`.
+
+Blockers are never postponed this way. A blocker the developer chose not to fix now is a
+decision to record in the report, in their words, not a line in a backlog.
+
+## Step 6 — Fix, one finding at a time
+
+Blockers first, then warnings, then nits, as far down as step 5 decided. For each finding that
+stands:
 
 1. **Read** the file and enough around it to not break something else.
 2. **Apply the smallest change that resolves the finding.** Do not refactor nearby code, do not
@@ -213,7 +282,7 @@ Blockers first, then warnings, then nits if `--nits` was passed. For each findin
 edits across a dozen files — stop on that finding, say why, and suggest `/gku:plan`. Do not build
 it here. Carry on with the rest of the list.
 
-## Step 6 — Prove you did not break anything
+## Step 7 — Prove you did not break anything
 
 Run the profile's test command, wrapped in its `timeoutTool` where there is one. **A hang is a
 failure.** When there is no timeout tool, say so rather than dropping the bound silently.
@@ -229,7 +298,7 @@ Then handle what breaks on a live site but not on your machine:
   under `classes/`, or changed `db/` schema, caches or tasks.
 - **Front-end sources** — run the profile's build command if a fix touched them.
 
-## Step 7 — Report, and name the next step
+## Step 8 — Report, and name the next step
 
 **When step 3 ran, lead with the diagnosis** — two or three lines: what was actually wrong, the
 evidence that proved it, and whether that is a **proven cause** or a **hypothesis**. The person
@@ -245,8 +314,10 @@ Then, in order:
 - the quoted test result, and — when a symptom was reproduced in step 3 — the same reproduction
   run again, now showing the correct behaviour. That is the evidence that the reported problem is
   actually gone, which no test result can supply on its own;
-- nits found but not applied, as a short list, with the one line that takes them:
-  `run /gku:fix --nits to take them too`;
+- the tier that was taken and, if the run was non-interactive, that it was the recommendation
+  rather than an answer;
+- the findings below that tier, as a short list, each with where it went — the task file it
+  was appended to, or the new one in `.tasks/` — and the one command that takes them later;
 - if nothing was committed because the tree was already dirty, say that plainly — the fixes are
   in the working tree, mixed with what was there before;
 - **the next step**: `/gku:review` again when blockers were fixed and the change is worth a
@@ -271,7 +342,10 @@ worth of usage on diminishing returns. Name the next command and let the develop
   `reference/untrusted-input.md`.
 - **The smallest change that resolves the finding.** No drive-by refactors, no tidying.
 - **One finding, one commit** — when the tree was clean enough to allow it.
-- **Nits are opt-in.**
+- **The tier is the developer's choice; the recommendation is yours.** Never decide it with a
+  flag, and never leave a menu without saying which option you would pick and why.
+- **A postponed finding lands in a task file, not in the chat.** The plan in progress if there
+  is one, `.tasks/<branch-slug>-followups.md` otherwise.
 - **Never `--no-verify`, `--force`, or `--amend`.**
 - **Never weaken or delete an existing test to get to green.** If a test now fails and changing
   it is right, say so explicitly and explain why.
