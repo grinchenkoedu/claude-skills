@@ -145,7 +145,18 @@ For each step, in order:
    What, why, and what it costs if wrong. One line each, only for what you decided rather than
    what the plan told you, and nothing that a question in step 2 already settled.
 
-6. **Commit** when the step is a coherent unit of work. One commit per step is the default.
+   **Put the same line in the commit body below.** The task file is ignored by git
+   (`reference/reports.md`), so a ruling that lives only there reaches `--continue` and nobody
+   else — not the reviewer, not the pull request, which is the whole audience for it.
+
+6. **Commit** when the step is a coherent unit of work. One commit per step is the default, and
+   its body carries that step's rulings:
+
+   ```
+   <what the step did, in one line>
+
+   Ruling: <what you decided> — <why> — <what it costs if wrong>
+   ```
 
 Then say, in one line, what landed and what is next. Do not go quiet for six steps.
 
