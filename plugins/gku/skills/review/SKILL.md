@@ -24,6 +24,13 @@ Review-only. It never edits your code, never commits, never pushes, never posts 
 
 ## Step 1 — Work out what changed
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again. The status is cut at 40 lines, so a long one is a sample, not the whole
+tree — count it with `git status --porcelain | wc -l` if the number matters:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null | head -40 || true`
+
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md` in this plugin — detect and
 cache it if missing), and `reference/exec.md` for how the lint command in step 4b runs.
 
@@ -32,8 +39,8 @@ git diff --stat <base>...HEAD
 git diff --name-status <base>...HEAD
 ```
 
-Include uncommitted work too (`git status --porcelain`) — reviewing only committed changes
-misses the half you were about to commit.
+Include the uncommitted work from the status above — reviewing only committed changes misses
+the half you were about to commit.
 
 Stop early when there is nothing to do:
 - on the base branch itself → "You are on `<base>` — switch to your branch first."

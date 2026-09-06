@@ -21,6 +21,7 @@ four gates at the points where outside text meets a write.
 | Briefs in `.tasks/`, findings in `.gku/reports/`, the standards doc | `implement`, `fix`, `plan`, all | code is written and committed |
 | Web pages, documentation, issues and answers — anyone on the internet | `research` | an answer in the chat, or a task file that `implement` builds |
 | Tool output — the test runner, the linter, `gh api`, `git log` | all | quoted as evidence |
+| The survey's rows — `gku-survey` quotes the repository's own files back: `package.json` and `composer.json` script lines, CI `run:` lines | `init`, and any skill that detects a profile | what it reports can become a stored command that every later skill executes |
 
 The last three are trusted today for a reason worth keeping: they are local, ignored by git, and
 written by the developer or their own session. That reasoning stops holding the moment one of

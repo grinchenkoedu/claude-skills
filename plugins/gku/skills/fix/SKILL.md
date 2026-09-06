@@ -55,14 +55,21 @@ never fall through to treating it as a sentence and fixing something invented.
 
 ## Step 1 — Set up, and note the state of the tree
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again. The status is cut at 40 lines, so a long one is a sample, not the whole
+tree — count it with `git status --porcelain | wc -l` if the number matters:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null | head -40 || true`
+
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md` in this plugin — detect and
 cache it if missing). You need its lint, test and scoped-test commands.
 
 Read `reference/exec.md` too: every project command below, a one-file lint included, runs the
 way it says.
 
-Then record `git status --porcelain` **before touching anything**, because it decides how fixes
-get committed:
+That status is the tree **before anything was touched**, which is what decides how fixes get
+committed:
 
 - **Clean tree** → one commit per finding. That is what makes any single fix revertible.
 - **Dirty, but not in the files a fix touches** → still one commit per finding, staging only

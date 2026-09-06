@@ -907,6 +907,24 @@ from — own work, a dependency, or a copy only with approval — is in
 `plugins/gku/reference/code-provenance.md`; a skill that writes code follows it, and a skill that
 reviews code looks for its tells.
 
+**What the harness gives a skill, and what it does not.** Four facts worth knowing before you
+reach for one of them:
+
+- **A `` !`command` `` line in a `SKILL.md` runs before the skill does**, and its output lands in
+  the prompt. That is how six skills start with the branch and the working tree already in hand,
+  and how `/gku:init` starts with the survey. Keep such a line cheap, end it in `|| true`, and
+  add one only to a skill that always reads it — an injection the skill ignores is a command run
+  on every invocation for nothing.
+- **`${CLAUDE_PLUGIN_ROOT}` is expanded in a `hooks:` block and in `allowed-tools`, and nowhere
+  else.** It is not set in the shell a skill's own commands run in, so a path written with it in
+  prose turns into `/reference/…` the moment it reaches a command line. Reference files are
+  therefore named relative; every invocation is told its own base directory.
+- **A plugin's `bin/` is on `PATH`** — it is there even when the plugin ships none. A script a
+  skill needs to run belongs there and is called by name, like `gku-survey`. `plugins/gku/scripts/`
+  is for what the harness resolves itself, such as the guard a `hooks:` block names.
+- **`allowed-tools` is a whitelist, not an addition.** A skill that lists one tool has only that
+  tool. Leave it out unless you are prepared to enumerate everything the skill uses.
+
 A change to a `SKILL.md` or to `reference/` is code that runs in every session on every machine
 that updates the plugin. Review it as such.
 
