@@ -214,6 +214,9 @@ their categories; and anything you changed in the environment and restored. The 
 from step 5b are listed with the rest, under their own heading, so a verdict shows at a glance
 which refusals were confirmed and which were not checked.
 
+Every row's evidence is output from this run, quoted — `reference/exec.md`'s rule, and the
+reason this skill exists rather than a reading of the diff.
+
 **"Cannot tell" is a real and useful verdict.** A confident "works" that rests on three
 skipped checks is worse than useless — it is misleading.
 
