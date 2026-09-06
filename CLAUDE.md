@@ -20,9 +20,11 @@ the lint command reaches for one only because shellcheck is not installed here. 
 timeout tool on this machine** (`timeoutTool: null`), so a hang cannot be bounded
 automatically — say so rather than dropping the bound silently.
 
+<!-- toolkit:begin family-rules -->
 No family template applies: the profile's family is `other`, and the four templates under
 `plugins/gku/templates/` are rules this toolkit writes into *other* projects' `CLAUDE.md`, not
 rules for this repository. Do not edit them to change how a skill behaves.
+<!-- toolkit:end family-rules -->
 
 ## This project specifically
 
