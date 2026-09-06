@@ -52,6 +52,8 @@ for dir in "$skills"/*/; do
   if in_list "$s" "$HOOKED"; then
     has "$s" 'hooks:' || note "$s: pushes or commits, so it must register the guard hook"
     head_of "$s" | grep -q 'scripts/guard.sh' || note "$s: hook does not point at scripts/guard.sh"
+  else
+    has "$s" 'hooks:' && note "$s: registers a hook but neither pushes nor commits"
   fi
 done
 
