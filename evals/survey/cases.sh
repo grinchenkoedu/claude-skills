@@ -90,7 +90,10 @@ printf '#!/bin/sh\nsleep 30\n' > "$slow/docker"; chmod +x "$slow/docker"
 started="$(date +%s)"
 out="$(cd "$bare" && PATH="$slow:$PATH" bash "$survey" 2>/dev/null)"
 elapsed="$(( $(date +%s) - started ))"
-[ "$elapsed" -lt 15 ] || note "a hanging docker held the survey for ${elapsed}s; it must give up"
+# 25, not 15: the assertion is that the survey gave up rather than waiting out
+# the 30s sleep, and a shared CI runner is slower than the 7-8s this takes on a
+# developer's machine. A bound with no slack is a test that fails for the weather.
+[ "$elapsed" -lt 25 ] || note "a hanging docker held the survey for ${elapsed}s; it must give up"
 want docker 'not answering' 'hanging docker'
 
 if [ "$fails" -eq 0 ]; then
