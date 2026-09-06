@@ -18,8 +18,7 @@ skills="$root/plugins/gku/skills"
 # A run that finds nothing to check must fail, not pass: a moved directory
 # would otherwise leave this green while it asserted nothing at all.
 [ -d "$skills" ] || { printf 'no skills at %s\n' "$skills" >&2; exit 1; }
-count="$(ls -d "$skills"/*/ 2>/dev/null | wc -l | tr -d ' ')"
-[ "$count" -gt 0 ] || { printf 'no skills under %s\n' "$skills" >&2; exit 1; }
+[ -n "$(ls -d "$skills"/*/ 2>/dev/null)" ] || { printf 'no skills under %s\n' "$skills" >&2; exit 1; }
 
 # The three lists are the deliberate choices; a skill in none of them is judged
 # by the default rules alone — user-invocable, no when_to_use, model-invocable,
@@ -30,6 +29,7 @@ READS="plan research review verify pr-review audit"      # never edit an existin
 HOOKED="implement fix pr pr-resolve"                     # register the guard
 
 fails=0
+checked=0
 note() { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
 head_of() { sed -n '2,/^---$/p' "$skills/$1/SKILL.md"; }   # the frontmatter, minus its opening ---
 has() { head_of "$1" | grep -q "^$2"; }
@@ -38,6 +38,7 @@ in_list() { case " $2 " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
 for dir in "$skills"/*/; do
   s="$(basename "$dir")"
   [ -f "$dir/SKILL.md" ] || continue
+  checked=$((checked + 1))
 
   has "$s" 'user-invocable: true' || note "$s: not user-invocable"
   has "$s" 'when_to_use'          && note "$s: declares when_to_use; gku skills are typed, not fired"
@@ -61,8 +62,11 @@ for dir in "$skills"/*/; do
   fi
 done
 
-if [ "$fails" -eq 0 ]; then
-  printf 'skills: frontmatter invariants hold across %s skills\n' "$count"
+if [ "$checked" -eq 0 ]; then
+  printf 'no SKILL.md under %s\n' "$skills" >&2
+  exit 1
+elif [ "$fails" -eq 0 ]; then
+  printf 'skills: frontmatter invariants hold across %s skills\n' "$checked"
 else
   printf 'skills: %s frontmatter problem(s)\n' "$fails" >&2
 fi
