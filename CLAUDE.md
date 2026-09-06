@@ -48,6 +48,10 @@ rules for this repository. Do not edit them to change how a skill behaves.
   prompt. Keep it cheap, end it in `|| true`, and add one only where the skill always reads it.
 - **Record a `Ruling:` line** in the commit body when you decide something the plan did not:
   what, why, and what it costs if wrong. `/gku:review` reads them back.
+- **The plugin manifest has no `version`, on purpose.** Claude Code then treats every commit as
+  a new version, so `/plugin marketplace update` always brings the latest; a declared version
+  would hold users on whatever was last bumped. Both READMEs explain it under "Why you always
+  get updates" — do not add the field back because a validator suggests it.
 - **What breaks only "in production":** the installed plugin is a cache keyed by content, so a
   session keeps running the version it was started with. A change merged to `main` is not what
   your current session executes — to exercise it, install from the branch or run with
