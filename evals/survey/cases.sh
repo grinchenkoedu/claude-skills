@@ -75,7 +75,18 @@ want moodle    'plugin'      'moodle plugin'
 want manifests 'version.php' 'moodle plugin'
 want database-markers 'db/install.xml' 'moodle plugin'
 
-rm -rf "$fix" "$bare" "$mood"
+# A command that hangs must not hang the skill this runs before. The fake docker
+# here sleeps for 30s; the survey has to give up on it and finish anyway — and on
+# a machine with no timeout tool, which is the ordinary macOS case.
+slow="$(mktemp -d)"
+printf '#!/bin/sh\nsleep 30\n' > "$slow/docker"; chmod +x "$slow/docker"
+started="$(date +%s)"
+out="$(cd "$bare" && PATH="$slow:$PATH" bash "$survey" 2>/dev/null)"
+elapsed="$(( $(date +%s) - started ))"
+[ "$elapsed" -lt 15 ] || note "a hanging docker held the survey for ${elapsed}s; it must give up"
+want docker 'not answering' 'hanging docker'
+
+rm -rf "$fix" "$bare" "$mood" "$slow"
 if [ "$fails" -eq 0 ]; then
   printf 'survey: every row follows its fixture\n'
 else
