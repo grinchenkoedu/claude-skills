@@ -8,7 +8,9 @@
 # per-step file lists, a runner. A reader who cannot find them in the README does
 # not know they exist, and README.uk.md is a translation that has to keep up.
 # The tokens below are identical in both languages, which is what makes this
-# checkable at all.
+# checkable at all — and it is also the limit: the evidence gate is prose in both
+# ("output from this turn", «виводу цього ж ходу») with no shared token, so it is
+# the one mechanic here that review has to catch rather than this suite.
 #
 # Exits 0 when both READMEs mention every one, 1 otherwise.
 
