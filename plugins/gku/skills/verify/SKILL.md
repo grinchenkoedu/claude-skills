@@ -26,6 +26,12 @@ Local only. It never touches a live system and never writes to the pull request.
 
 ## Step 1 — Preflight, and be honest about blockers
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null || true`
+
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`).
 
 Check, and report all of these together in one block rather than discovering them one at a

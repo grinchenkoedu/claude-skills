@@ -47,10 +47,16 @@ prose — `/gku:implement add CSV export --continue` is ambiguous about where th
 
 ## Step 1 — Set up
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null || true`
+
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`; detect and cache it if
 missing). You need its test, lint and build commands, and its base branch.
 
-Check the working tree:
+Read the tree above:
 
 - **Uncommitted changes you did not make** → stop and ask. Do not build on top of someone
   else's half-finished work.

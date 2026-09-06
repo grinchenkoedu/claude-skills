@@ -43,9 +43,15 @@ anything outside them** — that is someone's work.
 
 ## Step 1 — Profile the repository
 
-Read `.claude/repo-profile.json`, or detect and cache it per `reference/repo-profile.md`. You
-need: family, language and version, base branch, install / lint / test / build commands, the
-execution environment, the runtime surface, and whether there is a database.
+The repository's markers, gathered before this skill ran by `gku-survey` (it ships in this
+plugin's `bin/`, which Claude Code puts on `PATH`):
+
+!`gku-survey 2>/dev/null || true`
+
+Read `.claude/repo-profile.json`, or decide from the survey above and cache it per
+`reference/repo-profile.md` — running a check by hand only for what the survey did not settle.
+You need: family, language and version, base branch, install / lint / test / build commands,
+the execution environment, the runtime surface, and whether there is a database.
 
 **Take the family from the profile** (`reference/repo-profile.md` detects it) and map it to a
 template. The two vocabularies are not identical — the profile distinguishes cases that share a

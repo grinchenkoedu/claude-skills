@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cases for plugins/gku/scripts/survey.sh — run them from anywhere:
+# Cases for plugins/gku/bin/gku-survey — run them from anywhere:
 #
 #   bash evals/survey/cases.sh
 #
@@ -12,7 +12,7 @@
 set -u
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
-survey="$root/plugins/gku/scripts/survey.sh"
+survey="$root/plugins/gku/bin/gku-survey"
 [ -x "$survey" ] || { printf 'no survey at %s\n' "$survey" >&2; exit 1; }
 
 fails=0

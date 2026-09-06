@@ -7,6 +7,11 @@
 # local keyring). Every line is `key: value`; an empty value means "not found",
 # which is an answer.
 #
+# It lives in bin/ because Claude Code puts a plugin's bin/ directory on PATH,
+# so a skill calls it by name — `gku-survey` — with no path to resolve.
+# CLAUDE_PLUGIN_ROOT is not set in the shell a skill runs; only a hooks: block
+# and allowed-tools see it expanded.
+#
 # Ported from claude-rpg's plugins/rpg/scripts/survey.sh — MIT, same author
 # (Yevhen Matasar) — with its quest-specific rows replaced by gku's.
 

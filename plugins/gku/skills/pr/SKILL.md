@@ -36,6 +36,16 @@ It pushes commits you already made. It never commits for you, never merges, neve
 
 ## Step 1 — Preflight
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null || true`
+
+And the pull request this branch already has, if it has one — step 2's question, answered:
+
+!`gh pr view --json number,state,url,title,isDraft,baseRefName 2>/dev/null || true`
+
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`; detect and cache it if
 missing) for the base branch.
 

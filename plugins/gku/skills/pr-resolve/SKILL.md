@@ -40,6 +40,12 @@ Required either way: there is no default target. This skill changes files and pu
 
 ## Step 1 — Work out which pull request, and where
 
+The branch and the working tree, gathered before this skill ran — read them here rather than
+asking git again:
+
+!`git branch --show-current 2>/dev/null || true`
+!`git status --short 2>/dev/null || true`
+
 **Resolve the target first, before assuming anything about the current directory.**
 
 - **A URL** gives you `owner`, `repo` and the number directly. Parse it and ignore `origin`
