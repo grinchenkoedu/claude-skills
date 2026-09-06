@@ -41,6 +41,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # Deliberately unpinned: the job asks whether the plugin still loads in the
+      # CLI people actually run, and a pinned version quietly stops asking. The
+      # cost is that a bad upstream release fails a build nobody changed — which
+      # is visible, and passes again when upstream fixes it.
       - run: npm install -g @anthropic-ai/claude-code
       # No credentials: validate reads the manifest and the skills off disk.
       # The version and author warnings are expected and do not fail the run.
