@@ -34,7 +34,8 @@ rules for this repository. Do not edit them to change how a skill behaves.
 - **One eval suite per rule**, at `evals/<area>/<name>.sh`: each prints one summary line and
   exits non-zero the moment its rule stops holding. Adding a convention to a skill means adding
   or extending a suite; `bash evals/run-all.sh` runs them all and CI runs the same command.
-- **Prose wraps at the file's width** (about 96 characters). The two READMEs are English and
+- **Prose wraps at the file's width** (about 96 characters; a command or a table row that
+  cannot be broken is left long). The two READMEs are English and
   Ukrainian and must stay in step — `evals/docs/readme.sh` asserts that both describe every
   mechanic, and it can only check tokens identical in both languages.
 - **`${CLAUDE_PLUGIN_ROOT}` expands in a `hooks:` block and in `allowed-tools`, nowhere else.**
