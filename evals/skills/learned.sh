@@ -23,6 +23,10 @@ flat() { tr '\n' ' ' < "$1" | tr -s ' '; }
 
 grep -q 'learned.md' "$reports" || note 'reports.md: the learned-notes file is undocumented'
 flat "$reports" | grep -q 'last 20 lines' || note 'reports.md: the cap on the file is gone — plan and research pay for its length every run'
+# The words are not the cap; the command is. Assert the mechanism too, and the
+# mkdir without which the first note in a repository is lost.
+grep -q 'tail -20' "$reports" || note 'reports.md: the cap has no command behind it'
+grep -q 'mkdir -p "$root/.gku"' "$reports" || note 'reports.md: the append can land in a directory that does not exist'
 
 for s in implement fix; do
   f="$skills/$s/SKILL.md"
