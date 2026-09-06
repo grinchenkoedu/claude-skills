@@ -56,8 +56,13 @@ not match is a finding at the severity its own cost line implies. They cost a `g
 point straight at the parts of the change nobody has agreed to yet.
 
 ```bash
-git log <base>..HEAD --format=%b | grep -i '^Ruling:'
+git log <base>..HEAD --format='%h %b' | grep -i 'Ruling:'
 ```
+
+**On a pull request, the commits are the only source.** `.tasks/` is ignored by git, so
+somebody else's branch — and the worktree `/gku:pr-review` reads — carries no task file at all.
+Finding no rulings there is not evidence that none were made; say which sources you could
+actually read, the same way this skill names a file it judged from the diff alone.
 
 Then decide what to read. Do not read everything — rank by risk and read down the list until
 the budget is spent:
