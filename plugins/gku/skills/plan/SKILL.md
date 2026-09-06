@@ -172,7 +172,10 @@ long-running piece, where it runs and how the user learns it finished. For a que
 ```
 
 **A step is the smallest thing with its own test cycle**, and its three lines say so
-mechanically: what it creates, what it changes down to the lines, and what proves it.
+mechanically: what it creates, what it changes down to the lines, and what proves it. The line
+numbers are as of planning — they drift as earlier steps land — so name the symbol too where
+one exists (`classes/export/Csv.php:120-140 (buildRow)`); the symbol is what a reader searches
+for when the numbers have moved.
 `/gku:implement` opens exactly those files, and `/gku:review` greps the `Modify:` paths for
 symbols that moved. A step you cannot write those lines for is not one step — split it, or say
 plainly which paths you could not name and why.
