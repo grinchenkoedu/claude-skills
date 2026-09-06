@@ -52,7 +52,10 @@ fi
 # leading + (which is itself a forced push), and spell itself out in full
 # (refs/heads/main). All four shapes push to the same branch.
 for b in main master ${base:+"$base"}; do
-  if printf '%s' "$scan" | grep -Eq "git[^|;&]*push[^|;&]*([[:space:]]|:)\+?(refs/heads/)?$b([[:space:]]|:|\$)"; then
+  # A branch name is a literal here, not a pattern: release.1 must not also
+  # match release01.
+  b_re="$(printf '%s' "$b" | sed -E 's|[^a-zA-Z0-9_/-]|\\&|g')"
+  if printf '%s' "$scan" | grep -Eq "git[^|;&]*push[^|;&]*([[:space:]]|:)\+?(refs/heads/)?$b_re([[:space:]]|:|\$)"; then
     refuse "a push to the base branch '$b'. A change lands through a pull request — /gku:pr opens it."
   fi
 done
