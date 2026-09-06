@@ -108,6 +108,7 @@ the repository, and it is the only file a later run reads back on its own.
   do with it:
 
   ```bash
+  mkdir -p "$root/.gku"   # the first note in a repository lands before any report has
   printf '%s — %s\n' "$(date -u +%F)" "<the note>" >> "$root/.gku/learned.md"
   tail -20 "$root/.gku/learned.md" > "$root/.gku/learned.tmp" && mv "$root/.gku/learned.tmp" "$root/.gku/learned.md"
   ```
