@@ -255,7 +255,9 @@ and Rounds:
 
 ## Steps
 1. [ ] <what the step does, one finding or one coherent group> — round 1
-   - Create: <paths> · Modify: <path:lines> · Test: <what proves it>
+   - Create: <paths this step adds>
+   - Modify: <path:lines this step changes>
+   - Test: <the check that proves this step, or "none — the sweep in How to check it">
 
 ## How to check it
 - `<the sweep grep that must come back empty>`
