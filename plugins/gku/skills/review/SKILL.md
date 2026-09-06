@@ -56,7 +56,7 @@ not match is a finding at the severity its own cost line implies. They cost a `g
 point straight at the parts of the change nobody has agreed to yet.
 
 ```bash
-git log <base>..HEAD --format='%h %b' | grep -i 'Ruling:'
+git log <base>..HEAD --format='%h %b' | grep -i -A2 'Ruling:'
 ```
 
 **On a pull request, the commits are the only source.** `.tasks/` is ignored by git, so

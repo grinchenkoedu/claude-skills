@@ -213,6 +213,13 @@ Handle the things that break a change on the live site but not on your machine:
 - **Front-end sources** — run the profile's build command if you touched them.
 - **Dependencies** — commit the lock file alongside the manifest.
 
+**Then, at most one line for the next run.** If this run had to find out something that was not
+in the plan, the standards doc or the profile — the suite needs the container up, a Moodle cache
+has to be purged before a change shows, a command only works from the repository root — append
+it to `.gku/learned.md` and prune to the last 20 lines, as `reference/reports.md` says. One line,
+dated, about the repository rather than this change. Nothing to say is the normal case; say
+nothing then.
+
 Then, in chat:
 
 - what was built, in two or three lines;
