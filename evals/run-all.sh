@@ -14,7 +14,10 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 failed=0
 ran=0
 
-for suite in "$root"/evals/*/*.sh; do
+# find, not a glob: evals/*/*.sh is exactly one level deep, and a suite added at
+# evals/a/b/c.sh would be skipped without a word. run-all.sh itself sits at the
+# top and is not a suite.
+while IFS= read -r suite; do
   [ -f "$suite" ] || continue
   name="${suite#"$root/evals/"}"
   ran=$((ran + 1))
@@ -24,7 +27,9 @@ for suite in "$root"/evals/*/*.sh; do
     printf '^^ %s failed\n' "$name" >&2
     failed=$((failed + 1))
   fi
-done
+done <<EOF
+$(find "$root/evals" -mindepth 2 -name '*.sh' | sort)
+EOF
 
 [ "$ran" -gt 0 ] || { printf 'no suites found under %s/evals\n' "$root" >&2; exit 1; }
 
