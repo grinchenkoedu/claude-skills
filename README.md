@@ -286,9 +286,11 @@ ends by naming what to run next, so you are not left holding a list.
 ```
 
 It picks up the findings from the review you just ran, **re-checks each one against the code**
-before touching it — some will already be fixed, and some will turn out to be wrong — then
-applies the blockers and warnings, one commit each, and re-runs the tests. Nits are listed, not
-applied, unless you add `--nits`.
+before touching it — some will already be fixed, and some will turn out to be wrong — then asks
+how far down the list to go: blockers only, warnings too, or nits as well, with a
+recommendation for this change. It fixes the chosen tier, one commit each, and re-runs the
+tests. Whatever you left for later goes into the task file in progress, or into a new one under
+`.tasks/`, so it is not lost in the chat.
 
 > The same command also starts from cold. `/gku:fix the export merges same-named departments`
 > in a brand-new session investigates the report first — finds the code, reproduces it, proves
@@ -540,16 +542,18 @@ there is not. It never applies anything itself.
 /gku:fix
 /gku:fix .gku/reports/review-my-branch-20260824-143201.md
 /gku:fix the export blows up when a department has no head
-/gku:fix --nits
 /gku:fix --dry-run
 ```
 
 Two jobs in one command, because in practice they are the same job.
 
-**Given findings**, it applies them — **blockers and warnings by default**, one commit each,
-then re-runs the tests. Nits are listed rather than applied; they are matters of taste and they
-bury the real changes in a diff somebody has to read. `--nits` takes them too. This is the half
-`/gku:review` deliberately leaves undone.
+**Given findings**, it applies them, one commit each, then re-runs the tests. How far down the
+list it goes is a question, not a flag: **blockers only, warnings too, or nits as well**, with a
+recommendation for this change — blockers only for a hotfix, warnings for a branch about to
+open its pull request, nits when they sit on lines a fix rewrites anyway. Nits are matters of
+taste and bury the real changes in a long diff, so what you leave for later is appended to the
+task file in progress, or written to `.tasks/<branch>-followups.md` for `/gku:implement` to
+take another day. This is the half `/gku:review` deliberately leaves undone.
 
 **Given a symptom** — a sentence describing something broken — **it investigates first**, the
 way `/gku:plan` does: work out whether you are describing a bug, a feature, a question or a data
