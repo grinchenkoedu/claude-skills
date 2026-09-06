@@ -15,6 +15,11 @@ set -u
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 skills="$root/plugins/gku/skills"
+# A run that finds nothing to check must fail, not pass: a moved directory
+# would otherwise leave this green while it asserted nothing at all.
+[ -d "$skills" ] || { printf 'no skills at %s\n' "$skills" >&2; exit 1; }
+count="$(ls -d "$skills"/*/ 2>/dev/null | wc -l | tr -d ' ')"
+[ "$count" -gt 0 ] || { printf 'no skills under %s\n' "$skills" >&2; exit 1; }
 
 WRITES="init implement fix pr pr-resolve audit"          # never model-invoked
 READS="plan research review verify pr-review audit"      # never edit an existing file
@@ -51,7 +56,7 @@ for dir in "$skills"/*/; do
 done
 
 if [ "$fails" -eq 0 ]; then
-  printf 'skills: frontmatter invariants hold across %s skills\n' "$(ls -d "$skills"/*/ | wc -l | tr -d ' ')"
+  printf 'skills: frontmatter invariants hold across %s skills\n' "$count"
 else
   printf 'skills: %s frontmatter problem(s)\n' "$fails" >&2
 fi
