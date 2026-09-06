@@ -797,7 +797,9 @@ instead:
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a
-  task file or a report, and may never change a file that was already there.
+  task file or a report, and may never change a file that was already there. `/gku:audit` is in
+  both lists — it writes a task file and must never edit anything else — which is why six and
+  six cover eleven skills.
 - **Facts arrive as data.** `gku-survey` gathers every marker the profile detection needs in one
   read-only pass, and the six skills that care about the tree get the branch and a short status
   injected before their first turn, rather than spending tool calls asking git what it already
