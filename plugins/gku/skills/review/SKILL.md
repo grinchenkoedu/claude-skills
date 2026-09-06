@@ -196,6 +196,10 @@ name. Anything it finds is a BLOCKER.
 Without `--deep`, do this yourself with `grep` for the *renamed and removed* symbols only —
 that is the case where a missed caller breaks the site — and skip the rest.
 
+**The task file narrows it.** When the branch has one, its steps name their `Modify:` paths;
+those are where a moved symbol was moved *from*, so grep them first. It is the difference
+between grepping a repository and grepping five files.
+
 ## Step 6 — Say it
 
 Write the review **in the conversation**, not to a file. Lead with the verdict:

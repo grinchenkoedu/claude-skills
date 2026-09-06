@@ -110,9 +110,16 @@ against code you have not written yet is testing nothing; find out why before co
 make it pass with the smallest change that does. The step is not done until its test is green,
 and step 4 is left only filling the gaps the steps did not reach.
 
+**The step's own lines say where to start.** A plan written by `/gku:plan`, `/gku:research` or
+`/gku:audit` gives each step a `Create:`, a `Modify: path:lines` and a `Test:` — open exactly
+those, and read around them rather than searching the repository again. A step without them is
+not a reason to stop: work out the files yourself, and write them into the step as you go, so
+`--continue` and the review after it get the same map.
+
 For each step, in order:
 
-1. **Read** the files it touches, and enough around them to not break something.
+1. **Read** the files it touches — the `Modify:` paths first — and enough around them to not
+   break something.
 2. **Make the change**, following the conventions in the profile's `standardsDoc`. Match the
    file you are editing — its naming, its structure, its comment style. Consistency with the
    neighbours beats consistency with a style guide. When the doc and the neighbours are both
@@ -148,6 +155,10 @@ For each step, in order:
    **Put the same line in the commit body below.** The task file is ignored by git
    (`reference/reports.md`), so a ruling that lives only there reaches `--continue` and nobody
    else — not the reviewer, not the pull request, which is the whole audience for it.
+
+   A ruling you only notice after its commit is written has nowhere to go but the task file —
+   amending is not allowed. Put it under the step with `(after the commit)` on it, and say so in
+   step 6's report, so the reviewer meets it somewhere.
 
 6. **Commit** when the step is a coherent unit of work. One commit per step is the default, and
    its body carries that step's rulings:

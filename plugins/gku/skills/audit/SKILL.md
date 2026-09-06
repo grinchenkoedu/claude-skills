@@ -254,7 +254,10 @@ and Rounds:
 - [ ] <checkable, one or more per round — what /gku:implement builds against and /gku:verify checks>
 
 ## Steps
-1. [ ] <file-level, one finding or one coherent group> — round 1
+1. [ ] <what the step does, one finding or one coherent group> — round 1
+   - Create: <paths this step adds>
+   - Modify: <path:lines this step changes>
+   - Test: <the check that proves this step, or "none — the sweep in How to check it">
 
 ## How to check it
 - `<the sweep grep that must come back empty>`
