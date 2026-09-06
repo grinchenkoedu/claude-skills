@@ -42,11 +42,11 @@ base=""
 if [ -f .claude/repo-profile.json ] && command -v jq >/dev/null 2>&1; then
   base="$(jq -r '.baseBranch // empty' .claude/repo-profile.json 2>/dev/null)"
 fi
+# The ref can arrive after a space or after a colon (HEAD:main), carry a
+# leading + (which is itself a forced push), and spell itself out in full
+# (refs/heads/main). All four shapes push to the same branch.
 for b in main master $base; do
-  if printf '%s' "$cmd" | grep -Eq "git[^|;&]*push[^|;&]*[[:space:]](origin[[:space:]]+)?(refs/heads/)?$b([[:space:]]|:|\$)"; then
-    refuse "a push to the base branch '$b'. A change lands through a pull request — /gku:pr opens it."
-  fi
-  if printf '%s' "$cmd" | grep -Eq "git[^|;&]*push[^|;&]*:$b([[:space:]]|\$)"; then
+  if printf '%s' "$cmd" | grep -Eq "git[^|;&]*push[^|;&]*([[:space:]]|:)\+?(refs/heads/)?$b([[:space:]]|:|\$)"; then
     refuse "a push to the base branch '$b'. A change lands through a pull request — /gku:pr opens it."
   fi
 done
