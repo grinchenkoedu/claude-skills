@@ -183,10 +183,11 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 
 - **`moodle-plugin`** — the repository root *is* the plugin root. Entry-point pages
   `require_once` the host's `config.php` from three levels up. Classes under `classes/` are
-  autoloaded by namespace, and Moodle **caches the class map**: adding or moving a file under
-  `classes/`, or changing `db/` schema, caches or tasks, requires bumping `$plugin->version`
-  in `version.php` or the live site will not see it. This is the single most common way a
-  correct-looking change fails in production — treat a missing bump as a blocker.
+  autoloaded by namespace, and Moodle **caches the class map, the AMD bundle, CSS and language
+  strings by revision**: adding or moving a file under `classes/`, changing `db/` schema,
+  caches or tasks, or touching `amd/src/`, `styles.css` or `lang/` requires bumping
+  `$plugin->version` in `version.php` or the live site will not see it. This is the single most
+  common way a correct-looking change fails in production — treat a missing bump as a blocker.
 - **`php-app`** — `application/` holds `controllers/`, `models/`, `views/`, `commands/`,
   `core/`. `./run` dispatches CLI commands. Several of these repositories have **no tests at
   all**; skills must not report "tests pass" when what happened is "there are no tests".

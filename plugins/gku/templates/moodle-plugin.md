@@ -101,9 +101,15 @@ works in testing.
 ### Things that break only on the live site
 
 - **Bump `$plugin->version` in `version.php`** whenever you add or move a file under `classes/`,
-  or change `db/` schema, `db/caches.php` or `db/tasks.php`. Moodle caches the class map and the
-  schema version; without the bump the site keeps running the old code and you get a
-  "class not found" that reproduces nowhere else. When unsure, bump — it is cheap.
+  change `db/` schema, `db/caches.php` or `db/tasks.php`, or touch anything Moodle caches by
+  revision — `amd/src/*.js`, `styles.css`, `lang/`. Moodle caches the class map and the schema
+  version; without the bump the site keeps running the old code and you get a "class not found"
+  that reproduces nowhere else. When unsure, bump — it is cheap.
+- In production Moodle serves every AMD module as **one bundle built once per JS revision**, so a
+  new or changed module deployed without a bump is invisible until someone purges caches by
+  hand: the module resolves to `undefined` and `js_call_amd` fails with "Cannot read properties
+  of undefined (reading 'init')". The same goes for `styles.css` and language strings. The
+  upgrade that follows a bump purges all of it, so run the upgrade after every deploy.
 - Schema changes belong in `db/upgrade.php` (or `db/tables/`) guarded by a version check, and
   the guard version must match the new `version.php` value.
 - Capability changes require the version bump too, or the new capability will not exist.
