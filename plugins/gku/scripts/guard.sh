@@ -45,8 +45,12 @@ if printf '%s' "$scan" | grep -Eq 'git[^|;&]*--no-verify'; then
 fi
 
 base=""
-if [ -f .claude/repo-profile.json ] && command -v jq >/dev/null 2>&1; then
-  base="$(jq -r '.baseBranch // empty' .claude/repo-profile.json 2>/dev/null)"
+if command -v jq >/dev/null 2>&1; then
+  # The payload names the session's directory; the hook's own cwd need not be
+  # the project, and a profile read from the wrong place is no profile at all.
+  hook_cwd="$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)"
+  profile="${hook_cwd:+$hook_cwd/}.claude/repo-profile.json"
+  [ -f "$profile" ] && base="$(jq -r '.baseBranch // empty' "$profile" 2>/dev/null)"
 fi
 # The ref can arrive after a space or after a colon (HEAD:main), carry a
 # leading + (which is itself a forced push), and spell itself out in full
