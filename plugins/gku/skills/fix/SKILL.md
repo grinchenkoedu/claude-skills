@@ -3,6 +3,12 @@ name: fix
 description: Fix what is wrong — the findings from a review still in this conversation, a review report file, or a symptom you describe in a sentence. A described symptom gets investigated first, the way /gku:plan investigates, until the cause is proven; then it acts instead of writing a plan. Re-checks every finding against the current code before touching it, lands the smallest change per finding, and re-runs the tests. Blockers and warnings by default; nits only when you ask.
 argument-hint: "[<what is wrong> | <path/to/review.md>] [--nits] [--blockers-only] [--dry-run]"
 user-invocable: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/scripts/guard.sh"
 ---
 
 # /gku:fix — find what is wrong, then fix it
