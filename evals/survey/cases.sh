@@ -15,6 +15,11 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 survey="$root/plugins/gku/bin/gku-survey"
 [ -x "$survey" ] || { printf 'no survey at %s\n' "$survey" >&2; exit 1; }
 
+# Fixtures are temporary directories; clean them up however this run ends.
+fixtures=""
+cleanup() { [ -n "$fixtures" ] && rm -rf $fixtures; }
+trap cleanup EXIT INT TERM
+
 fails=0
 note() { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
 row()  { printf '%s\n' "$out" | sed -n "s/^$1: //p"; }
@@ -31,7 +36,7 @@ wantnot() { # wantnot <row> <substring>
 }
 
 # A library-shaped PHP fixture with a database call and a compose file.
-fix="$(mktemp -d)"
+fix="$(mktemp -d)"; fixtures="$fixtures $fix"
 mkdir -p "$fix/src" "$fix/tests" "$fix/.github/workflows"
 printf '{"name":"x/y","type":"library"}\n'          > "$fix/composer.json"
 printf '<phpunit/>\n'                                > "$fix/phpunit.xml"
@@ -58,14 +63,14 @@ case "$(row timeout-tool)" in timeout|gtimeout|none) ;; *) note "php library: ti
 ( cd "$fix" && [ -z "$(git status --porcelain)" ] ) || note 'the survey changed the tree it surveyed'
 
 # A directory that is not a repository at all.
-bare="$(mktemp -d)"
+bare="$(mktemp -d)"; fixtures="$fixtures $bare"
 out="$(cd "$bare" && bash "$survey" 2>/dev/null)" || note 'a non-repository directory made the survey exit non-zero'
 want root         'not a git repository' 'bare directory'
 want base-branch  'unknown'              'bare directory'
 want profile      'missing'              'bare directory'
 
 # A Moodle-shaped fixture.
-mood="$(mktemp -d)"
+mood="$(mktemp -d)"; fixtures="$fixtures $mood"
 mkdir -p "$mood/db" "$mood/lang/en" "$mood/classes"
 printf '<?php $plugin->component = "local_x"; $plugin->version = 2026010100;\n' > "$mood/version.php"
 printf '<?xml version="1.0"?>\n'                                                > "$mood/db/install.xml"
@@ -78,7 +83,7 @@ want database-markers 'db/install.xml' 'moodle plugin'
 # A command that hangs must not hang the skill this runs before. The fake docker
 # here sleeps for 30s; the survey has to give up on it and finish anyway — and on
 # a machine with no timeout tool, which is the ordinary macOS case.
-slow="$(mktemp -d)"
+slow="$(mktemp -d)"; fixtures="$fixtures $slow"
 printf '#!/bin/sh\nsleep 30\n' > "$slow/docker"; chmod +x "$slow/docker"
 started="$(date +%s)"
 out="$(cd "$bare" && PATH="$slow:$PATH" bash "$survey" 2>/dev/null)"
@@ -86,7 +91,6 @@ elapsed="$(( $(date +%s) - started ))"
 [ "$elapsed" -lt 15 ] || note "a hanging docker held the survey for ${elapsed}s; it must give up"
 want docker 'not answering' 'hanging docker'
 
-rm -rf "$fix" "$bare" "$mood" "$slow"
 if [ "$fails" -eq 0 ]; then
   printf 'survey: every row follows its fixture\n'
 else
