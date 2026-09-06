@@ -28,13 +28,19 @@ case "$cmd" in *git*) ;; *) exit 0 ;; esac
 
 refuse() { printf 'The gku guard refuses: %s\n' "$1" >&2; exit 2; }
 
-if printf '%s' "$cmd" | grep -Eq 'git[^|;&]*push[^|;&]*(--force|--force-with-lease|(^|[[:space:]])-f([[:space:]]|$))'; then
+# Match against the command with quoted text blanked out: a commit message
+# that names a flag — git commit -m "never pass --no-verify" — is talk about
+# the flag, not use of it. Everything outside the quotes survives, so the
+# flags themselves are still seen.
+scan="$(printf '%s' "$cmd" | sed -E "s/'[^']*'/''/g; s/\"[^\"]*\"/\"\"/g")"
+
+if printf '%s' "$scan" | grep -Eq 'git[^|;&]*push[^|;&]*(--force|--force-with-lease|(^|[[:space:]])-f([[:space:]]|$))'; then
   refuse "a forced push rewrites history somebody else may have. Push a new commit instead."
 fi
-if printf '%s' "$cmd" | grep -Eq 'git[^|;&]*commit[^|;&]*--amend'; then
+if printf '%s' "$scan" | grep -Eq 'git[^|;&]*commit[^|;&]*--amend'; then
   refuse "--amend rewrites the last commit. Make a new commit instead."
 fi
-if printf '%s' "$cmd" | grep -Eq 'git[^|;&]*--no-verify'; then
+if printf '%s' "$scan" | grep -Eq 'git[^|;&]*--no-verify'; then
   refuse "--no-verify skips a hook. A failing hook means the code needs fixing."
 fi
 
@@ -46,7 +52,7 @@ fi
 # leading + (which is itself a forced push), and spell itself out in full
 # (refs/heads/main). All four shapes push to the same branch.
 for b in main master $base; do
-  if printf '%s' "$cmd" | grep -Eq "git[^|;&]*push[^|;&]*([[:space:]]|:)\+?(refs/heads/)?$b([[:space:]]|:|\$)"; then
+  if printf '%s' "$scan" | grep -Eq "git[^|;&]*push[^|;&]*([[:space:]]|:)\+?(refs/heads/)?$b([[:space:]]|:|\$)"; then
     refuse "a push to the base branch '$b'. A change lands through a pull request — /gku:pr opens it."
   fi
 done
