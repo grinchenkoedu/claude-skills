@@ -41,10 +41,11 @@ Required either way: there is no default target. This skill changes files and pu
 ## Step 1 — Work out which pull request, and where
 
 The branch and the working tree, gathered before this skill ran — read them here rather than
-asking git again:
+asking git again. The status is cut at 40 lines, so a long one is a sample, not the whole
+tree — count it with `git status --porcelain | wc -l` if the number matters:
 
 !`git branch --show-current 2>/dev/null || true`
-!`git status --short 2>/dev/null || true`
+!`git status --short 2>/dev/null | head -40 || true`
 
 **Resolve the target first, before assuming anything about the current directory.**
 

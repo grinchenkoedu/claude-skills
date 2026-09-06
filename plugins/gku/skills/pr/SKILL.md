@@ -37,10 +37,11 @@ It pushes commits you already made. It never commits for you, never merges, neve
 ## Step 1 — Preflight
 
 The branch and the working tree, gathered before this skill ran — read them here rather than
-asking git again:
+asking git again. The status is cut at 40 lines, so a long one is a sample, not the whole
+tree — count it with `git status --porcelain | wc -l` if the number matters:
 
 !`git branch --show-current 2>/dev/null || true`
-!`git status --short 2>/dev/null || true`
+!`git status --short 2>/dev/null | head -40 || true`
 
 And the pull request this branch already has, if it has one — step 2's question, answered:
 
