@@ -98,7 +98,10 @@ anyway.
 Beside the reports sits one file that is not a report. A report is about a run; this is about
 the repository, and it is the only file a later run reads back on its own.
 
-- **One line per note, dated:** `2026-09-06 — the test suite needs the container up; on the host it errors at bootstrap`. A trap, a convention the standards doc does not state, a command that only works a particular way.
+- **One line per note, dated — and a short one.** A note that needs a paragraph is not a note:
+  it is a convention, and it belongs in the standards doc where `/gku:init` keeps them. Twenty
+  lines of prose cost the readers as much as two hundred short ones.
+- **The shape:** `2026-09-06 — the test suite needs the container up; on the host it errors at bootstrap`. A trap, a convention the standards doc does not state, a command that only works a particular way.
 - **`/gku:implement` and `/gku:fix` append at most one line each**, at the end of a run, and only
   for something the next run would otherwise learn the hard way. Nothing about one change: no
   findings, no progress, no decisions — those are the task file, the report and the `Ruling:`
