@@ -80,6 +80,10 @@ a question asked into an empty room stops the run for nothing.
 
 Repeat 2–4 until a round finds nothing worth fixing, **at most three rounds**. A finding that
 survives two rounds of fixing will not fall to a third: stop and report it with what you tried.
+Three is the whole cycle's budget, not each part's — a test that fails at 4 is a finding for the
+next round, not a fresh three attempts under step 5. Unattended, that bound is the only thing
+between a wrong premise and a long night, so count it across the run and say which round you
+are in.
 
 **`--auto` does not widen the scope.** The sort in step 3 still decides what gets touched, and
 unattended is exactly when nobody is watching a run wander. Case 2 there — the plan cannot reach
