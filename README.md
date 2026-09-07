@@ -502,6 +502,7 @@ fixing, `/gku:fix` does the same investigation and then acts on it.
 /gku:implement .tasks/export-department-collision.md
 /gku:implement add a CSV option to the student export
 /gku:implement .tasks/big-task.md --continue
+/gku:implement .tasks/big-task.md --auto
 ```
 
 Works sequentially in your working tree — no background agents, nothing hidden. It creates a
@@ -511,8 +512,21 @@ writes tests, and runs the suite.
 **The task file is also the progress log.** Each finished step gets ticked off with a note of
 what landed, which is what makes `--continue` work after an interruption.
 
-It stays inside the task. If it notices something else broken, it tells you at the end rather
-than quietly fixing it — an implementation that wanders is one nobody can review.
+It stays inside the task. Something it notices along the way is fixed only when the step cannot
+land without it; a plan that turns out not to reach its goal comes back to you before anything
+is built differently; everything else is reported at the end and left alone. An implementation
+that wanders is one nobody can review.
+
+**`--auto` runs the whole cycle unattended** — build, review its own diff, fix what that found,
+run the tests, and round again until nothing is left — then pushes the branch and opens the pull
+request. A task big enough to need several branches gets several pull requests, each based on
+the one before it and saying so. It asks everything it needs at the start, in one batch, and
+after that stops only for something that genuinely needs you: a decision with no defensible
+default, a plan that cannot reach its goal, three rounds with a test still failing. When it does
+stop, the work is committed, pushed and waiting in a draft pull request rather than lost.
+
+**It never merges and it never deploys** — with `--auto` or without it. The open pull request is
+where it ends; merging is yours.
 
 ### `/gku:review` — check your own work
 
