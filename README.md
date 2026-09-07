@@ -667,9 +667,9 @@ reads from your recent merged pull requests. The testing section says what was a
 **admits it when nothing was**. Updating an existing pull request never silently overwrites a
 description somebody wrote by hand.
 
-The description carries no Claude Code session link. Such a link answers `403` to anyone not
-signed in as its owner, so to every other reader it is a dead link that says only which tool
-wrote the change — and it is left out whether the repository is public or private, because
+The description carries no Claude Code session link. Such a link answers `403` to an
+unauthenticated request and promises nothing to anyone but the account that owns it, so to its
+readers it is a dead link that says only which tool wrote the change — and it is left out whether the repository is public or private, because
 visibility changes and descriptions are not rewritten when it does. The co-author trailer in the
 commits is the attribution, and it stays.
 

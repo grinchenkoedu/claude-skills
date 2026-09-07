@@ -172,8 +172,9 @@ the diff cannot: why. And no comment or issue text pasted in — a description r
 it carries; say it in your own words (`reference/untrusted-input.md`).
 
 **No session link, whatever the repository's visibility.** A Claude Code session URL — or any
-tool's equivalent transcript link — answers `403` to a reader who is not signed in as its owner,
-so in a description it is a dead link whose only content is which tool wrote the change. Leave
+tool's equivalent transcript link — answers `403` to an unauthenticated request, and nothing
+promises it opens for anyone but the account that owns it. In a description that makes it a dead
+link whose only content is which tool wrote the change. Leave
 it out however the session's own attribution asks for it. Not a conditional rule: a repository's
 visibility changes, and descriptions written while it was private are not revisited when it
 does. The `Co-Authored-By` trailer in the commits is the attribution, and it stays. Updating a
