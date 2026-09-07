@@ -268,6 +268,12 @@ plan than a half-built change.
 It creates a branch, works through the steps in order, ticks each one off in the task file,
 and runs the tests. You can watch every edit and stop at any time.
 
+**The plan is the scope.** Something it notices along the way gets fixed only when the step
+cannot land without it; a plan that turns out not to reach its goal is brought back to you
+before anything is built differently. Everything else is reported at the end and left alone.
+The run stops at the last step, and whatever is left over becomes the next plan rather than
+more of this one.
+
 > **If you run out of usage partway through, that is fine.** The finished steps are ticked in
 > the task file. When your limit resets, `/gku:implement .tasks/export-department-collision.md
 > --continue` picks up exactly where it stopped.
