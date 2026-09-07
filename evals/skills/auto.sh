@@ -42,6 +42,16 @@ has 'This is a self-review: say so' || note 'implement: --auto passes its own re
 has '### When an autonomous run stops' || note 'implement: --auto never says what is worth stopping for'
 has 'Stopping is not halting' || note 'implement: a stopped run leaves the work nowhere the developer can pick it up'
 
+# What an unattended run leaves behind. Nobody watched it, so a nit it skipped
+# or a thing it half-finished exists only if it was written down at the time —
+# and only reaches the developer if it travels somewhere git does not ignore.
+# Careful: a bare '## Notes' is a substring of this section's own '### Notes'
+# heading, which would leave this green with the instruction gone.
+has 'task file under `## Notes`' || note 'implement: --auto keeps no notes, so what it left alone is lost'
+has 'the moment it comes up' || note 'implement: notes are reconstructed at the end rather than written as they happen'
+has "pull request's body under **Notes**" || note 'implement: notes stay in the git-ignored task file and reach nobody'
+has 'warning the developer before it says it is finished' || note 'implement: --auto can report done without putting the notes in front of anyone'
+
 # Several branches, still readable in order.
 has 'Depends on #' || note 'implement: chained pull requests are not linked to the one they sit on'
 has 'draft otherwise' || note 'implement: opens a pull request as ready whether or not the criteria are met'

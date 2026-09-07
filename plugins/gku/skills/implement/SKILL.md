@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Build a task step by step in the current session — from a plan file, a markdown brief, or a sentence. Works through ordered steps, ticking each one off in the task file as it lands, so an interrupted run resumes exactly where it stopped instead of starting over. With --auto it runs the whole cycle unattended — build, self-review, fix, test, repeat — and opens the pull request at the end, stopping only for something that genuinely needs you. It never merges and never deploys.
+description: Build a task step by step in the current session — from a plan file, a markdown brief, or a sentence. Works through ordered steps, ticking each one off in the task file as it lands, so an interrupted run resumes exactly where it stopped instead of starting over. With --auto it runs the whole cycle unattended — build, self-review, fix, test, repeat — and opens the pull request at the end, stopping only for something that genuinely needs you. Everything it noticed and left alone is written down and put in front of you before it calls the plan done. It never merges and never deploys.
 argument-hint: "<path/to/task.md> | <what to build> [--auto] [--continue] [--step <n>]"
 user-invocable: true
 disable-model-invocation: true
@@ -124,6 +124,40 @@ in order:
 The closing report lists them in the order they should be merged, and says plainly that merging
 is yours. `--auto --step 3-5` bounds the work to those steps; the cycle and the pull request
 still happen for what they produce.
+
+### Notes, and the warning that ends the run
+
+Nobody watched this run, so everything it noticed and did not act on has to be written down as
+it happens — reconstructed at the end, half of it is already forgotten. Append each one to the
+task file under `## Notes` the moment it comes up:
+
+```markdown
+## Notes
+- `classes/export/Csv.php:88` — repeated header logic, three call sites — nit, not fixed
+- `db/upgrade.php` — the migration needs a dry run against real data — needs its own plan
+- Assumed the export keeps the current column order — nobody was there to ask — `[assumed]`
+```
+
+What belongs there: everything the sort in step 3 put in case 3, every finding the review round
+raised and the cycle did not fix, every criterion met narrowly or partly, every `[assumed]`
+answer from the batch at the start, and anything you decided that a reader would question — the
+`Ruling:` lines are already in the commits, so the note is a pointer, not a copy.
+
+**The task file is git-ignored** (`reference/reports.md`), so the same list goes in the last
+pull request's body under **Notes**. A note that exists only on the machine that ran the build
+reaches nobody, which is the same as not writing it.
+
+Then the run ends by **warning the developer before it says it is finished**, in this order:
+
+1. **what needs your eyes** — the notes, shortest first, each with its path and why it was left;
+2. **what needs more work than a note** — each as a command: `/gku:plan <the thing>` for
+   anything that needs deciding, `/gku:fix <the symptom>` for something small and understood;
+3. the pull requests, in merge order, ready or draft;
+4. **then** the plan is done, in those words — and merging is yours.
+
+A run that reports "done" without that list has hidden the part the developer most needs to
+read. An empty notes list is a fine thing to report — say there is nothing, rather than padding
+it.
 
 ## Step 1 — Set up
 

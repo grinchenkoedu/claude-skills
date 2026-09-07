@@ -525,6 +525,11 @@ after that stops only for something that genuinely needs you: a decision with no
 default, a plan that cannot reach its goal, three rounds with a test still failing. When it does
 stop, the work is committed, pushed and waiting in a draft pull request rather than lost.
 
+**What it left alone, it writes down.** A nit it skipped, a criterion met narrowly, something
+that needs a plan of its own, an assumption it had to make because nobody was there to ask —
+each lands in the task file as it comes up and in the pull request description, and the run ends
+by putting that list in front of you *before* it says the plan is done.
+
 **It never merges and it never deploys** — with `--auto` or without it. The open pull request is
 where it ends; merging is yours.
 
