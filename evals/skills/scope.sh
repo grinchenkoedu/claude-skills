@@ -51,7 +51,7 @@ printf '%s' "$impf" | grep -q 'the plan is done' || note 'implement: never says 
 printf '%s' "$impf" | grep -q 'start of a new plan' || note 'implement: leftovers have nowhere to go but this run'
 
 # /gku:fix applies a list rather than a plan, and needs the same rule in its loop.
-printf '%s' "$(flat "$skills/fix/SKILL.md")" | grep -q 'Do not refactor nearby code' || note 'fix: drive-by refactors are back'
+flat "$skills/fix/SKILL.md" | grep -q 'Do not refactor nearby code' || note 'fix: drive-by refactors are back'
 
 if [ "$fails" -eq 0 ]; then
   printf 'scope: implement sorts what it finds, honours "Do not touch", and ends when the plan does\n'
