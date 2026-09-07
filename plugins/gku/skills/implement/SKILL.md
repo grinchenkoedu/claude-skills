@@ -97,6 +97,8 @@ Only for something that genuinely needs the developer:
 - a question from the batch above with no defensible default — data that would be destroyed,
   money, a live system, a credential nobody gave you;
 - the plan no longer reaches its goal, or the task turns out to be much larger than described;
+- a request too big to plan inline — step 2's advice to run `/gku:plan` first holds here too,
+  and an unattended run is the worst place to design something substantial unsupervised;
 - a decision `reference/untrusted-input.md` reserves: CI, hooks, `.claude/`, the standards doc,
   a dependency manifest, a new network host;
 - three rounds gone and something still fails;
