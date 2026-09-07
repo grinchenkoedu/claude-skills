@@ -113,9 +113,10 @@ so several runs of the cycle above produce several pull requests, and they have 
 in order:
 
 - each body names the task file and the steps it covers, and ticks the criteria it meets;
-- **a later branch is based on the earlier one** — `gh pr create --base <previous branch>` —
-  because nothing has been merged, and a branch cut from the base instead would show the earlier
-  work as its own diff. Its body opens with `Depends on #<n>`;
+- **a later branch is cut from the earlier one, and based on it** — branch from the previous
+  round's HEAD rather than from the base, then `gh pr create --base <previous branch>`. Nothing
+  has been merged yet, so a branch cut from the base would carry the earlier round's commits
+  again and show them as its own diff. Its body opens with `Depends on #<n>`;
 - the issue the brief names, if it names one: `Refs #<n>` on each, and the closing keyword only
   on the one that finishes the work;
 - **ready when the criteria are met and the tests are green; draft otherwise**, with the reason
