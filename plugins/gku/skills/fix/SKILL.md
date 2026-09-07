@@ -275,9 +275,11 @@ stands:
 1. **Read** the file and enough around it to not break something else.
 2. **Apply the smallest change that resolves the finding.** Do not refactor nearby code, do not
    tidy the file, do not fix a second finding while you are in there. A fix that grows into a
-   rewrite is no longer reviewable against the finding that prompted it. Write the fix yourself;
-   a block from a codebase under a different licence needs the developer's approval first
-   (`reference/code-provenance.md`).
+   rewrite is no longer reviewable against the finding that prompted it. A change the fix
+   genuinely cannot land without is part of that fix — make it and say so in the commit body;
+   anything else you notice on the way is a new finding for the list, not an edit. Write the
+   fix yourself; a block from a codebase under a different licence needs the developer's
+   approval first (`reference/code-provenance.md`).
 3. **Check it immediately** — lint the changed file if the profile has a lint command, and run
    the scoped test if one covers it. A failure here means the fix is wrong; fix the fix before
    moving on.
