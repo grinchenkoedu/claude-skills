@@ -75,6 +75,23 @@ cases() {
 0|git commit -m 'do not --amend'
 # allowed — and the flags outside the quotes are still seen
 2|git commit -m \"msg\" && git push --force
+# refused — the gh commands that end or ship a change
+2|gh pr merge 12
+2|gh pr merge --squash --delete-branch 12
+2|gh pr merge --admin
+2|gh pr review 12 --approve
+2|gh release create v1.2.0
+2|gh release upload v1.2.0 dist.zip
+2|gh workflow run deploy.yml
+2|gh api repos/o/r/pulls/12/merge -X PUT
+# allowed — the gh a skill actually needs, including the ones that say merge
+0|gh pr create --base main --head x
+0|gh pr ready 12
+0|gh pr view 12 --json mergeable,mergeStateStatus
+0|gh pr list --search \"merge conflict\"
+0|gh pr comment 12 --body \"this needs a merge from main\"
+0|gh repo view --json isPrivate
+0|gh api repos/o/r/pulls/12/comments
 # allowed — nothing to do with git, or nothing to read
 0|ls -la
 0|rm -rf build

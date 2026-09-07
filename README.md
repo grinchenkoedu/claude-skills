@@ -818,7 +818,11 @@ instead:
   `/gku:pr-resolve` register a `PreToolUse` hook while they run. It reads the command about to
   execute and refuses `--force`, `--force-with-lease`, `--no-verify`, `git commit --amend`, and a
   push to the base branch — including the spellings that hide one: `+main`, `HEAD:refs/heads/main`.
-  Talk about a flag in a commit message is not use of it.
+  Talk about a flag in a commit message is not use of it. It refuses the commands that end or
+  ship a change rather than propose one, too — `gh pr merge`, `gh pr review --approve`,
+  `gh release`, `gh workflow run`, and the `gh api` call that merges — so a skill allowed to push
+  and open a pull request still stops there. `gh pr ready` is deliberately allowed: `/gku:pr`
+  offers it when the work behind a draft is finished.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a

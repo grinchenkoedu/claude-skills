@@ -8,7 +8,11 @@
 #   git commit --amend
 #   --no-verify on any git command
 #   git push to the base branch (main, master, or the profile's baseBranch)
-# Everything else exits 0 and the command runs.
+# and the gh commands that end or ship a change rather than propose one:
+#   gh pr merge, gh pr review --approve, gh release, gh workflow run,
+#   gh api ... /merge
+# Everything else exits 0 and the command runs — gh pr ready included, which
+# /gku:pr offers deliberately when the work behind a draft is finished.
 #
 # Ported from claude-rpg's plugins/rpg/scripts/guard.sh — MIT, same author
 # (Yevhen Matasar), reworded for gku's vocabulary.
@@ -24,7 +28,7 @@ else
 fi
 
 [ -n "$cmd" ] || exit 0
-case "$cmd" in *git*) ;; *) exit 0 ;; esac
+case "$cmd" in *git*|*gh*) ;; *) exit 0 ;; esac
 
 refuse() { printf 'The gku guard refuses: %s\n' "$1" >&2; exit 2; }
 
@@ -55,6 +59,25 @@ fi
 # The ref can arrive after a space or after a colon (HEAD:main), carry a
 # leading + (which is itself a forced push), and spell itself out in full
 # (refs/heads/main). All four shapes push to the same branch.
+# Merging and shipping are where every skill here stops, including a run given
+# --auto, which pushes and opens a pull request with nobody watching. The word
+# has to end there — --json mergeable is a question, not a merge.
+if printf '%s' "$scan" | grep -Eq 'gh[^|;&]*pr[^|;&]*[[:space:]]merge([[:space:]]|$)'; then
+  refuse "merging is where this stops. Open or update the pull request; a person merges it."
+fi
+if printf '%s' "$scan" | grep -Eq 'gh[^|;&]*pr[^|;&]*[[:space:]]--approve([[:space:]]|$)'; then
+  refuse "approving is a reviewer's act. A run that wrote the change cannot also approve it."
+fi
+if printf '%s' "$scan" | grep -Eq 'gh[^|;&]*release[[:space:]]+(create|edit|delete|upload)([[:space:]]|$)'; then
+  refuse "a release ships to users. That is a decision a person makes, after the merge."
+fi
+if printf '%s' "$scan" | grep -Eq 'gh[^|;&]*workflow[[:space:]]+(run|enable|disable)([[:space:]]|$)'; then
+  refuse "running a workflow reaches CI and whatever it deploys. Ask before triggering it."
+fi
+if printf '%s' "$scan" | grep -Eq 'gh[^|;&]*api[^|;&]*/merge'; then
+  refuse "that API call merges. Opening the pull request is where this stops."
+fi
+
 for b in main master ${base:+"$base"}; do
   # A branch name is a literal here, not a pattern: release.1 must not also
   # match release01.
