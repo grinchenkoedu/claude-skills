@@ -114,7 +114,7 @@ where the developer can see it, and `--continue` picks the rest up.
 ### The pull requests
 
 One branch per coherent change, opened the way `/gku:pr` does — its coherence check, its body,
-its ban on a session link in a public repository. An audit file's rounds are one branch each,
+its ban on a session link in the body. An audit file's rounds are one branch each,
 so several runs of the cycle above produce several pull requests, and they have to be readable
 in order:
 
