@@ -4,9 +4,11 @@
 #   bash evals/guard/cases.sh
 #
 # Every case is "expected exit code | the command the hook is asked about".
-# The table runs twice: once as the machine is, and once with jq off the PATH,
+# Each table runs twice: once as the machine is, and once with jq off the PATH,
 # because the guard's jq-less fallback is the half that silently refused
-# nothing when its regex was wrong.
+# nothing when its regex was wrong. The second table runs the shipping commands
+# again with .gku/auto-run in place, which is the whole difference between a run
+# a person is watching and one nobody is.
 #
 # Exits 0 when every case matches, 1 otherwise, naming each mismatch.
 
@@ -29,9 +31,9 @@ fails=0
 run() { # run <label> <expected> <json-escaped command> [PATH]
   local label="$1" want="$2" cmd="$3" path="${4-}" got
   if [ -n "$path" ]; then
-    ( cd "$work" && printf '{"tool_input":{"command":"%s"}}' "$cmd" | PATH="$path" /bin/bash "$guard" ) >/dev/null 2>&1
+    ( cd "$work" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$work" "$cmd" | PATH="$path" /bin/bash "$guard" ) >/dev/null 2>&1
   else
-    ( cd "$work" && printf '{"tool_input":{"command":"%s"}}' "$cmd" | "$guard" ) >/dev/null 2>&1
+    ( cd "$work" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$work" "$cmd" | "$guard" ) >/dev/null 2>&1
   fi
   got=$?
   if [ "$got" != "$want" ]; then
@@ -75,15 +77,17 @@ cases() {
 0|git commit -m 'do not --amend'
 # allowed — and the flags outside the quotes are still seen
 2|git commit -m \"msg\" && git push --force
-# refused — the gh commands that end or ship a change
-2|gh pr merge 12
-2|gh pr merge --squash --delete-branch 12
-2|gh pr merge --admin
+# refused whoever is watching — the run that wrote a change is not its reviewer
 2|gh pr review 12 --approve
-2|gh release create v1.2.0
-2|gh release upload v1.2.0 dist.zip
-2|gh workflow run deploy.yml
-2|gh api repos/o/r/pulls/12/merge -X PUT
+# allowed — no .gku/auto-run, so a person is watching and what they ask for is
+# theirs to ask for
+0|gh pr merge 12
+0|gh pr merge --squash --delete-branch 12
+0|gh pr merge --admin
+0|gh release create v1.2.0
+0|gh release upload v1.2.0 dist.zip
+0|gh workflow run deploy.yml
+0|gh api repos/o/r/pulls/12/merge -X PUT
 # allowed — the gh a skill actually needs, including the ones that say merge
 0|gh pr create --base main --head x
 0|gh pr ready 12
@@ -98,8 +102,37 @@ cases() {
 TABLE
 }
 
+# The same commands with an unattended run in progress: /gku:implement --auto
+# writes .gku/auto-run for as long as it runs, and nobody is reading what that
+# run does — so the commands that end or ship a change stop there.
+auto_cases() {
+  local label="$1" path="${2-}"
+  while IFS='|' read -r want cmd; do
+    case "$want" in ''|'#'*) continue ;; esac
+    run "$label" "$want" "$cmd" "$path"
+  done <<'TABLE'
+# refused — ending or shipping a change, with nobody watching
+2|gh pr merge 12
+2|gh pr merge --squash --delete-branch 12
+2|gh release create v1.2.0
+2|gh workflow run deploy.yml
+2|gh api repos/o/r/pulls/12/merge -X PUT
+# allowed — proposing one is what an unattended run is for
+0|gh pr create --base main --head x
+0|gh pr ready 12
+0|gh pr view 12 --json mergeable,mergeStateStatus
+# refused either way, so the marker cannot be read as the only thing holding
+2|git push --force origin x
+2|git push origin main
+TABLE
+}
+
 cases 'jq'
 [ -x "$nojq/sed" ] && cases 'no-jq' "$nojq"
+
+mkdir -p "$work/.gku" && printf 'started 2026-09-09T00:00:00Z in session eval\n' > "$work/.gku/auto-run"
+auto_cases 'jq-auto'
+[ -x "$nojq/sed" ] && auto_cases 'no-jq-auto' "$nojq"
 
 rm -rf "$work"
 if [ "$fails" -eq 0 ]; then
