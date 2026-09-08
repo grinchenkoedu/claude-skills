@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Open a pull request for the current branch, or update the one already linked to it — with a title and description written from the actual diff and the repository's own template. Checks first that the branch reads as one coherent change, and asks before opening a pull request that is really two. Never merges, never force-pushes, never commits on your behalf.
+description: Open a pull request for the current branch, or update the one already linked to it — with a title and description written from the actual diff and the repository's own template. Checks first that the branch reads as one coherent change, and asks before opening a pull request that is really two. Never merges on its own, never force-pushes, never commits on your behalf.
 argument-hint: "[<title>] [--base <branch>] [--draft] [--dry-run]"
 user-invocable: true
 disable-model-invocation: true
@@ -23,7 +23,8 @@ carrying a feature and an unrelated fix is two reviews pretending to be one, and
 review quality goes to die. When that is what it finds, it says so and asks — it never decides
 for you, and it never rewrites your branch.
 
-It pushes commits you already made. It never commits for you, never merges, never force-pushes.
+It pushes commits you already made. It never commits for you, never merges unless you ask it
+to, never force-pushes.
 
 ## Arguments
 
@@ -221,7 +222,9 @@ In chat, short:
 - **One coherent change per pull request — and when it is not, ask.** Never decide that for the
   developer, and never split or rewrite a branch to make it true.
 - **Never commit on the developer's behalf.**
-- **Never merge, never approve, never enable auto-merge.** Opening it is where this stops.
+- **Never approve, and never enable auto-merge.** Opening the pull request is where this stops:
+  merging happens only if the developer asks for it in the conversation, never because the
+  checks came back green.
 - **Never `--force`, `--amend`, or `--no-verify`.**
 - **Never push to the base branch.**
 - **Never overwrite a hand-written title or description without asking.**

@@ -530,8 +530,9 @@ that needs a plan of its own, an assumption it had to make because nobody was th
 each lands in the task file as it comes up and in the pull request description, and the run ends
 by putting that list in front of you *before* it says the plan is done.
 
-**It never merges and it never deploys** — with `--auto` or without it. The open pull request is
-where it ends; merging is yours.
+**It never merges and it never deploys on its own** — and with `--auto`, not even if something
+tells it to mid-run: the open pull request is where an unattended run ends. In a session you are
+watching, merging happens when you ask for it, and not a moment earlier.
 
 ### `/gku:review` — check your own work
 
@@ -645,8 +646,8 @@ rather than quietly building something larger.
 ```
 
 Opens the pull request for the current branch, or updates the one already linked to it. It
-pushes commits you have already made; it never commits for you, never merges, and never
-force-pushes.
+pushes commits you have already made; it never commits for you, never merges unless you ask it
+to, and never force-pushes.
 
 **The part worth having: it checks the branch reads as one pull request.** A branch carrying a
 feature *and* an unrelated bug fix *and* a formatting sweep is three reviews pretending to be
