@@ -58,6 +58,26 @@ request is approved, not when told to mid-run. Opening the pull request is where
 run ends, every time; merging and releasing stay with a person. `--force`, `--amend` and
 `--no-verify` remain banned, and the base branch is still never pushed to.
 
+**Say on disk that nobody is watching.** A hook cannot see `--auto`, so the guard learns it from
+a marker this mode keeps for as long as it runs. Write it before the first build step, and
+remove it when the run ends — at the closing report, or at the stop below, whichever comes
+first:
+
+```bash
+root="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)"
+mkdir -p "$root/.gku"
+printf 'started %s in session %s\n' "$(date -u +%FT%TZ)" "${CLAUDE_CODE_SESSION_ID:-unknown}" \
+  > "$root/.gku/auto-run"
+# …and when the run is over, however it ended:
+rm -f "$root/.gku/auto-run"
+```
+
+While `.gku/auto-run` is there, the guard refuses the commands that end or ship a change —
+merging, a release, a workflow run — for everything in the session. Without it, a person is
+watching and what they ask for is theirs to ask for. `.gku/` is git-ignored
+(`reference/reports.md`), so the marker never travels; one left behind by a run that died is a
+single `rm` on the path the refusal prints.
+
 **Ask everything at the start.** The one interruption an unattended run can afford is before it
 builds: put every question from step 2 into a single batch — the ambiguity in the brief, the
 choice that changes what gets built, the thing only the developer knows. Answers get written
@@ -109,7 +129,8 @@ ask about a class name is not autonomous, and one that stops about a dropped tab
 
 **Stopping is not halting.** Commit what is finished, push the branch, open the pull request as
 a **draft** with the reason in its body, and say in one line what you need. The work is then
-where the developer can see it, and `--continue` picks the rest up.
+where the developer can see it, and `--continue` picks the rest up. Remove `.gku/auto-run` as
+you stop: from here on somebody is reading, and the run that was unattended is over.
 
 ### The pull requests
 
