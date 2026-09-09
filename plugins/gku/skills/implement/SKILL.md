@@ -183,6 +183,9 @@ Then the run ends by **warning the developer before it says it is finished**, in
 3. the pull requests, in merge order, ready or draft;
 4. **then** the plan is done, in those words — and merging is yours.
 
+**Remove `.gku/auto-run` before that last line.** The run is over and you are talking to a
+person again; a marker left behind refuses them the merge you just handed them.
+
 A run that reports "done" without that list has hidden the part the developer most needs to
 read. An empty notes list is a fine thing to report — say there is nothing, rather than padding
 it.
