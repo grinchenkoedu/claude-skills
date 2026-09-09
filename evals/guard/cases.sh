@@ -23,21 +23,22 @@ guard="$root/plugins/gku/scripts/guard.sh"
 work="$(mktemp -d)"
 # The jq-less PATH: the tools the guard needs, and not jq.
 nojq="$work/nojq"; mkdir -p "$nojq"
-for t in cat sed grep head; do
+for t in cat sed grep head git; do
   for c in /bin/$t /usr/bin/$t; do [ -x "$c" ] && ln -sf "$c" "$nojq/$t" && break; done
 done
 
 fails=0
-run() { # run <label> <expected> <json-escaped command> [PATH]
-  local label="$1" want="$2" cmd="$3" path="${4-}" got
+run() { # run <label> <expected> <json-escaped command> [PATH] [cwd]
+  local label="$1" want="$2" cmd="$3" path="${4-}" here="${5-$work}" got where=""
   if [ -n "$path" ]; then
-    ( cd "$work" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$work" "$cmd" | PATH="$path" /bin/bash "$guard" ) >/dev/null 2>&1
+    ( cd "$here" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$here" "$cmd" | PATH="$path" /bin/bash "$guard" ) >/dev/null 2>&1
   else
-    ( cd "$work" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$work" "$cmd" | "$guard" ) >/dev/null 2>&1
+    ( cd "$here" && printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$here" "$cmd" | "$guard" ) >/dev/null 2>&1
   fi
   got=$?
+  [ "$here" = "$work" ] || where="  [cwd ${here#"$work"/}]"
   if [ "$got" != "$want" ]; then
-    printf 'FAIL  %-8s want=%s got=%s  %s\n' "$label" "$want" "$got" "$cmd"
+    printf 'FAIL  %-10s want=%s got=%s  %s%s\n' "$label" "$want" "$got" "$cmd" "$where"
     fails=$((fails + 1))
   fi
 }
@@ -127,12 +128,42 @@ auto_cases() {
 TABLE
 }
 
+# The marker in a real checkout. The tables run from a bare temp directory,
+# where every way of resolving a repository root falls back to the directory
+# itself — so they cannot tell --show-toplevel from --git-common-dir, and a
+# guard that reads the marker in the worktree instead of the primary checkout
+# passes them while letting an unattended run ship. These cases can.
+repo_cases() {
+  local label="$1" path="${2-}" repo="$work/repo" d
+  git init -q "$repo" 2>/dev/null || { printf 'SKIP  %-10s no git\n' "$label"; return; }
+  git -C "$repo" -c user.email=eval@example.invalid -c user.name=eval \
+    commit -q --allow-empty -m root 2>/dev/null
+  mkdir -p "$repo/sub" "$repo/.gku"
+  printf 'started at eval time in session eval\n' > "$repo/.gku/auto-run"
+  git -C "$repo" worktree add -q "$work/wt" HEAD 2>/dev/null
+  # The marker lives at the primary root; the run may be anywhere under it.
+  for d in "$repo" "$repo/sub" "$work/wt"; do
+    [ -d "$d" ] && run "$label" 2 'gh pr merge 12' "$path" "$d"
+  done
+  # And gone means gone, from the same three places.
+  rm -f "$repo/.gku/auto-run"
+  for d in "$repo" "$repo/sub" "$work/wt"; do
+    [ -d "$d" ] && run "$label" 0 'gh pr merge 12' "$path" "$d"
+  done
+  git -C "$repo" worktree remove --force "$work/wt" 2>/dev/null
+  rm -rf "$repo" "$work/wt"
+}
+
 cases 'jq'
 [ -x "$nojq/sed" ] && cases 'no-jq' "$nojq"
 
 mkdir -p "$work/.gku" && printf 'started 2026-09-09T00:00:00Z in session eval\n' > "$work/.gku/auto-run"
 auto_cases 'jq-auto'
 [ -x "$nojq/sed" ] && auto_cases 'no-jq-auto' "$nojq"
+rm -f "$work/.gku/auto-run"
+
+repo_cases 'jq-repo'
+[ -x "$nojq/git" ] && repo_cases 'no-jq-repo' "$nojq"
 
 rm -rf "$work"
 if [ "$fails" -eq 0 ]; then
