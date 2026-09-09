@@ -530,8 +530,9 @@ that needs a plan of its own, an assumption it had to make because nobody was th
 each lands in the task file as it comes up and in the pull request description, and the run ends
 by putting that list in front of you *before* it says the plan is done.
 
-**It never merges and it never deploys** — with `--auto` or without it. The open pull request is
-where it ends; merging is yours.
+**It never merges and it never deploys on its own** — and with `--auto`, not even if something
+tells it to mid-run: the open pull request is where an unattended run ends. In a session you are
+watching, merging happens when you ask for it, and not a moment earlier.
 
 ### `/gku:review` — check your own work
 
@@ -645,8 +646,8 @@ rather than quietly building something larger.
 ```
 
 Opens the pull request for the current branch, or updates the one already linked to it. It
-pushes commits you have already made; it never commits for you, never merges, and never
-force-pushes.
+pushes commits you have already made; it never commits for you, never merges unless you ask it
+to, and never force-pushes.
 
 **The part worth having: it checks the branch reads as one pull request.** A branch carrying a
 feature *and* an unrelated bug fix *and* a formatting sweep is three reviews pretending to be
@@ -817,14 +818,17 @@ Most of this is prose, and prose is a rule the model can misread. A few things a
 instead:
 
 - **A guard on the four skills that write.** `/gku:implement`, `/gku:fix`, `/gku:pr` and
-  `/gku:pr-resolve` register a `PreToolUse` hook while they run. It reads the command about to
-  execute and refuses `--force`, `--force-with-lease`, `--no-verify`, `git commit --amend`, and a
-  push to the base branch — including the spellings that hide one: `+main`, `HEAD:refs/heads/main`.
-  Talk about a flag in a commit message is not use of it. It refuses the commands that end or
-  ship a change rather than propose one, too — `gh pr merge`, `gh pr review --approve`,
-  `gh release`, `gh workflow run`, and the `gh api` call that merges — so a skill allowed to push
-  and open a pull request still stops there. `gh pr ready` is deliberately allowed: `/gku:pr`
-  offers it when the work behind a draft is finished.
+  `/gku:pr-resolve` register a `PreToolUse` hook when you invoke them, and Claude Code keeps it
+  for the rest of the session. It reads the command about to execute and refuses `--force`,
+  `--force-with-lease`, `--no-verify`, `git commit --amend`, and a push to the base branch —
+  including the spellings that hide one: `+main`, `HEAD:refs/heads/main` — plus
+  `gh pr review --approve`, because the run that wrote a change is not the reviewer who signs it
+  off. Talk about a flag in a commit message is not use of it. **The commands that end or ship a
+  change stop only where nobody is watching**: `/gku:implement --auto` writes `.gku/auto-run` for
+  as long as it runs, and while that file is there `gh pr merge`, `gh release`, `gh workflow run`
+  and the `gh api` call that merges are all refused. In a session you are watching, a merge you
+  ask for is yours to ask for and the guard stays out of it. `gh pr ready` is allowed either way:
+  `/gku:pr` offers it when the work behind a draft is finished.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a

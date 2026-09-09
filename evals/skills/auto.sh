@@ -31,8 +31,13 @@ has '## `--auto`' || note 'implement: --auto has no section of its own'
 
 # The bans. These are the reason the mode is safe to hand a repository.
 has 'never merges and it never deploys' || note 'implement: --auto does not rule out merging and deploying'
-has 'Never merge, never deploy, never touch a live system' || note 'implement: the rules no longer ban merge and deploy outright'
+has 'Never merge, never deploy, never touch a live system' || note 'implement: the rules no longer ban merge and deploy on the skill own initiative'
+has 'never under `--auto`, whoever asks' || note 'implement: the rules let an unattended run merge or deploy if something asks it to'
 has 'remain banned' || note 'implement: --auto does not carry the --force/--amend/--no-verify ban forward'
+# The ban that is mechanism rather than prose: the guard cannot see --auto, so
+# the mode has to say it is unattended on disk, and clear it when it is over.
+has '.gku/auto-run' || note 'implement: --auto writes no marker, so the guard cannot tell an unattended run from a watched one'
+has 'rm -f "$root/.gku/auto-run"' || note 'implement: --auto never removes the marker, so it would refuse the developer their own merge afterwards'
 
 # The shape of an unattended run.
 has 'Ask everything at the start' || note 'implement: --auto does not front-load its questions, so it will stop mid-run instead'
