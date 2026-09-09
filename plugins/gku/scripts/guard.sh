@@ -84,10 +84,16 @@ elif printf '%s' "$scan" | grep -Eq 'gh[^|;&]*api[^|;&]*/merge'; then
   ship="that API call merges"
 fi
 if [ -n "$ship" ]; then
-  # The marker sits at the root of the repository the session works in, or in
-  # its directory when that is not a checkout.
+  # The marker sits at the root of the primary repository, or in the session's
+  # directory when that is not a checkout. --git-common-dir, not
+  # --show-toplevel: in a worktree the latter is the worktree's own root, and
+  # the run that wrote the marker used the primary one (reference/reports.md).
   dir="${hook_cwd:-$PWD}"
-  root="$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)" || root=""
+  root=""
+  # Resolve the common dir first: empty means no checkout here, and cd-ing to
+  # "/.." on the way past would silently land on the filesystem root.
+  common="$(cd "$dir" 2>/dev/null && git rev-parse --git-common-dir 2>/dev/null)"
+  [ -n "$common" ] && root="$(cd "$dir" && cd "$common/.." 2>/dev/null && pwd)"
   marker="${root:-$dir}/.gku/auto-run"
   if [ -f "$marker" ]; then
     refuse "$ship, and nobody is watching this run — $marker says it is unattended. Opening the pull request is where it stops; if that run is over, remove that file."
