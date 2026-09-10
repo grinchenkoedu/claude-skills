@@ -95,6 +95,11 @@ has "$revf" 'nothing committed and nothing uncommitted' \
   || note 'review: reports "no changes" mid-step of a hand-built change, whose work is all uncommitted'
 has "$revf" 'A hand-written branch has none by design' \
   || note 'review: treats missing Ruling: lines on a hand-built branch as a finding'
+# Against the raw file, not the flattened copy: this one is a command, and
+# flat() strips the very backticks and asterisks that make it exact. Anchored,
+# or it matches any file that merely mentions the marker.
+grep -qF "grep -l '^\*\*Mode:\*\* manual'" "$skills/review/SKILL.md" \
+  || note 'review: no anchored check for the marker, so nothing tells a hand-built branch from any other'
 has "$revf" 'do not name /gku:fix as the next step' \
   || note 'review: ends a hand-built branch by recommending a skill that commits'
 

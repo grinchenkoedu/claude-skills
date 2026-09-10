@@ -72,6 +72,23 @@ the developer, step by step, and nothing was going to write `Ruling:` lines into
 Their absence is not a finding; the file's `## Progress` says which steps are meant to be here,
 and reviewing against its criteria works exactly as it does for a branch `/gku:implement` built.
 
+**Look for that marker here, once** — it is what the closing step keys on:
+
+```bash
+grep -l '^\*\*Mode:\*\* manual' .tasks/*.md 2>/dev/null
+```
+
+**Anchored, because the marker is a header line.** Unanchored, that pattern also matches every
+file that merely mentions the marker — a plan *about* manual mode, a brief quoting one — and a
+review that mistakes one of those for a hand-built branch stops recommending the skill the
+developer wanted.
+
+Or take the developer's word for it in the conversation. No match is not proof of the
+opposite: `.tasks/` is git-ignored, so another machine, a deleted plan or the worktree
+`/gku:pr-review` reads has no file to find. Review it as an ordinary branch then — and if the
+diff looks hand-built and you had nothing to check, say so in one line rather than assuming
+either way.
+
 Then decide what to read. Do not read everything — rank by risk and read down the list until
 the budget is spent:
 
