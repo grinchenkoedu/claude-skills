@@ -67,10 +67,14 @@ has "$planf" '## Resume prompt' || note 'plan: the manual template gives a new s
 has "$planf" 'do not write the code for me, and do not commit anything' \
   || note 'plan: the resume prompt lets the next session write the code it was meant to explain'
 
-# The step keeps the lines the readers grep (evals/skills/file-lists.sh) and
-# gains the three that make it followable by hand.
-for part in 'Shape:' 'Why:' 'Prove it:'; do
-  grep -qE "^ +- $part" "$skills/plan/SKILL.md" || note "plan: the manual step shape has no $part line"
+# The step keeps the lines the other skills grep and gains the three that make
+# it followable by hand. Cut step 6b out of the file first: the step-6 template
+# above it has Create:/Modify:/Test: of its own, so a check over the whole file
+# would stay green with 6b's dropped — which is the failure worth catching,
+# since /gku:review greps those paths on a hand-built branch too.
+sixb="$(awk '/^## Step 6b/,/^## Step 7/' "$skills/plan/SKILL.md")"
+for part in 'Create:' 'Modify:' 'Shape:' 'Why:' 'Prove it:'; do
+  printf '%s' "$sixb" | grep -qE "^ +- $part" || note "plan: the manual step shape has no $part line"
 done
 
 # Handing it over. Naming /gku:implement here is how a manual plan gets built
