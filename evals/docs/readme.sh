@@ -33,6 +33,7 @@ for doc in README.md README.uk.md; do
     'Ruling:' \
     'Modify: path:lines' \
     '\-\-auto' \
+    '\-\-manual' \
     'evals/run-all.sh'
   do
     grep -qE "$token" "$f" || note "$doc: never mentions ${token%%|*}"
