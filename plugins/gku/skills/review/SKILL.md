@@ -44,7 +44,10 @@ the half you were about to commit.
 
 Stop early when there is nothing to do:
 - on the base branch itself → "You are on `<base>` — switch to your branch first."
-- empty diff → "No changes against `<base>`."
+- **nothing committed *and* nothing uncommitted** → "No changes against `<base>`." Both halves,
+  because a branch with no commits and a dirty tree is the normal state mid-step of a change
+  somebody is writing by hand — the work is all in the worktree, and the committed diff is
+  empty. Reviewing that is exactly what was asked for.
 
 ## Step 2 — Decide what to read
 
@@ -63,6 +66,11 @@ git log <base>..HEAD --format='%h %b' | grep -i -A2 'Ruling:'
 somebody else's branch — and the worktree `/gku:pr-review` reads — carries no task file at all.
 Finding no rulings there is not evidence that none were made; say which sources you could
 actually read, the same way this skill names a file it judged from the diff alone.
+
+**A hand-written branch has none by design.** A task file marked `**Mode:** manual` was built by
+the developer, step by step, and nothing was going to write `Ruling:` lines into those commits.
+Their absence is not a finding; the file's `## Progress` says which steps are meant to be here,
+and reviewing against its criteria works exactly as it does for a branch `/gku:implement` built.
 
 Then decide what to read. Do not read everything — rank by risk and read down the list until
 the budget is spent:
@@ -225,6 +233,11 @@ to work out what to do with it, which is a step they should not have to take:
   that here.
 - **nits only, or clean** → `/gku:pr` opens the pull request; `/gku:verify` first if the change
   needs proving rather than re-reading.
+
+**On a branch built by hand, do not offer `/gku:fix`** — it commits, and the point of a
+`**Mode:** manual` plan is that the developer's commits are theirs. Hand the findings back
+instead: the file, the line, and what to change, in the order worth doing them, for them to
+apply and commit themselves. Offer `/gku:fix` only if they ask for it.
 
 Suggest it; do not run it. This skill does not edit, and the developer decides whether a finding
 is worth acting on.
