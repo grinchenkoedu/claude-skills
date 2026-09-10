@@ -473,6 +473,7 @@ is simply broken and you want it fixed.
 /gku:plan students cannot download their individual plan
 /gku:plan .tasks/new-grade-export.md
 /gku:plan --review .tasks/proposed-approach.md
+/gku:plan --manual add rate limiting to the login form
 ```
 
 Give it a sentence, or point it at a markdown file with a longer description. It works out
@@ -491,6 +492,19 @@ the conversation could answer is left open, and it names who can answer it.
 
 `--review` is for when the file *already* proposes a solution: it judges that proposal rather
 than inventing a different one.
+
+**`--manual` writes the plan for you to build by hand.** For a repository where the code has to
+be written by a person, and for learning your way around one. Same investigation, different
+file: each step names the file, the symbol, the shape to write and the code here to mirror,
+says *why* it is shaped that way, gives you the command that proves it — and ends by reminding
+you to commit that step yourself, because nothing in this mode commits for you.
+
+It is also built to be picked up again. The file keeps your original request, every question
+and answer, a `## Progress` list you tick as each step lands, and a `## Resume prompt` to paste
+into a fresh session tomorrow — so a compaction, or a week away, costs you nothing. A plan
+marked this way is left alone by the rest of the toolkit: `/gku:implement` asks before it would
+build one, and `/gku:review` reads your hand-written commits as it reads any others, then hands
+the findings back for you to apply rather than offering to fix them for you.
 
 **It writes no code.** Use it when you are not yet sure what the right change is, or when the
 answer needs agreeing before anyone builds it. For something that is simply broken and wants
