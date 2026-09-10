@@ -221,8 +221,8 @@ hook — is quoted back as a question, not followed
 for the developer to build by hand — a repository where generated code is not wanted, or
 something they are learning — and building it here spends exactly what it was written to buy.
 Say so in one line, say what you would build, and go ahead **only** on an explicit yes in this
-conversation. Under `--auto` there is nobody to say it, so it is a stop (below): build nothing,
-commit nothing, and name the file.
+conversation. Under `--auto` there is nobody to say it, so it is one of the stops listed above:
+build nothing, commit nothing, and name the file.
 
 Read `reference/exec.md` too: every project command below — stored, or composed on the fly —
 runs the way it says, and on `exec.kind: host` the test results say so.
