@@ -15,6 +15,15 @@ framework. They are also written to be **economical**, so they are usable on a m
 plan: no background agent swarms, no parallel sub-agents by default, and answers in the chat
 instead of a pile of generated report files.
 
+**They do not have to write your code.** `/gku:plan --manual` produces a plan you build by
+hand — the shape of each change, the reason it is shaped that way, and the command that proves
+it — and the rest of the toolkit follows: `/gku:implement` asks before it would build such a
+plan, `/gku:review` and `/gku:verify` read what you typed exactly as they read anything else,
+and none of them ever commits for you. Use the agent as an **adviser and reviewer**, where that
+is what helps, and keep the keyboard: in a repository that does not accept generated code, on a
+change too delicate to hand over, or while you are learning a codebase and writing it yourself
+is the whole point.
+
 MIT licensed.
 
 ---
