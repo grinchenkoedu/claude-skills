@@ -1,7 +1,7 @@
 ---
 name: plan
 description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /gku:implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Asks you in the chat, in one batched round, whatever only you can answer — and writes your answers into the plan instead of leaving them open. Plans only; writes no production code.
-argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep]"
+argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep] [--manual]"
 user-invocable: true
 disallowed-tools: Edit, NotebookEdit
 ---
@@ -35,6 +35,8 @@ They are only useful for marking where prose ends when a flag follows it.
 - `--review` — a brief that already proposes a solution: judge that proposal instead of
   designing a fresh one (see step 7).
 - `--deep` — allow one sub-agent for mechanical code search on a large unfamiliar area.
+- `--manual` — write the plan for a **person** to build by hand rather than for `/gku:implement`:
+  the same investigation, a different file (see step 6b).
 
 ## Step 1 — Understand the request
 
