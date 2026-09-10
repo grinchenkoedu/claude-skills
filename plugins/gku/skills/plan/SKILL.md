@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /gku:implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Asks you in the chat, in one batched round, whatever only you can answer — and writes your answers into the plan instead of leaving them open. Plans only; writes no production code.
+description: Turn a request — a sentence you type, or a markdown brief — into a grounded plan you can hand to /gku:implement. Works out what is really being asked (bug, feature, question, data fix), checks it against the actual code and data, and writes an ordered plan with acceptance criteria. Asks you in the chat, in one batched round, whatever only you can answer — and writes your answers into the plan instead of leaving them open. With --manual it writes the plan for you to build by hand instead, detailed enough to follow and to pick up again in a new session. Plans only; writes no production code.
 argument-hint: "<what you want> | <path/to/brief.md> [--review] [--deep] [--manual]"
 user-invocable: true
 disallowed-tools: Edit, NotebookEdit
