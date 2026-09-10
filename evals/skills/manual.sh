@@ -45,6 +45,17 @@ grep '^argument-hint:' "$skills/plan/SKILL.md" | grep -q -- '--manual' \
 has "$planf" '- --manual —' || note 'plan: --manual has no entry in the Arguments list'
 has "$planf" '## Step 6b' || note 'plan: --manual has no section of its own'
 
+# How the flag is recognised. "manual" is an ordinary word in an ordinary
+# request — the manual export is wrong, add a manual override — and a mode that
+# fires on any of those writes the wrong kind of file for a developer who asked
+# for the usual one. So: the literal token, at the front, or it is prose.
+has "$planf" '--manual is the literal flag, and only in front' \
+  || note 'plan: nothing pins --manual to the literal flag at the front of the argument'
+has "$planf" 'is an ordinary word in an ordinary request' \
+  || note 'plan: the bare word manual could switch the mode on'
+has "$planf" 'counts only at the front' \
+  || note 'plan: a trailing --manual is swallowed silently instead of being named'
+
 # What makes it a manual plan rather than a plan with a different name. Without
 # the first of these the mode writes an implementation to paste, which is what
 # both of its audiences — an AI-agnostic repository and a learner — are avoiding.

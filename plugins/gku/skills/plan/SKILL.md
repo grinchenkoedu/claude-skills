@@ -38,6 +38,24 @@ They are only useful for marking where prose ends when a flag follows it.
 - `--manual` — write the plan for a **person** to build by hand rather than for
   `/gku:implement`: the same investigation, a different file (see step 6b).
 
+**`--manual` is the literal flag, and only in front.** It switches modes only when the argument
+**begins** with the exact token `--manual`, followed by a space or nothing:
+`/gku:plan --manual add rate limiting to the login form`. Everywhere else it is text to plan
+from, because "manual" is an ordinary word in an ordinary request — *the manual export is
+wrong*, *add a manual override*, *update the operations manual* — and a mode that switched on
+any of those would quietly write the wrong file for a developer who asked for the usual one. So:
+
+| The argument | What it is |
+|---|---|
+| `--manual add a CSV export` | the mode, and the request is the rest |
+| `add a CSV export --manual` | **not** the mode — say so in one line, plan normally |
+| `the manual export drops a column` | a request about a manual export. Not the mode |
+| `--manual` alone | the mode, with nothing to plan — ask what to plan |
+
+Trailing flags are not the mode, but they are not silently swallowed either: plan the request as
+given, and say in one line that `--manual` counts only at the front, so a developer who meant
+the mode can put it there and run it again.
+
 ## Step 1 — Understand the request
 
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`; detect and cache if
