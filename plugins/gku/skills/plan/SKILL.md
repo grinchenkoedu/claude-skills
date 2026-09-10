@@ -370,6 +370,13 @@ because no answer came, and — when there is something to build — the next co
 
 The plan was written to be executed without re-deriving it.
 
+**A `--manual` plan hands off differently.** Its next command is not `/gku:implement` — the file
+was written for the developer. Give them, in this order: the absolute path, the summary, how
+many steps there are and which to start with, **"commit each step yourself before starting the
+next one"**, and `/gku:review` for when the work is done. Point at `## Resume prompt` as what to
+paste into a new session, and say that `/gku:implement` asks before building a manual plan, so
+nothing is locked in.
+
 ## Rules
 
 - **No production code.** Only the plan, and at most one read-only script (untracked, with its
@@ -388,6 +395,9 @@ The plan was written to be executed without re-deriving it.
   says who could answer it.
 - **Absolute paths. English or Ukrainian. No essays** — a reader of the summary alone should be
   able to act.
+- **`--manual` writes for a person, and warns them to commit.** Shapes and reasons, never a
+  paste-ready implementation; the marker in the header; and the warning that nothing in that
+  file commits for them — at the top, at the end of every step, and in the hand-off.
 
 ## Edge cases
 
