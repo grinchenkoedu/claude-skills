@@ -95,8 +95,8 @@ has "$revf" 'nothing committed and nothing uncommitted' \
   || note 'review: reports "no changes" mid-step of a hand-built change, whose work is all uncommitted'
 has "$revf" 'A hand-written branch has none by design' \
   || note 'review: treats missing Ruling: lines on a hand-built branch as a finding'
-has "$revf" 'do not offer /gku:fix' \
-  || note 'review: ends a hand-built branch by offering a skill that commits'
+has "$revf" 'do not name /gku:fix as the next step' \
+  || note 'review: ends a hand-built branch by recommending a skill that commits'
 
 if [ "$fails" -eq 0 ]; then
   printf 'manual: plan writes it for a person, implement asks first, review hands it back\n'

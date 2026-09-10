@@ -234,10 +234,12 @@ to work out what to do with it, which is a step they should not have to take:
 - **nits only, or clean** → `/gku:pr` opens the pull request; `/gku:verify` first if the change
   needs proving rather than re-reading.
 
-**On a branch built by hand, do not offer `/gku:fix`** — it commits, and the point of a
-`**Mode:** manual` plan is that the developer's commits are theirs. Hand the findings back
-instead: the file, the line, and what to change, in the order worth doing them, for them to
-apply and commit themselves. Offer `/gku:fix` only if they ask for it.
+**On a branch built by hand, do not name `/gku:fix` as the next step** — it commits, and the
+point of a `**Mode:** manual` plan is that the developer's commits are theirs. Hand the findings
+back instead: the file, the line, and what to change, in the order worth doing them, for them to
+apply and commit themselves. `/gku:fix` is still theirs to run, and this skill was never the
+thing permitting it — what changes is only what the review recommends, so say in one line that
+it is there if they would rather it were applied for them.
 
 Suggest it; do not run it. This skill does not edit, and the developer decides whether a finding
 is worth acting on.
