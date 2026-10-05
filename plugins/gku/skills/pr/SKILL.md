@@ -149,13 +149,15 @@ read directly:
 gh pr list --state merged --limit 5 --json title
 ```
 
-If that shows a convention — a `feat:` prefix, a ticket key, Ukrainian titles — follow it. A
-`<title>` passed as an argument always wins.
+If that shows a convention — a `feat:` prefix, a ticket key — follow it: their format, not their
+language. The words are in the run's language (`reference/language.md`). A `<title>` passed as
+an argument always wins.
 
 **Body**, with no template to follow, short and in this order:
 
 - **What and why** — one paragraph. The problem, then the change. Take the problem statement
-  from the task file if the branch has one in `.tasks/`.
+  from the task file if the branch has one in `.tasks/`, and its `**Language:**` line for the
+  language of the title and the body when you have no prose of the developer's to go on.
 - **How** — two or three bullets, only where a reviewer would otherwise have to reverse-engineer
   the approach. Skip it for an obvious change.
 - **Testing** — what was actually run, quoted, under `reference/exec.md`'s rule on fresh

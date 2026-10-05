@@ -224,6 +224,10 @@ Say so in one line, say what you would build, and go ahead **only** on an explic
 conversation. Under `--auto` there is nobody to say it, so it is one of the stops listed above:
 build nothing, commit nothing, and name the file.
 
+**Its `**Language:**` line is the language of the run** whenever you have written no prose here
+— a bare path, `--continue`, `--auto`: the chat, the commits and the pull request follow it
+(`reference/language.md`).
+
 Read `reference/exec.md` too: every project command below — stored, or composed on the fly —
 runs the way it says, and on `exec.kind: host` the test results say so.
 

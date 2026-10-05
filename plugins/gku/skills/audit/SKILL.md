@@ -262,6 +262,7 @@ and Rounds:
 # Audit — <repository>, <date>
 
 **Type:** audit
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Asked:** <the invocation, verbatim>
 **Scope:** <areas> · <N> tracked files, <M> read in full (listed under Evidence) · lint <ran | skipped: why> · dependency audit <tool: summary line | skipped: why> · provenance <off | N fingerprints sent to GitHub code search | skipped: why>
 

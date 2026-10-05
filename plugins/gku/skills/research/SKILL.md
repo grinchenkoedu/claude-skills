@@ -236,6 +236,7 @@ Evidence.
 # <Short title>
 
 **Type:** bug | feature | question | data fix | decision
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Asked:** <the original request, verbatim>
 **Scope:** <N> files read in full · <M> searches, <K> pages fetched · local data <queried | none>
 

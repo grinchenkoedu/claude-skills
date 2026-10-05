@@ -203,6 +203,7 @@ project deliberately commits briefs). Overwrite an existing plan for the same sl
 # <Short title>
 
 **Type:** bug | feature | question | data fix
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Asked:** <the original request, verbatim>
 
 ## Summary
@@ -289,6 +290,7 @@ Same location and slug rules as step 6. The header marker is what `/gku:implemen
 # <Short title>
 
 **Type:** bug | feature | question | data fix
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Mode:** manual
 **Asked:** <the original request, verbatim>
 **Plan file:** <absolute path to this file>
