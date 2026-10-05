@@ -474,9 +474,9 @@ the report that it landed outside the plan.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
   right to change it, say so explicitly and explain why.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
-- **Identifiers and commit messages in English**; commit bodies may be English or Ukrainian.
-  User-facing strings follow whatever the file already does — a page written in Ukrainian stays
-  Ukrainian.
+- **Identifiers in English; commit subjects and bodies in the developer's language**, with
+  `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md`). User-facing strings
+  follow whatever the file already does — a page written in Ukrainian stays Ukrainian.
 
 ## Edge cases
 

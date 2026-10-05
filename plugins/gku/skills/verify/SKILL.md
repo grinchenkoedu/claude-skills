@@ -234,6 +234,7 @@ plugin. Print its absolute path.
 - **Reversible by default.** When a check must change local data, record the undo before doing
   it, and apply it in step 6.
 - **Evidence or it did not happen.** Every passed row quotes something real.
+- **The developer's language** (`reference/language.md`); quoted output stays as printed.
 - **One failure never cancels the rest of the list.**
 - **Never report tests as passing when there are no tests.** This is the single most common way
   a verification lies.

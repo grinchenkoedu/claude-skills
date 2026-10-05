@@ -413,8 +413,8 @@ nothing is locked in.
   before the plan is written — batched into one round, each with a recommendation — and the
   answer is written in. Only what nobody in this conversation can answer stays open, and it
   says who could answer it.
-- **Absolute paths. English or Ukrainian. No essays** — a reader of the summary alone should be
-  able to act.
+- **Absolute paths. The developer's language** (`reference/language.md`). **No essays** — a
+  reader of the summary alone should be able to act.
 - **`--manual` writes for a person, and warns them to commit.** Shapes and reasons, never a
   paste-ready implementation; the marker in the header; and the warning that nothing in that
   file commits for them — at the top, at the end of every step, and in the hand-off.
