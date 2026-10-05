@@ -874,6 +874,11 @@ instead:
 - **Every planned step names its files.** `Create:`, `Modify: path:lines (symbol)`, `Test:` — so
   `/gku:implement` opens exactly those files instead of searching, and `/gku:review` greps them
   for symbols that moved.
+- **Your language, from the plan to the pull request.** Write in Ukrainian, Polish or anything
+  else, and the questions, the plan, the commits and the pull request come back in it; mix
+  Ukrainian and Russian and Ukrainian wins. What the skills read back — headings, `Modify:`,
+  `Ruling:`, identifiers — stays English. A `**Language:**` line in the task file carries the
+  choice to a later session. One rule, in `reference/language.md`.
 
 ## Using these on a Pro plan
 

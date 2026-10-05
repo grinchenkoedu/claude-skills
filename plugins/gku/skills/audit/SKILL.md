@@ -262,6 +262,7 @@ and Rounds:
 # Audit — <repository>, <date>
 
 **Type:** audit
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Asked:** <the invocation, verbatim>
 **Scope:** <areas> · <N> tracked files, <M> read in full (listed under Evidence) · lint <ran | skipped: why> · dependency audit <tool: summary line | skipped: why> · provenance <off | N fingerprints sent to GitHub code search | skipped: why>
 
@@ -336,7 +337,8 @@ round together and `/gku:pr` will then ask to split it.
   unanswered stays a numbered question; nothing about a licence or an origin is ever assumed.
 - **No verdicts on licence compatibility.** Flag it, name both licences, hand it to a person.
 - **Local only.** Never a production system, never a host the developer does not control.
-- **Absolute paths. English or Ukrainian.** A reader of the summary alone should be able to act.
+- **Absolute paths. The developer's language** (`reference/language.md` — Ukrainian over Russian
+  when the two are mixed). A reader of the summary alone should be able to act.
 
 ## Edge cases
 

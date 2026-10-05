@@ -224,6 +224,10 @@ Say so in one line, say what you would build, and go ahead **only** on an explic
 conversation. Under `--auto` there is nobody to say it, so it is one of the stops listed above:
 build nothing, commit nothing, and name the file.
 
+**Its `**Language:**` line is the language of the run** whenever the developer has written no
+prose here — a bare path, `--continue`: the chat, the commits and the pull request follow it
+(`reference/language.md`).
+
 Read `reference/exec.md` too: every project command below — stored, or composed on the fly —
 runs the way it says, and on `exec.kind: host` the test results say so.
 
@@ -470,9 +474,10 @@ the report that it landed outside the plan.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
   right to change it, say so explicitly and explain why.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
-- **Identifiers and commit messages in English**; commit bodies may be English or Ukrainian.
-  User-facing strings follow whatever the file already does — a page written in Ukrainian stays
-  Ukrainian.
+- **Identifiers in English; commit subjects and bodies in the developer's language**, with
+  `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md` — Ukrainian over Russian
+  when the two are mixed). User-facing strings follow whatever the file already does — a page
+  written in Ukrainian stays Ukrainian.
 
 ## Edge cases
 

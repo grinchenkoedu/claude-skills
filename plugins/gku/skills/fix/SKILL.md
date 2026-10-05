@@ -383,8 +383,10 @@ worth of usage on diminishing returns. Name the next command and let the develop
 - **Absolute paths** everywhere, so they are clickable in an editor.
 - **Data-safety rules are not optional** — see `reference/repo-profile.md`. A fix to code that
   writes in bulk still needs dry-run by default, safe re-runs and bounded scope.
-- **English or Ukrainian, matching the developer.** Identifiers and commit messages in English;
-  user-facing strings follow whatever the file already does.
+- **The developer's language** (`reference/language.md` — Ukrainian over Russian when the two
+  are mixed). Identifiers in English; commit subjects and bodies in the developer's language,
+  with `Ruling:` and `Co-Authored-By:` kept literal; user-facing strings follow whatever the
+  file already does.
 
 ## Edge cases
 

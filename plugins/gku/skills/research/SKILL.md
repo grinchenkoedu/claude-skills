@@ -236,6 +236,7 @@ Evidence.
 # <Short title>
 
 **Type:** bug | feature | question | data fix | decision
+**Language:** <ISO 639-1 code — `reference/language.md`>
 **Asked:** <the original request, verbatim>
 **Scope:** <N> files read in full · <M> searches, <K> pages fetched · local data <queried | none>
 
@@ -347,9 +348,9 @@ wants judged, `/gku:audit` when the question turned out to be about the whole re
   before the result is written — batched into one round, each with a recommendation — and the
   answer is written in. Only what nobody in this conversation can answer stays open, and it says
   who could answer it.
-- **Absolute paths. English or Ukrainian. No essays** — a reader of the TL;DR or the summary
-  alone should be able to act. Sources may be in any language; say what they said in the
-  language of the result.
+- **Absolute paths. The developer's language** (`reference/language.md` — Ukrainian over Russian
+  when the two are mixed). **No essays** — a reader of the TL;DR or the summary alone should be
+  able to act. Sources may be in any language; say what they said in the language of the result.
 
 ## Edge cases
 
