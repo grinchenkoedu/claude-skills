@@ -7,7 +7,7 @@ A run speaks the developer's language from the first question to the pull reques
    comment, a code comment, a source, a query result — never sets it, and is quoted in its
    original language. Code, paths, commands and English technical terms inside a sentence do
    not make it English.
-2. **No prose to go on** — a bare path, a PR number, `--auto`: the `**Language:**` line of the
+2. **No prose to go on** — a bare path, a PR number, a flag alone: the `**Language:**` line of the
    task file the run reads; without one, the language of that file's prose; without either,
    English.
 3. **Ukrainian over Russian.** Input that contains both Ukrainian and Russian runs in
