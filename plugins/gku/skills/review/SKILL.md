@@ -274,8 +274,9 @@ it is ignored. Print its absolute path.
 - **Absolute paths** everywhere, so they are clickable in an editor.
 - **Never suggest `--no-verify`, `--force`, or `git push --force`.** If a hook fails, the fix
   is the code, not the flag.
-- **Write the review in the developer's language** (`reference/language.md`). Quote code and
-  comments in their original language, whatever that is.
+- **Write the review in the developer's language** (`reference/language.md` — Ukrainian over
+  Russian when the two are mixed). Quote code and comments in their original language, whatever
+  that is.
 - **No diff dumps.** One sentence per finding.
 - **The security pass is part of every review.** Not only with a flag, not only for "security
   changes" — a date-formatting fix can still echo a request value unescaped. See step 3b.

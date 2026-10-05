@@ -226,9 +226,9 @@ With `--dry-run`, print the file and write nothing.
 - **Keep it short.** Under ~120 lines including the family block. If it is growing past that,
   the surplus belongs in the repository's own documentation, which is read on demand rather than
   every session.
-- **The chat in the developer's language** (`reference/language.md`); `CLAUDE.md` itself in the
-  language of the repository's existing documentation — a standing file the whole team reads,
-  not part of one run.
+- **The chat in the developer's language** (`reference/language.md` — Ukrainian over Russian
+  when the two are mixed); `CLAUDE.md` itself in the language of the repository's existing
+  documentation — a standing file the whole team reads, not part of one run.
 
 ## Edge cases
 

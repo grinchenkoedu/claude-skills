@@ -239,8 +239,8 @@ In chat, short:
 - **Do not request reviewers, assign labels or link issues** unless asked, or unless the
   repository's template asks for it.
 - **The title, the description and any commit in the developer's language**
-  (`reference/language.md`) — the repository's convention decides their format, not their
-  language.
+  (`reference/language.md` — Ukrainian over Russian when the two are mixed) — the repository's
+  convention decides their format, not their language.
 
 ## Edge cases
 

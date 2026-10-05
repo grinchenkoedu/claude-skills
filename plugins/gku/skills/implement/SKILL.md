@@ -475,8 +475,9 @@ the report that it landed outside the plan.
   right to change it, say so explicitly and explain why.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
 - **Identifiers in English; commit subjects and bodies in the developer's language**, with
-  `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md`). User-facing strings
-  follow whatever the file already does — a page written in Ukrainian stays Ukrainian.
+  `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md` — Ukrainian over Russian
+  when the two are mixed). User-facing strings follow whatever the file already does — a page
+  written in Ukrainian stays Ukrainian.
 
 ## Edge cases
 

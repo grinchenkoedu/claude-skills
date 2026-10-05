@@ -59,6 +59,9 @@ for f in "$skills"/*/SKILL.md; do
   s="$(basename "$(dirname "$f")")"
   sf="$(flat "$f")"
   has "$sf" 'reference/language.md' || note "$s: never points at reference/language.md"
+  # Inline as well: nothing tells a skill to open language.md, so the one
+  # exception the rule exists for has to be in the pointer itself.
+  has "$sf" 'Ukrainian over Russian' || note "$s: the pointer drops Ukrainian over Russian"
   for old in 'English or Ukrainian' 'commit messages in English' 'messages and titles in English'; do
     printf '%s' "$sf" | grep -qiF -e "$old" && note "$s: still says \"$old\""
   done
