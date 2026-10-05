@@ -149,7 +149,7 @@ read directly:
 gh pr list --state merged --limit 5 --json title
 ```
 
-If that shows a convention — a `feat:` prefix, a ticket key — follow it: their format, not their
+If that shows a convention — a `feat:` prefix, a ticket key — follow its format, not its
 language. The words are in the run's language (`reference/language.md`). A `<title>` passed as
 an argument always wins.
 
