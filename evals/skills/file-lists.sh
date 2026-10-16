@@ -6,9 +6,11 @@
 # Three skills write plans and two read them. The lists are only worth writing
 # because something reads them: /gku:implement opens the Modify: paths instead of
 # searching the repository, and /gku:review greps them for symbols that moved. If
-# either half goes, the lists become decoration in a file nobody re-reads.
+# either half goes, the lists become decoration in a file nobody re-reads. Two
+# rules about what goes in them ride along: a re-signed symbol's callers, and an
+# order in which every step leaves something that runs.
 #
-# Exits 0 when both halves hold, 1 otherwise.
+# Exits 0 when all of it holds, 1 otherwise.
 
 set -u
 
@@ -37,8 +39,18 @@ done
 flat "$skills/implement/SKILL.md" | grep -q 'Modify: paths first' || note 'implement: does not start from the step Modify: paths'
 flat "$skills/review/SKILL.md" | grep -q 'Modify: paths' || note 'review: does not narrow the symbol grep to the steps Modify: paths'
 
+# A changed signature: plan puts its callers in the same step's Modify: list, and
+# review greps for callers still written for the old one. Without both, the change
+# lands in one step and its callers break in another.
+plf="$(flat "$skills/plan/SKILL.md")"
+printf '%s' "$plf" | grep -q 'lists those callers under Modify:' || note 'plan: a step that changes a signature does not list its callers'
+flat "$skills/review/SKILL.md" | grep -q 're-signed' || note 'review: the caller grep skips symbols whose signature changed'
+
+# The order of the steps: each leaves something that runs, so each can be checked.
+printf '%s' "$plf" | grep -q 'each one leaves something that runs' || note 'plan: steps may be ordered layer by layer, unchecked until the last'
+
 if [ "$fails" -eq 0 ]; then
-  printf 'file-lists: the three planners write them, implement and review read them\n'
+  printf 'file-lists: the three planners write them, implement and review read them; callers and order hold\n'
 else
   printf 'file-lists: %s problem(s)\n' "$fails" >&2
 fi

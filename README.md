@@ -576,7 +576,9 @@ gives you a list sorted by severity:
 - **NIT** — take it or leave it.
 
 It also checks whether your **tests actually prove anything** — a test with no real assertion,
-or one that mocks away the exact thing you changed, passes while proving nothing.
+or one that mocks away the exact thing you changed, passes while proving nothing. It also flags
+an existing test loosened or skipped to get to green, and an error swallowed or a warning
+suppressed instead of fixed.
 
 Every review includes a **security pass** against the well-known flaws — a request value
 reaching SQL, a shell, the filesystem or the page unescaped; an entry point with no login or
@@ -595,8 +597,8 @@ standing between a syntax error and a live site. It will tell you when the linte
 language version than the project targets — passing a PHP 8 parser proves nothing about a
 project that declares `>=7.4`.
 
-`--deep` allows one helper agent to double-check callers of code you renamed. It costs more;
-use it when you have touched shared code.
+`--deep` allows one helper agent to double-check callers of code you renamed or whose
+signature you changed. It costs more; use it when you have touched shared code.
 
 It ends by naming the next command — `/gku:fix` when there is something to fix, `/gku:pr` when
 there is not. It never applies anything itself.
