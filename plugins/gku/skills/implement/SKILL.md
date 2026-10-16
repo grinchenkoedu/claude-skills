@@ -90,7 +90,9 @@ a question asked into an empty room stops the run for nothing.
 1. **Build** the steps as step 3 says, committing as each lands.
 2. **Review the diff from scratch** — `git diff <base>...HEAD`, read as if somebody else wrote
    it, against the plan's criteria, the repository's conventions and
-   `reference/security-checklist.md`. Judge the diff, not your memory of writing it. This is a
+   `reference/security-checklist.md` — and for the two ways a build goes green without being
+   right: an existing test edited to pass, a check silenced instead of satisfied
+   (`/gku:review` steps 3 and 4). Judge the diff, not your memory of writing it. This is a
    self-review: say so in the report and in the pull request, because it is weaker than a
    `/gku:review` that comes to the code fresh, and a body that hides that oversells the change.
 3. **Fix** what it found — smallest change per finding, one commit each, the way `/gku:fix`
@@ -472,7 +474,8 @@ the report that it landed outside the plan.
   bulk needs dry-run by default, safe re-runs, and bounded scope with an expected row count.
 - **Never `--no-verify`, `--force`, or `--amend`.** A failing hook means fix the code.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
-  right to change it, say so explicitly and explain why.
+  right to change it, say so explicitly and explain why. The same holds for any other check: a
+  suppression, a cast or a catch that swallows the error makes it quiet, not right.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
 - **Identifiers in English; commit subjects and bodies in the developer's language**, with
   `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md` — Ukrainian over Russian

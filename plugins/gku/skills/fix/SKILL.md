@@ -378,7 +378,8 @@ worth of usage on diminishing returns. Name the next command and let the develop
   is one, `.tasks/<branch-slug>-followups.md` otherwise.
 - **Never `--no-verify`, `--force`, or `--amend`.**
 - **Never weaken or delete an existing test to get to green.** If a test now fails and changing
-  it is right, say so explicitly and explain why.
+  it is right, say so explicitly and explain why. The same holds for any other check: a
+  suppression, a cast or a catch that swallows the error makes it quiet, not right.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
 - **Absolute paths** everywhere, so they are clickable in an editor.
 - **Data-safety rules are not optional** — see `reference/repo-profile.md`. A fix to code that
