@@ -29,12 +29,14 @@ for s in implement fix; do
   f="$(flat "$skills/$s/SKILL.md")"
   printf '%s' "$f" | grep -q 'Never weaken or delete an existing test to get to green' || note "$s: nothing forbids weakening a test to get to green"
   printf '%s' "$f" | grep -q 'makes it quiet, not right' || note "$s: a suppression or a swallowing catch is not covered by the rule"
+  printf '%s' "$f" | grep -q 'looks for the reason' || note "$s: the reason for changing a test has no place review reads"
 done
 
 # The reviewer's half: an edited test and a silenced check are findings.
 rev="$(flat "$skills/review/SKILL.md")"
 printf '%s' "$rev" | grep -q 'An existing test edited to pass' || note 'review: judges new tests only, so a loosened existing assertion passes unseen'
 printf '%s' "$rev" | grep -q 'a red suite is not' || note 'review: an edited test is not checked for a stated reason'
+printf '%s' "$rev" | grep -q 'on the branch gives the reason' || note 'review: a reason recorded as a Ruling: does not clear an edited test'
 printf '%s' "$rev" | grep -q 'a check silenced instead of satisfied' || note 'review: a swallowing catch or a suppression is not a finding'
 
 # The unattended run reviews itself, so it has to look for the same two things.

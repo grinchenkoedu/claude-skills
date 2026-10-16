@@ -474,8 +474,9 @@ the report that it landed outside the plan.
   bulk needs dry-run by default, safe re-runs, and bounded scope with an expected row count.
 - **Never `--no-verify`, `--force`, or `--amend`.** A failing hook means fix the code.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
-  right to change it, say so explicitly and explain why. The same holds for any other check: a
-  suppression, a cast or a catch that swallows the error makes it quiet, not right.
+  right to change it, say so in a `Ruling:` in the commit body — that is where `/gku:review`
+  looks for the reason. The same holds for any other check: a suppression, a cast that forces a
+  type the value may not have, or a catch that swallows the error makes it quiet, not right.
 - **Own work, a dependency, or an approved copy** — see `reference/code-provenance.md`.
 - **Identifiers in English; commit subjects and bodies in the developer's language**, with
   `Ruling:` and `Co-Authored-By:` kept literal (`reference/language.md` — Ukrainian over Russian

@@ -115,25 +115,25 @@ file around you does something a particular way, matching it is correct.
 
 Assign every finding one of three severities:
 
-- **BLOCKER** — do not push this. A secret or credential committed; a change that silently
-  loses or corrupts data; a mass write with no bounded scope; a batch script with no dry-run;
-  a data-fix script that duplicates on a second run; a removed, renamed or re-signed function
-  still called the old way; user input reaching SQL, a shell, the filesystem, HTML or a
-  spreadsheet cell unescaped; an entry point with no login or permission check; a record
-  reachable by changing an id; a state change with no CSRF token (the full list, with what
-  counts as proof for each, is in step 3b); a block copied from a codebase under a different
-  licence with no approval on record — the project's own licence, a source declared in the
-  commit or pull request body, or the developer's word when asked settles it; origin unknown is
-  a WARNING (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task change
-  with **no `version.php` bump** (the live site will not see it).
+- **BLOCKER** — do not push this. A secret or credential committed; a change that silently loses
+  or corrupts data; a mass write with no bounded scope; a batch script with no dry-run; a
+  data-fix script that duplicates on a second run; a removed or renamed function, or one with a
+  changed signature, still called the old way; user input reaching SQL, a shell, the filesystem,
+  HTML or a spreadsheet cell unescaped; an entry point with no login or permission check; a
+  record reachable by changing an id; a state change with no CSRF token (the full list, with
+  what counts as proof for each, is in step 3b); a block copied from a codebase under a
+  different licence with no approval on record — the project's own licence, a source declared in
+  the commit or pull request body, or the developer's word when asked settles it; origin unknown
+  is a WARNING (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task
+  change with **no `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a check silenced instead of satisfied — a new catch
   that swallows the error, a lint or type suppression, a cast that forces a type the value may
-  not have, a branch taken only under test — unless the line says why; a value that can be
-  null and is not checked; a loop that can run forever on unexpected data; a comment explaining
-  *what* instead of *why*; work that may outlast a page load — a loop over user-scale data, an
-  export, a call to an outside service — run inline in a web request when the project already
-  has a background mechanism.
+  not have, a branch taken only under test — unless the line or a `Ruling:` says why; a value
+  that can be null and is not checked; a loop that can run forever on unexpected data; a comment
+  explaining *what* instead of *why*; work that may outlast a page load — a loop over user-scale
+  data, an export, a call to an outside service — run inline in a web request when the project
+  already has a background mechanism.
 - **NIT** — optional. Naming, ordering, a clearer way to say the same thing; an optimisation
   that costs readability with no stated reason.
 
@@ -182,9 +182,9 @@ change that should have had one:
 
 - **No assertion, or a trivial one** (`assertTrue(true)`) → WARNING.
 - **An existing test edited to pass** — an assertion removed or loosened, an expected value
-  changed to match the new output, a skip marker added, a test deleted → WARNING. Quote the
-  removed line, and say whether a commit body gives the reason `/gku:implement` and `/gku:fix`
-  owe for it: behaviour meant to change is a reason, a red suite is not.
+  changed to match the new output, a skip marker added, a test deleted → WARNING, unless a
+  `Ruling:` on the branch gives the reason `/gku:implement` and `/gku:fix` owe for it. Quote the
+  removed line either way: behaviour meant to change is a reason, a red suite is not.
 - **Error paths untested** — the diff adds a throw, a guard, or an error return, and nothing
   asserts that failure → WARNING.
 - **Edges untested** — new inputs with no test for null, empty, zero, one, or duplicate
@@ -225,8 +225,9 @@ or method the diff renamed, moved or removed, find everything that still refers 
 name — and for each whose signature changed (a parameter added, dropped or reordered, a return
 type changed), every caller still written for the old one. Anything it finds is a BLOCKER.
 
-Without `--deep`, do this yourself with `grep` for the *renamed, removed and re-signed* symbols
-only — that is the case where a missed caller breaks the site — and skip the rest.
+Without `--deep`, do this yourself with `grep` for the *renamed and removed* symbols and those
+with a changed signature only — that is the case where a missed caller breaks the site — and
+skip the rest.
 
 **The task file narrows it.** When the branch has one, its steps name their `Modify:` paths;
 those are where a moved symbol was moved *from*, so grep them first. It is the difference

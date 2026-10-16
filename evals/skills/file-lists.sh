@@ -7,8 +7,8 @@
 # because something reads them: /gku:implement opens the Modify: paths instead of
 # searching the repository, and /gku:review greps them for symbols that moved. If
 # either half goes, the lists become decoration in a file nobody re-reads. Two
-# rules about what goes in them ride along: a re-signed symbol's callers, and an
-# order in which every step leaves something that runs.
+# rules about what goes in them ride along: the callers of a changed signature,
+# and an order in which every step leaves something that runs.
 #
 # Exits 0 when all of it holds, 1 otherwise.
 
@@ -44,7 +44,8 @@ flat "$skills/review/SKILL.md" | grep -q 'Modify: paths' || note 'review: does n
 # lands in one step and its callers break in another.
 plf="$(flat "$skills/plan/SKILL.md")"
 printf '%s' "$plf" | grep -q 'lists those callers under Modify:' || note 'plan: a step that changes a signature does not list its callers'
-flat "$skills/review/SKILL.md" | grep -q 're-signed' || note 'review: the caller grep skips symbols whose signature changed'
+flat "$skills/review/SKILL.md" | grep -q 'symbols and those with a changed signature' ||
+  note 'review: the caller grep skips symbols whose signature changed'
 
 # The order of the steps: each leaves something that runs, so each can be checked.
 printf '%s' "$plf" | grep -q 'each one leaves something that runs' || note 'plan: steps may be ordered layer by layer, unchecked until the last'
