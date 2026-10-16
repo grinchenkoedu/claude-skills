@@ -245,7 +245,9 @@ one exists (`classes/export/Csv.php:120-140 (buildRow)`); the symbol is what a r
 for when the numbers have moved.
 `/gku:implement` opens exactly those files, and `/gku:review` greps the `Modify:` paths for
 symbols that moved. A step you cannot write those lines for is not one step — split it, or say
-plainly which paths you could not name and why.
+plainly which paths you could not name and why. A step that changes a signature something else
+calls lists those callers under `Modify:` too, found by `grep` now: they change in the same
+step, or the step leaves the branch broken.
 
 Omit acceptance criteria and steps for a pure question — the answer is the deliverable.
 
