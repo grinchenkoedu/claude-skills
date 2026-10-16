@@ -576,8 +576,8 @@ gives you a list sorted by severity:
 - **NIT** — take it or leave it.
 
 It also checks whether your **tests actually prove anything** — a test with no real assertion,
-or one that mocks away the exact thing you changed, passes while proving nothing. So does an
-existing test loosened or skipped to get to green, and an error swallowed or a warning
+or one that mocks away the exact thing you changed, passes while proving nothing. It also flags
+an existing test loosened or skipped to get to green, and an error swallowed or a warning
 suppressed instead of fixed.
 
 Every review includes a **security pass** against the well-known flaws — a request value
