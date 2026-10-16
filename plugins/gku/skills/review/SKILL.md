@@ -131,10 +131,9 @@ Assign every finding one of three severities:
   that swallows the error, a lint or type suppression, a cast that forces a type the value may
   not have, a branch taken only under test — unless the line says why; a value that can be
   null and is not checked; a loop that can run forever on unexpected data; a comment explaining
-  *what* instead of *why*;
-  work that may outlast a page load — a loop over user-scale data, an export, a call to an
-  outside service — run inline in a web request when the project already has a background
-  mechanism.
+  *what* instead of *why*; work that may outlast a page load — a loop over user-scale data, an
+  export, a call to an outside service — run inline in a web request when the project already
+  has a background mechanism.
 - **NIT** — optional. Naming, ordering, a clearer way to say the same thing; an optimisation
   that costs readability with no stated reason.
 
