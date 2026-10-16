@@ -121,11 +121,11 @@ Assign every finding one of three severities:
   still called the old way; user input reaching SQL, a shell, the filesystem, HTML or a
   spreadsheet cell unescaped; an entry point with no login or permission check; a record
   reachable by changing an id; a state change with no CSRF token (the full list, with what
-  counts as proof for each, is in step 3b); a block copied from a codebase under a different licence with no
-  approval on record — the project's own licence, a source declared in the commit or pull
-  request body, or the developer's word when asked settles it; origin unknown is a WARNING
-  (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task change with
-  **no `version.php` bump** (the live site will not see it).
+  counts as proof for each, is in step 3b); a block copied from a codebase under a different
+  licence with no approval on record — the project's own licence, a source declared in the
+  commit or pull request body, or the developer's word when asked settles it; origin unknown is
+  a WARNING (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task change
+  with **no `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a check silenced instead of satisfied — a new catch
   that swallows the error, a lint or type suppression, a cast that hides a mismatch, a branch
