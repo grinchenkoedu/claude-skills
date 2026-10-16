@@ -92,8 +92,9 @@ a question asked into an empty room stops the run for nothing.
    it, against the plan's criteria, the repository's conventions and
    `reference/security-checklist.md` — and for the two ways a build goes green without being
    right: an existing test edited to pass (`/gku:review` step 4), a check silenced instead of
-   satisfied (its WARNING list). A `Ruling:` this run wrote clears one only when an acceptance
-   criterion names the behaviour that changed. Judge the diff, not your memory of writing it.
+   satisfied (step 3's WARNING list there). This run cannot clear either for itself: one it
+   keeps goes under `## Notes` with its reason, for a person to judge, and is not a finding for
+   the next round. Judge the diff, not your memory of writing it.
    This is a self-review: say so in the report and in the pull request, because it is weaker
    than a `/gku:review` that comes to the code fresh, and a body that hides that oversells the
    change.

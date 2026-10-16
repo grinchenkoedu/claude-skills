@@ -9,9 +9,10 @@
 # a silenced check counts the same as a weakened test. review flags both patterns
 # in your own diff, and --auto's self-review looks for them, because a self-review
 # is the one review an unattended run gets. A reason clears a finding only where
-# review can read it, and under --auto only when a criterion names the change.
+# review can read it; under --auto the run clears neither for itself, it hands them
+# to a person in its Notes.
 #
-# Exits 0 when both halves hold, 1 otherwise.
+# Exits 0 when all three groups hold, 1 otherwise.
 
 set -u
 
@@ -43,8 +44,10 @@ printf '%s' "$rev" | grep -q 'a check silenced instead of satisfied' || note 're
 # The unattended run reviews itself, so it has to look for the same two things.
 impf="$(flat "$skills/implement/SKILL.md")"
 printf '%s' "$impf" | grep -q 'goes green without being right' || note 'implement: the --auto self-review does not look for an edited test or a silenced check'
-printf '%s' "$impf" | grep -q 'only when an acceptance criterion names the behaviour' ||
-  note 'implement: an --auto run can clear its own edited test with a Ruling: it wrote'
+printf '%s' "$impf" | grep -q 'This run cannot clear either for itself' ||
+  note 'implement: an --auto run can clear its own edited test or suppression with a reason it wrote'
+printf '%s' "$impf" | grep -q 'goes under `## Notes` with its reason' ||
+  note 'implement: an --auto run keeps an edited test or suppression without telling a person'
 
 if [ "$fails" -eq 0 ]; then
   printf 'green: implement and fix forbid gaming a check, review and --auto look for it\n'

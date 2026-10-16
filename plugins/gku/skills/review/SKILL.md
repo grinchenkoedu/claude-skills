@@ -129,11 +129,11 @@ Assign every finding one of three severities:
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a check silenced instead of satisfied — a new catch
   that swallows the error, a lint or type suppression, a cast that forces a type the value may
-  not have, a branch taken only under test — unless the line or a `Ruling:` says why; a value
-  that can be null and is not checked; a loop that can run forever on unexpected data; a comment
-  explaining *what* instead of *why*; work that may outlast a page load — a loop over user-scale
-  data, an export, a call to an outside service — run inline in a web request when the project
-  already has a background mechanism.
+  not have, a branch taken only under test — unless the line, a `Ruling:` or its commit message
+  says why; a value that can be null and is not checked; a loop that can run forever on
+  unexpected data; a comment explaining *what* instead of *why*; work that may outlast a page
+  load — a loop over user-scale data, an export, a call to an outside service — run inline in a
+  web request when the project already has a background mechanism.
 - **NIT** — optional. Naming, ordering, a clearer way to say the same thing; an optimisation
   that costs readability with no stated reason.
 
@@ -183,8 +183,8 @@ change that should have had one:
 - **No assertion, or a trivial one** (`assertTrue(true)`) → WARNING.
 - **An existing test edited to pass** — an assertion removed or loosened, an expected value
   changed to match the new output, a skip marker added, a test deleted → WARNING, unless the
-  reason is on record — a `Ruling:` in a commit or the task file, or on a hand-built branch the
-  commit message itself. Quote the removed line either way: behaviour meant to change is a
+  reason is on record — a `Ruling:` in a commit or the task file, or the message of the commit
+  that made the edit. Quote the removed line either way: behaviour meant to change is a
   reason, a red suite is not.
 - **Error paths untested** — the diff adds a throw, a guard, or an error return, and nothing
   asserts that failure → WARNING.
@@ -224,7 +224,8 @@ found here costs a minute; found in production it costs a white page.
 One sub-agent, on a small fast model, doing mechanical lookup only: for each function, class
 or method the diff renamed, moved or removed, find everything that still refers to the old
 name — and for each whose signature changed (a parameter added, dropped or reordered, a return
-type changed), every caller the new one breaks. Anything it finds is a BLOCKER.
+type changed), every call site. It returns the list; you judge it. A reference to an old name
+is a BLOCKER, and so is a call site the new signature breaks.
 
 Without `--deep`, do this yourself with `grep` for the *renamed and removed* symbols and those
 with a changed signature only — that is the case where a missed caller breaks the site — and
@@ -233,8 +234,9 @@ skip the rest.
 **The task file narrows it.** When the branch has one, its steps name their `Modify:` paths;
 those are where a moved symbol was moved *from*, so grep them first. It is the difference
 between grepping a repository and grepping five files. A changed signature is the exception:
-the plan already lists the callers it found under `Modify:`, so the ones that break are the ones
-outside it — grep the whole tree.
+a caller the plan listed and the build missed breaks as surely as one nobody listed, so grep the
+whole tree, skipping what step 2 skips. A name too common to search alone is searched with its
+class or receiver.
 
 ## Step 6 — Say it
 

@@ -46,8 +46,8 @@ printf '%s' "$plf" | grep -q 'lists those callers under Modify:' || note 'plan: 
 revf="$(flat "$skills/review/SKILL.md")"
 printf '%s' "$revf" | grep -q 'symbols and those with a changed signature' ||
   note 'review: the caller grep skips symbols whose signature changed'
-printf '%s' "$revf" | grep -q 'every caller the new one breaks' ||
-  note 'review: the --deep cross-check skips symbols whose signature changed'
+printf '%s' "$revf" | grep -q 'every call site. It returns the list; you judge it' ||
+  note 'review: the --deep sub-agent decides which callers break, or skips changed signatures'
 printf '%s' "$revf" | grep -q 'grep the whole tree' ||
   note 'review: a changed signature is grepped in Modify: paths only, where the plan already fixed the callers'
 
