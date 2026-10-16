@@ -7,8 +7,9 @@
 # the assertion that failed, or wraps the error in a catch that swallows it. Two
 # halves keep that visible. implement and fix forbid it in their rules, and say
 # a silenced check counts the same as a weakened test. review flags both patterns
-# in someone's diff, and --auto's self-review looks for them, because a self-review
-# is the one review an unattended run gets.
+# in your own diff, and --auto's self-review looks for them, because a self-review
+# is the one review an unattended run gets. A reason clears a finding only where
+# review can read it, and under --auto only when a criterion names the change.
 #
 # Exits 0 when both halves hold, 1 otherwise.
 
@@ -36,11 +37,14 @@ done
 rev="$(flat "$skills/review/SKILL.md")"
 printf '%s' "$rev" | grep -q 'An existing test edited to pass' || note 'review: judges new tests only, so a loosened existing assertion passes unseen'
 printf '%s' "$rev" | grep -q 'a red suite is not' || note 'review: an edited test is not checked for a stated reason'
-printf '%s' "$rev" | grep -q 'on the branch gives the reason' || note 'review: a reason recorded as a Ruling: does not clear an edited test'
+printf '%s' "$rev" | grep -q 'unless the reason is on record' || note 'review: a reason recorded as a Ruling: does not clear an edited test'
 printf '%s' "$rev" | grep -q 'a check silenced instead of satisfied' || note 'review: a swallowing catch or a suppression is not a finding'
 
 # The unattended run reviews itself, so it has to look for the same two things.
-flat "$skills/implement/SKILL.md" | grep -q 'goes green without being right' || note 'implement: the --auto self-review does not look for an edited test or a silenced check'
+impf="$(flat "$skills/implement/SKILL.md")"
+printf '%s' "$impf" | grep -q 'goes green without being right' || note 'implement: the --auto self-review does not look for an edited test or a silenced check'
+printf '%s' "$impf" | grep -q 'only when an acceptance criterion names the behaviour' ||
+  note 'implement: an --auto run can clear its own edited test with a Ruling: it wrote'
 
 if [ "$fails" -eq 0 ]; then
   printf 'green: implement and fix forbid gaming a check, review and --auto look for it\n'

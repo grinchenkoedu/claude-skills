@@ -91,10 +91,12 @@ a question asked into an empty room stops the run for nothing.
 2. **Review the diff from scratch** — `git diff <base>...HEAD`, read as if somebody else wrote
    it, against the plan's criteria, the repository's conventions and
    `reference/security-checklist.md` — and for the two ways a build goes green without being
-   right: an existing test edited to pass, a check silenced instead of satisfied
-   (`/gku:review` steps 3 and 4). Judge the diff, not your memory of writing it. This is a
-   self-review: say so in the report and in the pull request, because it is weaker than a
-   `/gku:review` that comes to the code fresh, and a body that hides that oversells the change.
+   right: an existing test edited to pass (`/gku:review` step 4), a check silenced instead of
+   satisfied (its WARNING list). A `Ruling:` this run wrote clears one only when an acceptance
+   criterion names the behaviour that changed. Judge the diff, not your memory of writing it.
+   This is a self-review: say so in the report and in the pull request, because it is weaker
+   than a `/gku:review` that comes to the code fresh, and a body that hides that oversells the
+   change.
 3. **Fix** what it found — smallest change per finding, one commit each, the way `/gku:fix`
    does. A finding you disagree with is answered with the file and line that answers it, not
    silently dropped.
