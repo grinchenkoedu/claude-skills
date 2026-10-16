@@ -249,6 +249,12 @@ plainly which paths you could not name and why. A step that changes a signature 
 calls lists those callers under `Modify:` too, found by `grep` now: they change in the same
 step, or the step leaves the branch broken.
 
+**Order the steps so each one leaves something that runs.** Prefer a thin path end to end
+first, then widen it, over every layer of one kind before the next — built layer by layer,
+nothing can be checked until the last step lands, and every step before it is proved only by
+its own unit test. A change that is one layer to begin with, a migration or a rename, keeps its
+obvious order.
+
 Omit acceptance criteria and steps for a pure question — the answer is the deliverable.
 
 ## Step 6b — `--manual`: the plan a person builds by hand
