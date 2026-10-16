@@ -246,8 +246,8 @@ for when the numbers have moved.
 `/gku:implement` opens exactly those files, and `/gku:review` greps the `Modify:` paths for
 symbols that moved. A step you cannot write those lines for is not one step — split it, or say
 plainly which paths you could not name and why. A step that changes a signature something else
-calls lists those callers under `Modify:` too, found by `grep` now: they change in the same
-step, or the step leaves the branch broken.
+calls lists those callers under `Modify:` too, found by `grep` now, names in strings and hooks
+included: they change in the same step, or the step leaves the branch broken.
 
 **Order the steps so each one leaves something that runs.** Prefer a thin path end to end
 first, then widen it, over every layer of one kind before the next — built layer by layer,
