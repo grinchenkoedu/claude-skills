@@ -127,8 +127,11 @@ Assign every finding one of three severities:
   (`reference/code-provenance.md`); a Moodle `classes/`, `db/`, cache or task change with
   **no `version.php` bump** (the live site will not see it).
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
-  third time; an error path nobody handles; a value that can be null and is not checked; a
-  loop that can run forever on unexpected data; a comment explaining *what* instead of *why*;
+  third time; an error path nobody handles; a check silenced instead of satisfied — a new catch
+  that swallows the error, a lint or type suppression, a cast that hides a mismatch, a branch
+  taken only under test — unless the line says why; a value that can be null and is not
+  checked; a loop that can run forever on unexpected data; a comment explaining *what* instead
+  of *why*;
   work that may outlast a page load — a loop over user-scale data, an export, a call to an
   outside service — run inline in a web request when the project already has a background
   mechanism.
@@ -179,6 +182,10 @@ Green tests hide bugs when they are hollow. For every test in the diff, and ever
 change that should have had one:
 
 - **No assertion, or a trivial one** (`assertTrue(true)`) → WARNING.
+- **An existing test edited to pass** — an assertion removed or loosened, an expected value
+  changed to match the new output, a skip marker added, a test deleted → WARNING. Quote the
+  removed line, and say whether a commit body gives the reason `/gku:implement` and `/gku:fix`
+  owe for it: behaviour meant to change is a reason, a red suite is not.
 - **Error paths untested** — the diff adds a throw, a guard, or an error return, and nothing
   asserts that failure → WARNING.
 - **Edges untested** — new inputs with no test for null, empty, zero, one, or duplicate
