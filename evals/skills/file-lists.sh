@@ -10,7 +10,7 @@
 # rules about what goes in them ride along: a re-signed symbol's callers, and an
 # order in which every step leaves something that runs.
 #
-# Exits 0 when both halves hold, 1 otherwise.
+# Exits 0 when all of it holds, 1 otherwise.
 
 set -u
 
