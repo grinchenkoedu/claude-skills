@@ -273,17 +273,25 @@ Blockers first, then warnings, then nits, as far down as step 5 decided. For eac
 stands:
 
 1. **Read** the file and enough around it to not break something else.
-2. **Apply the smallest change that resolves the finding.** Do not refactor nearby code, do not
+2. **Make it fail first, when a test can show it.** A finding about behaviour — a wrong result,
+   a missing check, an error path that crashes — gets its test before its fix, when the
+   project's test framework can express it: write the test, run it scoped, and watch it fail
+   **for the reason the finding describes**. Quote that line. A test that passes before the fix
+   proves nothing, and one that fails for another reason — a typo, a missing fixture — is not
+   yet the test. When no test can show it — no framework, a symptom only production data
+   reproduces, a finding about naming or style — say so in one line; step 3's reproduction, run
+   again after the fix, is then the proof.
+3. **Apply the smallest change that resolves the finding.** Do not refactor nearby code, do not
    tidy the file, do not fix a second finding while you are in there. A fix that grows into a
    rewrite is no longer reviewable against the finding that prompted it. A change the fix
    genuinely cannot land without is part of that fix — make it and say so in the commit body;
    anything else you notice on the way is a new finding for the list, not an edit. Write the
    fix yourself; a block from a codebase under a different licence needs the developer's
    approval first (`reference/code-provenance.md`).
-3. **Check it immediately** — lint the changed file if the profile has a lint command, and run
-   the scoped test if one covers it. A failure here means the fix is wrong; fix the fix before
-   moving on.
-4. **Commit** (when step 1 said to), staging only that finding's paths, and put any ruling you
+4. **Check it immediately** — lint the changed file if the profile has a lint command, and run
+   the scoped test if one covers it; the test from 2 now passes. A failure here means the fix is
+   wrong; fix the fix before moving on.
+5. **Commit** (when step 1 said to), staging only that finding's paths, and put any ruling you
    made on your own in the body — a finding often admits more than one fix, and the one you
    chose is a decision the next reader inherits:
 
@@ -296,7 +304,7 @@ stands:
    Only for what you decided yourself. A fix the finding spelled out needs no ruling, and
    neither does anything the batched question in step 5 already answered.
 
-5. Say in one line what changed. Do not go quiet for eight findings.
+6. Say in one line what changed. Do not go quiet for eight findings.
 
 **If a commit hook fails, that finding is skipped and reported as skipped.** Never pass
 `--no-verify`. The hook is not the obstacle; the code is.
@@ -339,6 +347,8 @@ Then, in order:
 - the quoted test result, and — when a symptom was reproduced in step 3 — the same reproduction
   run again, now showing the correct behaviour. That is the evidence that the reported problem is
   actually gone, which no test result can supply on its own;
+- for each finding fixed red-first, its test's failing line from before the fix beside its
+  passing line after — the pair is what shows the test catches the bug, not just that it runs;
 - the tier that was taken and, if the run was non-interactive, that it was the recommendation
   rather than an answer;
 - the findings below that tier, as a short list, each with where it went — the task file it

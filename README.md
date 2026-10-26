@@ -643,7 +643,9 @@ needs to be in the conversation already:
 It is explicit about the difference between a **proven cause** and a **hypothesis**, and it says
 which one it acted on. When it reproduced the symptom, it re-runs that same reproduction after
 the fix — a green test suite does not prove your bug is gone; the thing that used to fail no
-longer failing does.
+longer failing does. When a test can show the bug, it writes that test **before** the fix and
+watches it fail for the bug's own reason — a test written after a fix passes whether or not it
+would have caught anything — and the report quotes the failing line beside the passing one.
 
 **It re-checks every finding against the code before editing anything**, including findings it
 produced itself a minute ago. Findings go stale: the file moved, somebody already fixed it, or
