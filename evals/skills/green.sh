@@ -42,7 +42,9 @@ printf '%s' "$rev" | grep -q 'unless the reason is on record' || note 'review: a
 printf '%s' "$rev" | grep -q 'a check silenced instead of satisfied' || note 'review: a swallowing catch or a suppression is not a finding'
 
 # The unattended run reviews itself, so it has to look for the same two things.
-impf="$(flat "$skills/implement/SKILL.md")"
+# That review lives in auto.md, the file an --auto run reads.
+[ -f "$skills/implement/auto.md" ] || { printf 'no implement/auto.md under %s\n' "$skills" >&2; exit 1; }
+impf="$(flat "$skills/implement/auto.md")"
 printf '%s' "$impf" | grep -q 'goes green without being right' || note 'implement: the --auto self-review does not look for an edited test or a silenced check'
 printf '%s' "$impf" | grep -q 'This run cannot clear either for itself' ||
   note 'implement: an --auto run can clear its own edited test or suppression with a reason it wrote'

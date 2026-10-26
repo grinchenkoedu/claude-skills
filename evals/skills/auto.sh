@@ -16,50 +16,62 @@ set -u
 
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 imp="$root/plugins/gku/skills/implement/SKILL.md"
-[ -f "$imp" ] || { printf 'no implement/SKILL.md at %s\n' "$imp" >&2; exit 1; }
+# The mode lives in its own file, read only when the flag is given; SKILL.md
+# keeps the bans and the pointer, so a run that never opens auto.md still
+# knows it must not merge.
+auto="$root/plugins/gku/skills/implement/auto.md"
+for f in "$imp" "$auto"; do
+  [ -f "$f" ] || { printf 'no %s\n' "$f" >&2; exit 1; }
+done
 
 fails=0
 note() { printf 'FAIL  %s\n' "$1"; fails=$((fails + 1)); }
 # Prose wrapped at the file's width: match against a flattened copy, as
 # evals/reference/claims.sh does.
 flat="$(tr '\n' ' ' < "$imp" | tr -s ' ')"
+autof="$(tr '\n' ' ' < "$auto" | tr -s ' ')"
 has() { printf '%s' "$flat" | grep -qF "$1"; }
+inauto() { printf '%s' "$autof" | grep -qF "$1"; }
 
 # The mode has to be reachable: a section nobody is told about is dead prose.
 grep '^argument-hint:' "$imp" | grep -q -- '--auto' || note 'implement: --auto is missing from argument-hint, so nothing advertises it'
 has '## `--auto`' || note 'implement: --auto has no section of its own'
+has 'read `auto.md` beside this file before step 1' \
+  || note 'implement: SKILL.md no longer sends an --auto run to auto.md, so the mode is never read'
 
-# The bans. These are the reason the mode is safe to hand a repository.
+# The bans. These are the reason the mode is safe to hand a repository, so they
+# stay in SKILL.md, where a run reads them whether or not it opens auto.md.
 has 'never merges and it never deploys' || note 'implement: --auto does not rule out merging and deploying'
 has 'Never merge, never deploy, never touch a live system' || note 'implement: the rules no longer ban merge and deploy on the skill own initiative'
 has 'never under `--auto`, whoever asks' || note 'implement: the rules let an unattended run merge or deploy if something asks it to'
 has 'remain banned' || note 'implement: --auto does not carry the --force/--amend/--no-verify ban forward'
 # The ban that is mechanism rather than prose: the guard cannot see --auto, so
 # the mode has to say it is unattended on disk, and clear it when it is over.
-has '.gku/auto-run' || note 'implement: --auto writes no marker, so the guard cannot tell an unattended run from a watched one'
-has 'rm -f "$root/.gku/auto-run"' || note 'implement: --auto never removes the marker, so it would refuse the developer their own merge afterwards'
+has '.gku/auto-run' || note 'implement: SKILL.md does not name the marker, so the pointer to auto.md reads as optional'
+inauto '.gku/auto-run' || note 'implement: --auto writes no marker, so the guard cannot tell an unattended run from a watched one'
+inauto 'rm -f "$root/.gku/auto-run"' || note 'implement: --auto never removes the marker, so it would refuse the developer their own merge afterwards'
 
 # The shape of an unattended run.
-has 'Ask everything at the start' || note 'implement: --auto does not front-load its questions, so it will stop mid-run instead'
-has 'at most three rounds' || note 'implement: the review-fix-test cycle has no bound and can grind forever'
-has 'Review the diff from scratch' || note 'implement: --auto has no review step, so nothing reads the diff before the pull request'
-has 'This is a self-review: say so' || note 'implement: --auto passes its own review off as an independent one'
-has '### When an autonomous run stops' || note 'implement: --auto never says what is worth stopping for'
-has 'Stopping is not halting' || note 'implement: a stopped run leaves the work nowhere the developer can pick it up'
+inauto 'Ask everything at the start' || note 'implement: --auto does not front-load its questions, so it will stop mid-run instead'
+inauto 'at most three rounds' || note 'implement: the review-fix-test cycle has no bound and can grind forever'
+inauto 'Review the diff from scratch' || note 'implement: --auto has no review step, so nothing reads the diff before the pull request'
+inauto 'This is a self-review: say so' || note 'implement: --auto passes its own review off as an independent one'
+inauto '## When an autonomous run stops' || note 'implement: --auto never says what is worth stopping for'
+inauto 'Stopping is not halting' || note 'implement: a stopped run leaves the work nowhere the developer can pick it up'
 
 # What an unattended run leaves behind. Nobody watched it, so a nit it skipped
 # or a thing it half-finished exists only if it was written down at the time —
 # and only reaches the developer if it travels somewhere git does not ignore.
-# Careful: a bare '## Notes' is a substring of this section's own '### Notes'
+# Careful: a bare '## Notes' is a prefix of this section's own '## Notes, and…'
 # heading, which would leave this green with the instruction gone.
-has 'task file under `## Notes`' || note 'implement: --auto keeps no notes, so what it left alone is lost'
-has 'the moment it comes up' || note 'implement: notes are reconstructed at the end rather than written as they happen'
-has "pull request's body under **Notes**" || note 'implement: notes stay in the git-ignored task file and reach nobody'
-has 'warning the developer before it says it is finished' || note 'implement: --auto can report done without putting the notes in front of anyone'
+inauto 'task file under `## Notes`' || note 'implement: --auto keeps no notes, so what it left alone is lost'
+inauto 'the moment it comes up' || note 'implement: notes are reconstructed at the end rather than written as they happen'
+inauto "pull request's body under **Notes**" || note 'implement: notes stay in the git-ignored task file and reach nobody'
+inauto 'warning the developer before it says it is finished' || note 'implement: --auto can report done without putting the notes in front of anyone'
 
 # Several branches, still readable in order.
-has 'Depends on #' || note 'implement: chained pull requests are not linked to the one they sit on'
-has 'draft otherwise' || note 'implement: opens a pull request as ready whether or not the criteria are met'
+inauto 'Depends on #' || note 'implement: chained pull requests are not linked to the one they sit on'
+inauto 'draft otherwise' || note 'implement: opens a pull request as ready whether or not the criteria are met'
 
 if [ "$fails" -eq 0 ]; then
   printf 'auto: --auto runs the cycle, stops for a person, and never merges or deploys\n'
