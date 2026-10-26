@@ -13,3 +13,6 @@ PR_REVIEW_*.md
 
 # plans written by /gku:plan — working notes, not history
 .tasks/
+
+# what `claude plugin eval` writes when no --output-dir is given
+evals/live/results/

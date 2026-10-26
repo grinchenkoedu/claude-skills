@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: review-catches-defect
+description: "/gku:review finds a defect the tests miss: clamp returns the lower bound above the range."
+tags: [review]
+plugins: ["../../../plugins/gku"]
+runs: 1
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  prompt: "/gku:review"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: finds-the-defect
+    type: llm
+    criteria: "The review reports, as a finding, that clamp in lib/math.sh prints the lower bound instead of the upper bound when x is above hi. A review that does not name this defect fails."
+  - name: read-only
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: writes-nothing
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
