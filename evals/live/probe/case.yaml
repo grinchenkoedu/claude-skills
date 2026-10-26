@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: probe
+description: "Run first on a new machine: proves the agent can run git inside the eval sandbox before a paid case depends on it."
+tags: [env]
+plugins: ["../../../plugins/gku"]
+runs: 1
+execution:
+  max_turns: 3
+  allowed_tools: [Bash]
+  prompt: "Run `git --version` and `git log --oneline` in the current directory and print their output verbatim."
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: log
+    type: regex
+    pattern: "seed commit"

@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: fix-red-first
+description: "/gku:fix shows its test failing before the fix and passing after it."
+tags: [fix]
+plugins: ["../../../plugins/gku"]
+runs: 1
+execution:
+  max_turns: 40
+  timeout_seconds: 1200
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  prompt: "/gku:fix clamp 15 0 10 prints 0, it should print 10"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: red-before-green
+    type: llm
+    focus: trace
+    criteria: "Before lib/math.sh is edited, a test for clamp above the upper bound is written and run, and that run fails. After lib/math.sh is edited, the same test runs and passes. Both runs appear in the trace in that order."
+  - name: reports-both-lines
+    type: llm
+    criteria: "The final report quotes the test's failing result from before the fix and its passing result after it."

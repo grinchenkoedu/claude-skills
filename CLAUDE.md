@@ -34,6 +34,12 @@ rules for this repository. Do not edit them to change how a skill behaves.
 - **One eval suite per rule**, at `evals/<area>/<name>.sh`: each prints one summary line and
   exits non-zero the moment its rule stops holding. Adding a convention to a skill means adding
   or extending a suite; `bash evals/run-all.sh` runs them all and CI runs the same command.
+- **The suites check what a skill says; `evals/live/` checks what a run does.** Those cases run
+  real sessions on your credential, so they stay out of CI and `run-all.sh` skips them;
+  `evals/live/README.md` has the command, the costs, and the macOS `git` trap to clear first. A
+  pull request that changes how a skill works quotes the affected cases' cost, turns and
+  seconds before and after — "economical" is a claim the README makes, and this is what backs
+  it.
 - **Prose wraps at the file's width** (about 96 characters; a command or a table row that
   cannot be broken is left long). The two READMEs are English and
   Ukrainian and must stay in step — `evals/docs/readme.sh` asserts that both describe every

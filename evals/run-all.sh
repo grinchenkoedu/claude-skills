@@ -16,7 +16,8 @@ ran=0
 
 # find, not a glob: evals/*/*.sh is exactly one level deep, and a suite added at
 # evals/a/b/c.sh would be skipped without a word. run-all.sh itself sits at the
-# top and is not a suite.
+# top and is not a suite. evals/live/ is not suites either: it holds the cases
+# `claude plugin eval` runs, and a case's setup script is not a rule to assert.
 while IFS= read -r suite; do
   [ -f "$suite" ] || continue
   name="${suite#"$root/evals/"}"
@@ -28,7 +29,7 @@ while IFS= read -r suite; do
     failed=$((failed + 1))
   fi
 done <<EOF
-$(find "$root/evals" -mindepth 2 -name '*.sh' | sort)
+$(find "$root/evals" -mindepth 2 -name '*.sh' ! -path "$root/evals/live/*" | sort)
 EOF
 
 [ "$ran" -gt 0 ] || { printf 'no suites found under %s/evals\n' "$root" >&2; exit 1; }
