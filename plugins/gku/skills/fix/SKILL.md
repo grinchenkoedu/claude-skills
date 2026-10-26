@@ -279,8 +279,9 @@ stands:
    **for the reason the finding describes**. Quote that line. A test that passes before the fix
    proves nothing, and one that fails for another reason — a typo, a missing fixture — is not
    yet the test. When no test can show it — no framework, a symptom only production data
-   reproduces, a finding about naming or style — say so in one line; step 3's reproduction, run
-   again after the fix, is then the proof.
+   reproduces, a finding about naming or style — say so in one line. When step 3 ran, its
+   reproduction, run again after the fix, is then the proof; when it did not, say the finding
+   is fixed with nothing beyond the suite to prove it.
 3. **Apply the smallest change that resolves the finding.** Do not refactor nearby code, do not
    tidy the file, do not fix a second finding while you are in there. A fix that grows into a
    rewrite is no longer reviewable against the finding that prompted it. A change the fix

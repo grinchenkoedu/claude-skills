@@ -38,9 +38,12 @@ has "$fixf" 'for the reason the finding describes' \
   || note 'fix: any failure counts, so a typo in the test passes for proof'
 has "$fixf" 'A test that passes before the fix proves nothing' \
   || note 'fix: a test that was green before the fix is accepted'
-# The way round, for a bug no test can show: the reproduction, run twice.
-has "$fixf" "step 3's reproduction, run again after the fix, is then the proof" \
+# The way round, for a bug no test can show: the reproduction, run twice — and
+# when there was none, saying so rather than claiming a proof that never ran.
+has "$fixf" 'When step 3 ran, its reproduction, run again after the fix, is then the proof' \
   || note 'fix: a bug no test can show is left with no proof at all'
+has "$fixf" 'is fixed with nothing beyond the suite to prove it' \
+  || note 'fix: a finding with no test and no reproduction is reported as proven'
 has "$fixf" 'the test from 2 now passes' \
   || note 'fix: the red test is never seen to turn green'
 has "$fixf" 'failing line from before the fix beside its passing line after' \
