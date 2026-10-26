@@ -52,9 +52,9 @@ the fixture project is plain bash.
 
 ## Costs
 
-One run per case unless noted, plugin arm only, Claude Opus 5.5, Claude Code 2.1.310, 2026-10-26. `--json`
-reports `costUsd`, `turns` and `durationSeconds` per run; it has no sub-agent count, and these
-cases spawn none.
+One run per case unless noted, plugin arm only, Claude Opus 5.5, Claude Code 2.1.310,
+2026-10-26. `--json` reports `costUsd`, `turns` and `durationSeconds` per run; it has no
+sub-agent count, and these cases spawn none.
 
 | Case | Cost (USD) | Turns | Seconds |
 |---|---|---|---|
