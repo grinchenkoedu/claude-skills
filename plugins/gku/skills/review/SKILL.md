@@ -129,11 +129,11 @@ Assign every finding one of three severities:
 - **WARNING** — fix before asking for review. New logic with no test; the same block copied a
   third time; an error path nobody handles; a check silenced instead of satisfied — a new catch
   that swallows the error, a lint or type suppression, a cast that forces a type the value may
-  not have, a branch taken only under test — unless the line, a `Ruling:` or its commit message
-  says why; a value that can be null and is not checked; a loop that can run forever on
-  unexpected data; a comment explaining *what* instead of *why*; work that may outlast a page
-  load — a loop over user-scale data, an export, a call to an outside service — run inline in a
-  web request when the project already has a background mechanism.
+  not have, a branch taken only under test — unless the line, a `Ruling:` or the message of the
+  commit that made the change says why; a value that can be null and is not checked; a loop
+  that can run forever on unexpected data; a comment explaining *what* instead of *why*; work
+  that may outlast a page load — a loop over user-scale data, an export, a call to an outside
+  service — run inline in a web request when the project already has a background mechanism.
 - **NIT** — optional. Naming, ordering, a clearer way to say the same thing; an optimisation
   that costs readability with no stated reason.
 
