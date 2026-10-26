@@ -13,9 +13,9 @@ pull request, deal with the comments on yours, and prove the result actually wor
 They work in any repository — nothing here is tied to a particular project, language or
 framework. They are also written to be **economical**, so they are usable on a modest Claude
 plan: no background agent swarms, no parallel sub-agents by default, and answers in the chat
-instead of a pile of generated report files. That is measured, not only promised: a review in
-a small repository cost about $0.21 and an unattended `--auto` build about $0.35, one run each
-on Claude Opus 5.5 (`evals/live/README.md` has the table and how to re-measure).
+instead of a pile of generated report files. That is measured, not only promised: the cases in
+`evals/live/` run the skills in real sessions, and `evals/live/README.md` says how to measure
+them on your own model and plan.
 
 **They do not have to write your code.** `/gku:plan --manual` produces a plan you build by
 hand — the shape of each change, the reason it is shaped that way, and the command that proves
