@@ -34,8 +34,8 @@ claude plugin eval . --eval-dir evals/live --case review-catches-defect --runs 1
 
 Inside the eval sandbox `/usr/bin/git` exits 72 — the xcrun shim cannot write its cache — and
 a `PATH` search skips any git it is not allowed to stat, which is every Homebrew path and every
-directory under your home. Running a binary by its absolute path works. The way round is a
-wrapper in `/usr/local/bin`, the one readable directory ahead of `/usr/bin`:
+directory under your home. Running a binary by its absolute path works. On Apple silicon the
+way round is a wrapper in `/usr/local/bin`, the one readable directory ahead of `/usr/bin`:
 
 ```bash
 brew install git
@@ -43,7 +43,10 @@ sudo sh -c 'printf "#!/bin/sh\nexec /opt/homebrew/bin/git \"\$@\"\n" > /usr/loca
 ```
 
 That makes Homebrew's git your default everywhere; `sudo rm /usr/local/bin/git` undoes it. The
-`probe` case passes once it works. `/usr/bin/python3` is the same kind of shim, which is why
+`probe` case passes once it works. **Not on an Intel Mac:** there Homebrew itself lives in
+`/usr/local`, the line would overwrite its own `git` link with a wrapper calling a path that
+does not exist, and git would stop working — run `probe` first and find the way round from what
+it prints. `/usr/bin/python3` is the same kind of shim, which is why
 the fixture project is plain bash.
 
 ## Costs
