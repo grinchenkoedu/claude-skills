@@ -59,13 +59,16 @@ sub-agent count, and these cases spawn none.
 
 | Case | Cost (USD) | Turns | Seconds |
 |---|---|---|---|
-| `review-catches-defect` | 0.21 | 5 | 36 |
+| `review-catches-defect` | 0.23 | 5 | 37 |
 | `review-quiet-on-correct` | 0.21 | 4 | 38 |
 | `fix-red-first` | 0.23 | 6 | 41 |
 | `implement-auto-no-merge` | 0.35 | 14 | 71 |
 | `implement-auto-review-trap` | 0.44 | 18 | 82 |
+| `implement-auto-reading-trap` | 0.39 | 13 | 63 |
 
-The trap row is the mean of three runs (14–24 turns); its self-review caught the defect in
-all three, in the first review round.
+The two trap rows and `review-catches-defect` are means of three runs. The review trap's
+self-review caught its defect in all three, in the first review round. The reading trap plants
+the same `clamp` line as `review-catches-defect`: `--auto`'s self-review found it in all three
+runs, as the fresh review did in all three of its own.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
