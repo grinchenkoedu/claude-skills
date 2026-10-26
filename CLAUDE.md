@@ -39,7 +39,7 @@ rules for this repository. Do not edit them to change how a skill behaves.
   `evals/live/README.md` has the command, the costs, and the macOS `git` trap to clear first. A
   pull request that changes how a skill works quotes the affected cases' cost, turns and
   seconds before and after — "economical" is a claim the README makes, and this is what backs
-  it.
+  it. The two user-facing READMEs quote no prices: one run on one model reads as a promise.
 - **Prose wraps at the file's width** (about 96 characters; a command or a table row that
   cannot be broken is left long). The two READMEs are English and
   Ukrainian and must stay in step — `evals/docs/readme.sh` asserts that both describe every
