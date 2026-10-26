@@ -121,6 +121,8 @@ holds:
 
 - the developer asked for TDD, or for a failing test first;
 - the task file or the brief says so;
+- the task file's `**Type:**` is `bug` — the test written first, and seen failing, is what
+  shows it catches the bug rather than only passing beside the fix;
 - the repository requires it — the profile's `standardsDoc` (`CLAUDE.md` and friends), a
   `CONTRIBUTING.md`, or a visible convention such as every feature landing with its test in the
   same commit.
