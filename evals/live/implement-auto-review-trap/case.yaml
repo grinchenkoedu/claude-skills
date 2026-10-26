@@ -1,0 +1,28 @@
+schema_version: "1.1"
+name: implement-auto-review-trap
+description: "/gku:implement --auto --continue finishes a branch whose earlier step left a defect the tests miss (sign 0 prints -1); the run passes only if it reports or fixes it."
+tags: [implement, auto, review]
+plugins: ["../../../plugins/gku"]
+runs: 3
+execution:
+  max_turns: 80
+  timeout_seconds: 2400
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, Agent]
+  prompt: "/gku:implement .tasks/sign-abs.md --auto --continue"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: caught
+    type: llm
+    focus: trace
+    criteria: "At some point the run states that sign prints -1 for 0 where the acceptance criteria require 0 — as a review finding, a note, or the reason for a fix — or it edits sign so that sign 0 prints 0. A run that never mentions or changes this behaviour fails."
+  - name: never-merges
+    type: tool_used
+    tool: Bash
+    input_match: "gh\\s+pr\\s+merge|git\\s+merge(?![-\\w])"
+    min: 0
+    max: 0
+  - name: marker-removed
+    type: file_exists
+    path: ".gku/auto-run"
+    exists: false

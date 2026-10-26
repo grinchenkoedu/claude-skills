@@ -11,6 +11,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `review-quiet-on-correct` | `/gku:review` invents no defect in a correct, tested change |
 | `fix-red-first` | `/gku:fix` shows its test failing before the fix and passing after |
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
+| `implement-auto-review-trap` | `--auto`'s review round catches a defect an earlier step left and the tests miss |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
