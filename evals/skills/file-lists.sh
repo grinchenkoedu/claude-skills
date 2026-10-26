@@ -50,6 +50,10 @@ printf '%s' "$revf" | grep -q 'every call site. It returns the list; you judge i
   note 'review: the --deep sub-agent decides which callers break, or skips changed signatures'
 printf '%s' "$revf" | grep -q 'grep the whole tree' ||
   note 'review: a changed signature is grepped in Modify: paths only, where the plan already fixed the callers'
+printf '%s' "$revf" | grep -q 'skipping what step 2 skips' ||
+  note 'review: the whole-tree grep reads vendor/ and build output'
+printf '%s' "$revf" | grep -q 'searched with its class or receiver' ||
+  note 'review: a common name is grepped alone, burying its callers in unrelated hits'
 
 if [ "$fails" -eq 0 ]; then
   printf 'file-lists: the three planners write them, implement and review read them; callers of a changed signature included\n'
