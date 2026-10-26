@@ -12,6 +12,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `fix-red-first` | `/gku:fix` shows its test failing before the fix and passing after |
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
 | `implement-auto-review-trap` | `--auto` catches a defect an earlier step left and the tests miss |
+| `implement-auto-reading-trap` | `--auto` catches an earlier step's change to code the task protects, which no test or criterion shows |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
