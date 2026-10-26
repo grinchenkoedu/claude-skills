@@ -69,10 +69,11 @@ done
 
 # --- the header that carries it across sessions ------------------------------
 
-# Step 6 and step 6b each have a template; count them, or one of the two could
-# lose its line while the other keeps the check green.
-n="$(grep -c '^\*\*Language:\*\*' "$skills/plan/SKILL.md")"
-[ "$n" -ge 2 ] || note "plan: $n of its two task-file templates carry **Language:**"
+# Step 6 and --manual each have a template, in SKILL.md and manual.md; check
+# both, or one could lose its line while the other keeps the check green.
+for f in SKILL.md manual.md; do
+  grep -q '^\*\*Language:\*\*' "$skills/plan/$f" || note "plan: the task-file template in $f has no **Language:** line"
+done
 for s in research audit; do
   grep -q '^\*\*Language:\*\*' "$skills/$s/SKILL.md" || note "$s: its task-file template has no **Language:** line"
 done
