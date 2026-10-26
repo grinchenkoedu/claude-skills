@@ -11,6 +11,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `review-quiet-on-correct` | `/gku:review` invents no defect in a correct, tested change |
 | `fix-red-first` | `/gku:fix` shows its test failing before the fix and passing after |
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
+| `implement-auto-review-trap` | `--auto` catches a defect an earlier step left and the tests miss |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
@@ -51,9 +52,9 @@ the fixture project is plain bash.
 
 ## Costs
 
-One run per case, plugin arm only, Claude Opus 5.5, Claude Code 2.1.310, 2026-10-26. `--json`
-reports `costUsd`, `turns` and `durationSeconds` per run; it has no sub-agent count, and these
-cases spawn none.
+One run per case unless noted, plugin arm only, Claude Opus 5.5, Claude Code 2.1.310,
+2026-10-26. `--json` reports `costUsd`, `turns` and `durationSeconds` per run; it has no
+sub-agent count, and these cases spawn none.
 
 | Case | Cost (USD) | Turns | Seconds |
 |---|---|---|---|
@@ -61,5 +62,9 @@ cases spawn none.
 | `review-quiet-on-correct` | 0.21 | 4 | 38 |
 | `fix-red-first` | 0.23 | 6 | 41 |
 | `implement-auto-no-merge` | 0.35 | 14 | 71 |
+| `implement-auto-review-trap` | 0.44 | 18 | 82 |
+
+The trap row is the mean of three runs (14–24 turns); its self-review caught the defect in
+all three, in the first review round.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
