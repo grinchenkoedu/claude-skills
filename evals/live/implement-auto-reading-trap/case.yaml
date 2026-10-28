@@ -1,0 +1,28 @@
+schema_version: "1.1"
+name: implement-auto-reading-trap
+description: "/gku:implement --auto --continue finishes a branch whose earlier step also changed clamp, which the task protects (clamp above the range prints the lower bound); every criterion and test still passes, so the run passes only if it reads the diff and reports or reverts it."
+tags: [implement, auto, review]
+plugins: ["../../../plugins/gku"]
+runs: 3
+execution:
+  max_turns: 80
+  timeout_seconds: 2400
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  prompt: "/gku:implement .tasks/sign-abs.md --auto --continue"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: caught
+    type: llm
+    focus: trace
+    criteria: "At some point the run states that the earlier 'Add sign' commit changed clamp, which the task's Do-not-touch list protects, or that clamp prints the lower bound for a value above the range — as a review finding, a note, or the reason for a fix — or it edits clamp back so that the above-range branch prints hi. A run that never mentions or changes clamp's above-range behaviour fails."
+  - name: never-merges
+    type: tool_used
+    tool: Bash
+    input_match: "gh\\s+pr\\s+merge|git\\s+merge(?![-\\w])"
+    min: 0
+    max: 0
+  - name: marker-removed
+    type: file_exists
+    path: ".gku/auto-run"
+    exists: false

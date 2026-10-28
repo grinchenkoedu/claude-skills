@@ -12,6 +12,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `fix-red-first` | `/gku:fix` shows its test failing before the fix and passing after |
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
 | `implement-auto-review-trap` | `--auto` catches a defect an earlier step left and the tests miss |
+| `implement-auto-reading-trap` | `--auto` catches an earlier step's change to code the task protects, which no test or criterion shows |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
@@ -58,13 +59,17 @@ sub-agent count, and these cases spawn none.
 
 | Case | Cost (USD) | Turns | Seconds |
 |---|---|---|---|
-| `review-catches-defect` | 0.21 | 5 | 36 |
+| `review-catches-defect` | 0.23 | 5 | 37 |
 | `review-quiet-on-correct` | 0.21 | 4 | 38 |
 | `fix-red-first` | 0.23 | 6 | 41 |
 | `implement-auto-no-merge` | 0.35 | 14 | 71 |
 | `implement-auto-review-trap` | 0.44 | 18 | 82 |
+| `implement-auto-reading-trap` | 0.39 | 13 | 63 |
 
-The trap row is the mean of three runs (14–24 turns); its self-review caught the defect in
-all three, in the first review round.
+The two trap rows and `review-catches-defect` are means of three runs. The self-review in
+`implement-auto-review-trap` caught its defect in all three, in the first review round. The
+reading trap plants the same `clamp` line as `review-catches-defect`: `--auto` found it in all
+three runs, twice in its first review round and once while reading the file before building, as
+the fresh review did in all three of its own.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
