@@ -68,7 +68,8 @@ sub-agent count, and these cases spawn none.
 
 The two trap rows and `review-catches-defect` are means of three runs. The review trap's
 self-review caught its defect in all three, in the first review round. The reading trap plants
-the same `clamp` line as `review-catches-defect`: `--auto`'s self-review found it in all three
-runs, as the fresh review did in all three of its own.
+the same `clamp` line as `review-catches-defect`: `--auto` found it in all three runs, twice in
+its first review round and once while reading the file before building, as the fresh review did
+in all three of its own.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
