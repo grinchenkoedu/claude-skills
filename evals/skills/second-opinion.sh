@@ -90,6 +90,7 @@ for grant in '--dangerously-skip-permissions' '--yolo' '--allow-all ' '--allow-a
 done
 
 has "$ref" 'multi-select' || note 'reference: does not ask which agents'
+has "$ref" "Never paste the diff's text into a command" || note 'reference: may let the diff be pasted into a command, where its $( would run'
 has "$ref" 'MAX_ARG_STRLEN' || note "reference: misses Linux's 128 KB cap on one argument"
 has "$ref" "brief='Review this git diff" || note 'reference: never assigns $brief, so a copied command sends no brief'
 has "$ref" 'never read an ignored file' || note 'reference: the brief lets an agent read git-ignored files'

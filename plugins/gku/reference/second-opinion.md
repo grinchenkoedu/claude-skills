@@ -56,7 +56,9 @@ new="$(git ls-files --others --exclude-standard)"
 [ -n "$new" ] && prompt="$prompt"$'\n\nNew, untracked files, one per line — read them too:\n'"$new"
 ```
 
-The `"<prompt>"` in each command is then `"$prompt"`. `copilot` does not read stdin, so all
+The `"<prompt>"` in each command is then `"$prompt"`. Never paste the diff's text into a
+command instead. The shell does not run what `$(git diff …)` outputs, but in pasted text a
+`$(` or a backtick from the code under review would run. `copilot` does not read stdin, so all
 three agents get the diff this way, and that sets a size limit:
 - **on Linux,** one argument is capped at 131072 bytes (`MAX_ARG_STRLEN`), whatever `ARG_MAX`
   says;
