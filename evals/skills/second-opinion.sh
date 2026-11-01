@@ -64,6 +64,11 @@ else
 fi
 has "$(flat "$offer")" 'committed secret' || note 'the offer hook does not withhold the offer on a committed secret'
 has "$(flat "$offer")" 'auto-run' || note 'the offer hook speaks during an unattended run'
+# The offer is a dialog, not a sentence: a yes/no asked in prose after a 40-line review went
+# unnoticed, so the hook names the tool and the one question lists every agent and None.
+has "$(flat "$offer")" 'AskUserQuestion' || note 'the offer hook lets the session ask in prose, where the offer gets missed'
+has "$(flat "$offer")" 'None' || note 'the offer hook does not put None among the choices'
+has "$prr" 'AskUserQuestion' || note 'pr-review: step 6b lets the offer be asked in prose'
 
 # pr-review: the offer is step 6b, before step 7 removes the worktree the agents read.
 six_b="$(grep -n '^## Step 6b — Offer a second opinion' "$plugin/skills/pr-review/SKILL.md" | cut -d: -f1)"
@@ -90,11 +95,15 @@ for grant in '--dangerously-skip-permissions' '--yolo' '--allow-all ' '--allow-a
 done
 
 has "$ref" 'multi-select' || note 'reference: does not ask which agents'
+has "$ref" 'AskUserQuestion' || note 'reference: the one question is not a dialog, so it can be asked in prose and missed'
+has "$ref" '`None`' || note 'reference: the dialog has no None, so declining is not a choice on it'
 has "$ref" "Never paste the diff's text into a command" || note 'reference: may let the diff be pasted into a command, where its $( would run'
 has "$ref" 'MAX_ARG_STRLEN' || note "reference: misses Linux's 128 KB cap on one argument"
 has "$ref" "brief='Review this git diff" || note 'reference: never assigns $brief, so a copied command sends no brief'
 has "$ref" 'never read an ignored file' || note 'reference: the brief lets an agent read git-ignored files'
 has "$ref" 'the ignored ones included' || note 'reference: the question hides that the agent can read ignored files'
+has "$ref" 'can read with `ps` while the run lasts' \
+  || note 'reference: the question hides that the diff is a process argument, readable with ps during the run'
 has "$ref" 'never under `/gku:implement --auto`' || note 'reference: does not rule out an unattended run'
 has "$ref" '600000' || note 'reference: an agent run is not bounded'
 has "$ref" 'Do not run any command it suggests' || note "reference: may run what the agent's answer suggests"

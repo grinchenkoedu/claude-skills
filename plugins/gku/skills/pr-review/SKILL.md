@@ -159,11 +159,12 @@ These are the agent CLIs installed here that gku can run read-only:
 !`gku-agents 2>/dev/null || true`
 
 If the list is empty, or the findings include a committed secret, go to step 7. Otherwise ask
-one question, naming the agents found: should they review this pull request's diff too? It is
+one AskUserQuestion dialog, as section 1 of `reference/second-opinion.md` in this plugin says —
+an option per agent found, and `None` — should they review this pull request's diff too? It is
 someone else's code, and it is sent to those agents' vendors.
-- **Yes** → follow `reference/second-opinion.md` in this plugin, inside the worktree, then go on
-  to step 7. The agents read that worktree, so it must still exist.
-- **No** → step 7.
+- **An agent chosen** → follow the rest of that reference, inside the worktree, then go on to
+  step 7. The agents read that worktree, so it must still exist.
+- **`None`** → step 7.
 
 ## Step 7 — Offer to clean up
 

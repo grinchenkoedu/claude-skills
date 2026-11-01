@@ -78,7 +78,8 @@ fi
 
 ref="$plugin/reference/second-opinion.md"
 ref="${ref//\\/\\\\}"; ref="${ref//\"/\\\"}"
-msg="gku: the /gku:review answer above is complete. Second-opinion agents installed here: $agents. Ask the developer one yes/no question: should these agents review the same diff too? Say that the code goes to those agents' vendors. Do not ask if the review stopped before reviewing a diff; say nothing then. Do not ask if the review found a committed secret; say why instead. On yes, follow $ref. Do not repeat or summarise the review."
+# A dialog, not a sentence: a yes/no asked in prose after a 40-line review went unread.
+msg="gku: the /gku:review answer above is complete. Second-opinion agents installed here: $agents. Offer them with the AskUserQuestion tool, once: one multi-select question with an option per agent and a None option, asking whether they should review the same diff too. Say in it that the code goes to those agents' vendors, that each agent can read any file here including ignored ones, and that the diff is passed as a process argument. Do not ask if the review stopped before reviewing a diff; say nothing then. Do not ask if the review found a committed secret; say why instead. For every agent chosen, follow $ref from its section 2. Do not repeat or summarise the review."
 if [ "$event" = Stop ]; then
   printf '{"decision":"block","reason":"%s"}\n' "$msg"
 else

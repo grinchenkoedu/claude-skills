@@ -9,8 +9,8 @@ read-only:
 A different model, from a different vendor, misses different things. This is how its findings
 reach the conversation without being taken on trust.
 
-**You are here because the developer said yes to that offer.** Saying yes is consent to send
-code to an outside service, and it covers this run only. Never start this unasked, never under
+**The offer is the dialog in section 1, and an agent chosen on it is the consent** to send code
+to an outside service; it covers this run only. Never start a run unasked, never under
 `/gku:implement --auto`, and never for a review that was dispatched rather than run by the
 developer. Nobody is there to consent.
 
@@ -18,13 +18,17 @@ developer. Nobody is there to consent.
 carries the secret, and sending it would publish it to that vendor. Say so, and leave it to the
 developer to remove the secret first.
 
-## 1. Which agents
+## 1. Which agents — one dialog
 
-Run `gku-agents` again: the list may have changed since the offer. Then ask one multi-select
-question, listing each agent it found with the service its code goes to. `None` ends this.
-Say in the question that the agent runs in that directory and can read any file in it, the
-ignored ones included, such as `.env`. The brief asks it to keep to the files git tracks, but
-that is a request, not a lock.
+Ask with the AskUserQuestion tool, once: one multi-select question, an option per agent
+`gku-agents` lists with the service its code goes to, and a `None` option that ends this. Run
+`gku-agents` first when the list you hold is older than this turn. A question asked in prose
+after a review goes unread; the dialog is the offer. Its text says:
+- the agent runs in this directory and can read any file in it, the ignored ones included,
+  such as `.env` — the brief asks it to keep to the files git tracks, but that is a request,
+  not a lock;
+- the diff reaches the agent as a command-line argument (section 2), which any account on this
+  machine can read with `ps` while the run lasts.
 
 | Agent | Code goes to |
 |---|---|

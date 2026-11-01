@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: review-offers-second-opinion
+description: "A typed /gku:review on a machine with an agent CLI installed: once the forked review is back, the session asks once whether the installed agents should review the same diff too, names them and says the code goes to their vendors, and runs none of them. Needs agy, copilot or opencode on this machine; setup.sh stops with the reason otherwise."
+tags: [review, second-opinion]
+plugins: ["../../../plugins/gku"]
+runs: 1
+execution:
+  max_turns: 30
+  timeout_seconds: 900
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, AskUserQuestion]
+  prompt: "/gku:review"
+context:
+  scaffold_script: setup.sh
+graders:
+  # The offer comes from scripts/second-opinion-offer.sh holding the Stop once, after the fork
+  # returned the review: the session's one turn is the question, and the judge reads that last
+  # message. A run that ends on the review with no question is the hook gone silent. Whether an
+  # agent was started before any yes is not in the last message: keep the trace (--keep-temp)
+  # and grep it for agy, copilot and opencode before trusting a pass.
+  - name: asks-once
+    type: llm
+    criteria: "After the review's verdict, the session offers a second opinion exactly once, as one question: whether the agent CLIs installed on this machine should also review the same diff. It is an AskUserQuestion dialog with an option per agent and a None option where that tool can be used in this run, and one message otherwise. The question names at least one of agy, copilot or opencode and says the code goes to those agents' vendors. The session asks once, does not repeat or summarise the review, and does not run agy, copilot or opencode. A run that ends on the review with no such question fails; a run that executes any of those agents fails."
+  - name: read-only
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: code-untouched
+    type: regex
+    target: { source: file, path: lib/math.sh }
+    pattern: '-gt "\$hi" \]; then\s+echo "\$lo"'

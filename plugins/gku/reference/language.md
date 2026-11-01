@@ -17,7 +17,9 @@ A run speaks the developer's language from the first question to the pull reques
 4. **Structure stays English** — whatever an agent reads back: identifiers; template headings
    and field labels (`## Steps`, `Create:`, `Modify:`, `Test:`, `**Type:**` and its values,
    `**Mode:** manual`, `**Language:**`); evidence tags (`[answered]`, `[assumed]`, …); commit
-   trailers (`Ruling:`, `Co-Authored-By:`); flags, branch names, file names and slugs.
+   trailers (`Ruling:`, `Co-Authored-By:`); flags, branch names, file names and slugs; a
+   review's severity labels (`BLOCKER`, `WARNING`, `NIT`) and the label its verdict line opens
+   with (`BLOCKER`/`BLOCKERS` or `Ready`), because the plugin's hooks read that word.
    **Everything else follows the language**: the chat and its questions, the prose of plans and
    reports, commit subjects and bodies, pull request titles, descriptions and thread replies.
 5. **A repository's convention keeps its form, not its language.** A `feat:` prefix, a ticket
