@@ -345,9 +345,9 @@ Suggest it; do not run it. This skill does not edit, and the developer decides w
 is worth acting on.
 
 **Do not offer a second opinion yourself.** The plugin's hook,
-`scripts/second-opinion-offer.sh`, has already told the session that started this review which
-agents are installed, and that session asks the developer once your answer is back. A line from
-you would only repeat it.
+`scripts/second-opinion-offer.sh`, makes sure the session that started this review asks the
+developer once your answer is back, naming the agents installed. A line from you would only
+repeat it.
 
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
 
