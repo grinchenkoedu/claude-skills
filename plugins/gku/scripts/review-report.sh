@@ -66,5 +66,5 @@ if [ -f "$transcript" ] && grep -Eq \
   exit 0
 fi
 
-printf '%s\n' "This review names a blocker and no report was written. Do /gku:review's step 5b now: write the review in full to .gku/reports/review-<branch-slug>-<timestamp>.md with the Write tool, as reference/reports.md says, then return the whole review again as your final answer, ending with the report's absolute path." >&2
+printf '%s\n' "This review names a blocker and no report was written. Do /gku:review's step 5b now: write the review in full to .gku/reports/review-<branch-slug>-<timestamp>.md with the Write tool, as reference/reports.md says, then return the whole review again as your final answer. Its last line is the report's absolute path, with nothing after it." >&2
 exit 2
