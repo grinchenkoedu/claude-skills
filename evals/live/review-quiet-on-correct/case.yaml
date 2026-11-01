@@ -16,7 +16,7 @@ graders:
   # no warning, and the judge this replaces split its votes on near-identical replies. Anchored
   # to the start, where the verdict leads: unanchored, "ready to push once that is fixed" after a
   # blocker would pass.
-  - name: no-invented-defect
+  - name: verdict-ready-to-push
     type: regex
     target: last_message
     pattern: '^\W*Ready to push'
