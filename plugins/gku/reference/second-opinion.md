@@ -37,7 +37,9 @@ question, listing each agent it found with the service its code goes to. `None` 
 
 **Which diff:** the range the review read.
 - For `/gku:review` that is `git diff $(git merge-base <base> HEAD)`, which includes
-  uncommitted work.
+  uncommitted work. New files git does not track yet are not in any diff: when
+  `git ls-files --others --exclude-standard` lists some, add a line after the diff,
+  `New, untracked files — read them too: <the list>`.
 - For `/gku:pr-review` it is `git diff <base>...HEAD`.
 
 **The prompt** is the brief below, a blank line, and then the diff, with the diff expanded in
