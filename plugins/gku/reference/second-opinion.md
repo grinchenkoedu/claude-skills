@@ -24,7 +24,8 @@ Run `gku-agents` again: the list may have changed since the offer. Then ask one 
 question, listing each agent it found with the service its code goes to. `None` ends this.
 Say in the question that the agent runs in that directory and can read any file in it, the
 ignored ones included, such as `.env`. The brief asks it to keep to the files git tracks, but
-that is a request, not a lock.
+that is a request, not a lock. Say too that the diff reaches the agent as a command-line
+argument (section 2), which any account on this machine can read with `ps` while the run lasts.
 
 | Agent | Code goes to |
 |---|---|

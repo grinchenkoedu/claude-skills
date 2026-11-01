@@ -892,8 +892,9 @@ instead:
   to ask you. That costs one turn per review, and only with an agent installed. The hook runs on
   every prompt, stop and skill call, and exits at once for anything else. If you say yes, you
   pick the agents, and each one reads the same diff in a read-only mode a probe proved; your
-  code goes to that agent's vendor, which is why it is asked, never assumed.
-  `reference/second-opinion.md` checks every finding it returns against the code before
+  code goes to that agent's vendor, which is why it is asked, never assumed — and while the run
+  lasts the diff sits in the agent's command line, where any account on your machine can read
+  it. `reference/second-opinion.md` checks every finding it returns against the code before
   reporting it. It is never offered under `--auto`, or when the review found a committed secret.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
