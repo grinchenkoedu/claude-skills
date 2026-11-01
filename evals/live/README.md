@@ -86,6 +86,13 @@ other file was created, and that `lib/math.sh` still has the defect. They show a
 its own step 5b), where the inline review on `main` wrote it in 3 of 3. About 0.055 USD and 21 s
 a run.
 
+The hook in `plugins/gku/hooks/hooks.json` (`scripts/review-report.sh`) closed that gap. On
+2026-11-01, three runs passed 3/3 on every grader. Each reviewer stopped without a report, was
+sent back once, wrote it with Write and returned the review again: step 5b alone held in none of
+the three, so the hook is what holds the rule. A blocker review now costs about 0.095 USD and
+37 s instead of 0.055 and 21 s. A clean one is not sent back: `review-quiet-on-correct`, one run,
+"Ready to push", 0.05 USD.
+
 What the rows say, and what they do not:
 
 - **A review on its own costs about a quarter.** Most of that is the model: the fork runs on
