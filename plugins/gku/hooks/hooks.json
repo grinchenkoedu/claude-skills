@@ -1,5 +1,5 @@
 {
-  "description": "Two gku hooks. review-report.sh sends a gku:reviewer answer that names a blocker back once when it wrote no report — /gku:review's step 5b, enforced; it fires for gku:reviewer only. second-opinion-offer.sh tells the session that started /gku:review which agents could give a second opinion, so it asks once the review is back; for any other prompt or skill it exits at once, silent.",
+  "description": "Two gku hooks. review-report.sh sends a gku:reviewer answer that names a blocker back once when it wrote no report — /gku:review's step 5b, enforced; it fires for gku:reviewer only. second-opinion-offer.sh has the session that started /gku:review ask whether installed agents should give a second opinion, once the review is back; for any other prompt, stop or skill it exits at once, silent.",
   "hooks": {
     "SubagentStop": [
       {
@@ -10,6 +10,13 @@
       }
     ],
     "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/second-opinion-offer.sh\"" }
+        ]
+      }
+    ],
+    "Stop": [
       {
         "hooks": [
           { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/second-opinion-offer.sh\"" }

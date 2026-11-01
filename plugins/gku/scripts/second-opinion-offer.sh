@@ -1,41 +1,55 @@
 #!/usr/bin/env bash
-# The gku second-opinion offer — UserPromptSubmit and PostToolUse (Skill), from
-# the plugin's hooks/hooks.json. /gku:review runs as a fork, and a fork reliably
-# drops a closing line nobody checks: given the installed agents in its skill
-# text, it returned its review without the offer. The session that called it
-# does get a turn once the fork returns, and a hook's additionalContext reaches
-# that session — so this tells the caller what to ask, not the fork.
+# The gku second-opinion offer — from the plugin's hooks/hooks.json, on
+# UserPromptSubmit, Stop, and PostToolUse for Skill. /gku:review runs as a
+# fork, and the offer cannot come from the fork: given the installed agents in
+# its skill text, it returned its review without the line. So the session that
+# started the review asks, and this makes sure it gets the turn to ask in.
 #
-# Two ways /gku:review starts, one event each, never both for one review:
-#   - typed by the developer → UserPromptSubmit, the prompt starting /gku:review
-#     (a typed command never goes through the Skill tool);
-#   - called by the model → PostToolUse on Skill, with "skill":"gku:review".
+# Two ways /gku:review starts, and each needs its own route (probes, 2026-11-01):
+#   - typed by the developer, it runs as a local command: its output goes
+#     straight to the developer and the main model takes no turn at all — and a
+#     UserPromptSubmit context reaches the fork, not the caller. So
+#     UserPromptSubmit only notes the review as pending, silently, and the Stop
+#     that ends that prompt blocks once with the offer, which gives the main
+#     model its turn;
+#   - called by the model through the Skill tool, the model already has its turn:
+#     PostToolUse hands it the offer as additionalContext.
 #
-# Silent — exit 0 with no output — unless that holds, no .gku/auto-run marks an
-# unattended run, and gku-agents lists at least one agent. Then it prints the
-# additionalContext: the agents, and what the caller asks the developer. It runs
-# on every prompt in every session the plugin is on, so the prompt is the first
-# thing checked and nothing else runs for any other.
+# Silent — exit 0 with no output — unless it is /gku:review, no .gku/auto-run
+# marks an unattended run, and gku-agents lists at least one agent. It runs on
+# every prompt, every stop and every skill call in every session the plugin is
+# on, so each event's cheap check comes first and nothing else runs otherwise.
+# The pending note lives in $TMPDIR, keyed by session, never in the repository,
+# and the Stop removes it before blocking — one offer per review, whatever
+# stop_hook_active says.
 
 input="$(cat)"
 
-# Which event, and is it /gku:review? Matched on the raw JSON: the prompt and the
-# skill name are plain strings, and nothing here needs decoding beyond them.
-event=""
-case "$input" in
-  *'"hook_event_name":"UserPromptSubmit"'*|*'"hook_event_name": "UserPromptSubmit"'*)
+str() { # str <key> — that JSON string value, still escaped
+  printf '%s' "$input" | sed -E -n 's/.*"'"$1"'"[[:space:]]*:[[:space:]]*"(([^"\\]|\\.)*)".*/\1/p' | head -1
+}
+event="$(str hook_event_name)"
+session="$(str session_id | tr -cd 'A-Za-z0-9-')"
+pending="${TMPDIR:-/tmp}/gku-second-opinion-${session:-none}"
+
+# The cheap check for each event: is this /gku:review?
+case "$event" in
+  UserPromptSubmit)
     printf '%s' "$input" |
-      grep -Eq '"prompt"[[:space:]]*:[[:space:]]*"([[:space:]]|\\n|\\t)*/gku:review([[:space:]"\\]|$)' &&
-      event=UserPromptSubmit ;;
-  *'"hook_event_name":"PostToolUse"'*|*'"hook_event_name": "PostToolUse"'*)
-    printf '%s' "$input" | grep -Eq '"skill"[[:space:]]*:[[:space:]]*"gku:review"' &&
-      event=PostToolUse ;;
+      grep -Eq '"prompt"[[:space:]]*:[[:space:]]*"([[:space:]]|\\n|\\t)*/gku:review([[:space:]"\\]|$)' || exit 0 ;;
+  Stop)
+    [ -f "$pending" ] || exit 0
+    noted="$(cat "$pending" 2>/dev/null)"; rm -f "$pending"
+    # A note from another prompt is stale — that review's stop never came. Drop it.
+    [ "$noted" = "$(str prompt_id)" ] || exit 0 ;;
+  PostToolUse)
+    printf '%s' "$input" | grep -Eq '"skill"[[:space:]]*:[[:space:]]*"gku:review"' || exit 0 ;;
+  *) exit 0 ;;
 esac
-[ -n "$event" ] || exit 0
 
 # Nobody is watching an --auto run, and nobody is there to consent: say nothing.
 # The marker sits at the primary repository's root, found as guard.sh finds it.
-dir="$(printf '%s' "$input" | sed -E -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"(([^"\\]|\\.)*)".*/\1/p' | head -1)"
+dir="$(str cwd)"
 dir="${dir:-$PWD}"
 root=""
 common="$(cd "$dir" 2>/dev/null && git rev-parse --git-common-dir 2>/dev/null)"
@@ -43,11 +57,20 @@ common="$(cd "$dir" 2>/dev/null && git rev-parse --git-common-dir 2>/dev/null)"
 [ -f "${root:-$dir}/.gku/auto-run" ] && exit 0
 
 plugin="$(cd "$(dirname "$0")/.." && pwd)"
-agents="$("$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):.*/\1/p' | paste -sd ',' - | sed 's/,/, /g')"
+agents="$("$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):.*/\1/p' | paste -s -d ',' - | sed 's/,/, /g')"
 [ -n "$agents" ] || exit 0
+
+if [ "$event" = UserPromptSubmit ]; then
+  str prompt_id > "$pending" 2>/dev/null
+  exit 0
+fi
 
 ref="$plugin/reference/second-opinion.md"
 ref="${ref//\\/\\\\}"; ref="${ref//\"/\\\"}"
-msg="gku: second-opinion agents installed here: $agents. When the /gku:review answer is back, show it as it is, then ask the developer one yes/no question: should these agents review the same diff too? Say that the code goes to those agents' vendors. Do not ask if the review found a committed secret; say why instead. On yes, follow $ref."
-printf '{"hookSpecificOutput":{"hookEventName":"%s","additionalContext":"%s"}}\n' "$event" "$msg"
+msg="gku: the /gku:review answer above is complete. Second-opinion agents installed here: $agents. Ask the developer one yes/no question: should these agents review the same diff too? Say that the code goes to those agents' vendors. Do not ask if the review found a committed secret; say why instead. On yes, follow $ref. Do not repeat or summarise the review."
+if [ "$event" = Stop ]; then
+  printf '{"decision":"block","reason":"%s"}\n' "$msg"
+else
+  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$msg"
+fi
 exit 0

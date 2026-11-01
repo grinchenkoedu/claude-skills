@@ -888,8 +888,10 @@ instead:
   CLIs installed here that gku can run read-only — `agy`, `copilot` and `opencode`. When it
   finds one, `/gku:review` and `/gku:pr-review` end by offering it. For `/gku:review`, the
   hooks file's `scripts/second-opinion-offer.sh` makes the offer, because the forked reviewer
-  drops a closing line. That hook runs on every prompt and every skill call, and exits at once
-  for anything other than `/gku:review`. If you say yes, you pick the
+  drops a closing line: once a typed review is back, it holds the stop once, so the session gets
+  a turn to ask you. That costs one turn per review, and only with an agent installed. The
+  hook runs on every prompt, stop and skill call, and exits at once for anything else. If you
+  say yes, you pick the
   agents, and each one reads the same diff in a read-only mode a probe proved; your code goes
   to that agent's vendor, which is why it is asked, never assumed.
   `reference/second-opinion.md` checks every finding it returns against the code before

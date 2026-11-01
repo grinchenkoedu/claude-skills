@@ -7,8 +7,8 @@
 # when there is one to run read-only. The offer sends the developer's code to
 # an outside vendor, so what is checked is the consent around it and the
 # read-only commands, not the wording:
-#   - /gku:review's offer comes from the plugin's hook, wired on UserPromptSubmit
-#     and on PostToolUse for Skill, which withholds it on a committed secret; the
+#   - /gku:review's offer comes from the plugin's hook, wired on UserPromptSubmit,
+#     Stop and PostToolUse for Skill, which withholds it on a committed secret; the
 #     forked reviewer offers nothing itself, since a fork drops a closing line;
 #   - /gku:pr-review injects gku-agents, points at reference/second-opinion.md, and
 #     withholds the offer on an empty list or a committed secret;
@@ -50,14 +50,14 @@ hooks="$plugin/hooks/hooks.json"
 offer="$plugin/scripts/second-opinion-offer.sh"
 [ -x "$offer" ] || note 'scripts/second-opinion-offer.sh is missing or not executable'
 if command -v python3 >/dev/null 2>&1; then
-  python3 - "$hooks" <<'PY' || note 'hooks.json: second-opinion-offer.sh is not wired on UserPromptSubmit and on PostToolUse for Skill'
+  python3 - "$hooks" <<'PY' || note 'hooks.json: second-opinion-offer.sh is not wired on UserPromptSubmit, Stop and PostToolUse for Skill'
 import json, sys
 h = json.load(open(sys.argv[1]))["hooks"]
 def wired(event, matcher=None):
     return any((matcher is None or e.get("matcher") == matcher)
                and any("second-opinion-offer.sh" in x.get("command", "") for x in e.get("hooks", []))
                for e in h.get(event, []))
-sys.exit(0 if wired("UserPromptSubmit") and wired("PostToolUse", "Skill") else 1)
+sys.exit(0 if wired("UserPromptSubmit") and wired("Stop") and wired("PostToolUse", "Skill") else 1)
 PY
 else
   grep -q 'second-opinion-offer.sh' "$hooks" 2>/dev/null || note 'hooks.json: second-opinion-offer.sh is not wired'

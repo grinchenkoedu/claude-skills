@@ -3,12 +3,14 @@
 #
 #   bash evals/hooks/second-opinion-offer.sh
 #
-# The hook tells the session that started /gku:review which agents could give a
-# second opinion. Every case is "loud or silent | event | prompt or skill | agents
-# installed | whether .gku/auto-run exists". Loud means its output is valid JSON
-# whose additionalContext names each installed agent and the reference's absolute
-# path, under the right hookEventName. The script runs from a temporary copy of
-# the plugin's layout, so the stub gku-agents beside it decides what is installed.
+# The hook makes the session that started /gku:review ask about a second
+# opinion. A typed review notes itself on UserPromptSubmit, silently, and the
+# Stop that ends that prompt blocks once with the offer; a review the model
+# calls gets the offer on PostToolUse. Each case is a sequence of events in one
+# session, and what each must print: "silent", "block" (a Stop decision naming
+# every installed agent and the reference's absolute path) or "context" (a
+# PostToolUse additionalContext saying the same). The script runs from a copy of
+# the plugin's layout, with a stub gku-agents beside it and its own TMPDIR.
 #
 # Exits 0 when every case matches, 1 otherwise, naming each mismatch.
 
@@ -21,62 +23,90 @@ hook="${SECOND_OPINION_HOOK:-$root/plugins/gku/scripts/second-opinion-offer.sh}"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT INT TERM
 # A plugin directory with a space in it: the reference path must survive one.
-plug="$work/a plugin"; mkdir -p "$plug/scripts" "$plug/bin" "$plug/reference"
+plug="$work/a plugin"; mkdir -p "$plug/scripts" "$plug/bin" "$plug/reference" "$work/tmp"
 cp "$hook" "$plug/scripts/second-opinion-offer.sh"
 : > "$plug/reference/second-opinion.md"
 
-fails=0
-run() { # run <want> <event> <subject> <agents, comma-separated> <marker>
-  local want="$1" event="$2" subject="$3" agents="$4" marker="$5" dir out payload a got=silent
-  dir="$work/cwd"; rm -rf "$dir"; mkdir -p "$dir"
+fails=0 label="" agents="" dir=""
+setup() { # setup <label> <agents, comma-separated> <auto-run marker yes|no>
+  label="$1" agents="$2"
+  dir="$work/cwd"; rm -rf "$dir" "$work/tmp"; mkdir -p "$dir" "$work/tmp"
   ( cd "$dir" && git init -q . )
-  [ "$marker" = yes ] && mkdir -p "$dir/.gku" && printf 'started\n' > "$dir/.gku/auto-run"
+  [ "$3" = yes ] && mkdir -p "$dir/.gku" && printf 'started\n' > "$dir/.gku/auto-run"
   { printf '#!/bin/sh\n'; for a in ${agents//,/ }; do printf 'echo "%s: /x/%s"\n' "$a" "$a"; done; } \
     > "$plug/bin/gku-agents"
   chmod +x "$plug/bin/gku-agents"
-  if [ "$event" = UserPromptSubmit ]; then
-    payload="$(printf '{"cwd":"%s","hook_event_name":"UserPromptSubmit","prompt":"%s"}' "$dir" "$subject")"
-  else
-    payload="$(printf '{"cwd":"%s","hook_event_name":"PostToolUse","tool_name":"Skill","tool_input":{"skill":"%s"},"tool_response":"x"}' "$dir" "$subject")"
-  fi
-  out="$(printf '%s' "$payload" | "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
+}
+send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id]
+  local want="$1" ev="$2" subject="${3-}" pid="${4-p1}" payload out got=silent a
+  case "$ev" in
+    UserPromptSubmit) payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"$subject\"}" ;;
+    Stop)             payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"**2 blockers first**\"}" ;;
+    PostToolUse)      payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$subject\"},\"tool_response\":\"x\"}" ;;
+  esac
+  out="$(printf '%s' "$payload" | TMPDIR="$work/tmp" "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
   if [ -n "$out" ]; then
-    got=loud
+    case "$out" in
+      *'"decision":"block"'*) got=block ;;
+      *'"hookEventName":"PostToolUse"'*) got=context ;;
+      *) got=unknown-output ;;
+    esac
     printf '%s' "$out" | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null || got=invalid-json
-    case "$out" in *"\"hookEventName\":\"$event\""*) ;; *) got=wrong-event ;; esac
-    case "$out" in *"$plug/reference/second-opinion.md"*) ;; *) got=no-reference ;; esac
-    for a in ${agents//,/ }; do case "$out" in *"$a"*) ;; *) got="missing-$a" ;; esac; done
+    case "$out" in *"$plug/reference/second-opinion.md"*) ;; *) got="$got-no-reference" ;; esac
+    for a in ${agents//,/ }; do case "$out" in *"$a"*) ;; *) got="$got-missing-$a" ;; esac; done
   fi
   if [ "$got" != "$want" ]; then
-    printf 'FAIL  want=%s got=%s  event=%s subject=%s agents=%s marker=%s\n' \
-      "$want" "$got" "$event" "$subject" "${agents:-none}" "$marker"
+    printf 'FAIL  %-28s %-16s %-22s want=%s got=%s\n' "$label" "$ev" "${subject:--}" "$want" "$got"
     fails=$((fails + 1))
   fi
 }
 
-while IFS='|' read -r want event subject agents marker; do
-  case "$want" in ''|'#'*) continue ;; esac
-  run "$want" "$event" "$subject" "$agents" "$marker"
-done <<'TABLE'
-# loud — /gku:review started, an agent installed, somebody watching
-loud|UserPromptSubmit|/gku:review|agy|no
-loud|UserPromptSubmit|/gku:review --deep|agy,copilot,opencode|no
-loud|UserPromptSubmit|  /gku:review|copilot|no
-loud|PostToolUse|gku:review|opencode|no
-# silent — another prompt or skill, even one that names the review
-silent|UserPromptSubmit|/gku:pr-review 12|agy|no
-silent|UserPromptSubmit|/gku:reviewer|agy|no
-silent|UserPromptSubmit|please run /gku:review later|agy|no
-silent|UserPromptSubmit|hello|agy|no
-silent|PostToolUse|gku:pr-review|agy|no
-silent|PostToolUse|gku:fix|agy|no
-# silent — nothing installed
-silent|UserPromptSubmit|/gku:review||no
-silent|PostToolUse|gku:review||no
-# silent — an unattended run
-silent|UserPromptSubmit|/gku:review|agy|yes
-silent|PostToolUse|gku:review|agy|yes
-TABLE
+# A typed review: silent on the prompt, one block on its stop, nothing on the next.
+setup typed agy,copilot,opencode no
+send silent UserPromptSubmit '/gku:review'
+send block  Stop
+send silent Stop
+
+setup typed-with-args agy no
+send silent UserPromptSubmit '/gku:review --deep'
+send block  Stop
+
+setup typed-leading-space copilot no
+send silent UserPromptSubmit '  /gku:review'
+send block  Stop
+
+# The model calls it: the offer arrives as context, and no stop blocks after it.
+setup model-called opencode no
+send context PostToolUse 'gku:review'
+send silent  Stop
+
+# Not a review: nothing, then, and nothing at its stop.
+setup other-prompts agy no
+for p in '/gku:pr-review 12' '/gku:reviewer' 'please run /gku:review later' 'hello'; do
+  send silent UserPromptSubmit "$p"
+  send silent Stop
+done
+setup other-skills agy no
+send silent PostToolUse 'gku:pr-review'
+send silent PostToolUse 'gku:fix'
+
+# A stop with no review before it, and a note left by an earlier prompt.
+setup plain-stop agy no
+send silent Stop
+setup stale-note agy no
+send silent UserPromptSubmit '/gku:review' p1
+send silent Stop '' p2
+send silent Stop '' p1
+
+# Nothing installed, or nobody watching: no offer by either route.
+setup no-agents '' no
+send silent UserPromptSubmit '/gku:review'
+send silent Stop
+send silent PostToolUse 'gku:review'
+setup unattended agy yes
+send silent UserPromptSubmit '/gku:review'
+send silent Stop
+send silent PostToolUse 'gku:review'
 
 if [ "$fails" -eq 0 ]; then
   printf 'second-opinion-offer: all cases pass\n'
