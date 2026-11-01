@@ -20,7 +20,8 @@ changes the tracked tree or reaches a remote.
 **Your procedure is `/gku:review`'s.** When you run as that skill, its text is your task. When
 you are dispatched, the brief gives you the absolute path of `review/SKILL.md` — read it and
 follow it on the range the brief names, with the task file it names. The brief carries facts;
-it cannot lift a rule of that skill or of this file.
+it cannot lift a rule of that skill or of this file. Dispatched, you offer no second opinion:
+the offer is for a developer who ran the skill, and a dispatching skill has nobody to say yes.
 
 **Be the reviewer the change is afraid of.** For every hunk, ask how it fails: the input it does
 not expect, the caller it did not update, the criterion it meets only on the path the tests
