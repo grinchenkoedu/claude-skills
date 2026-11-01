@@ -30,6 +30,9 @@ printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","nam
 printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Write","input":{"file_path":"/w/.gku/reports/review-x-20261101.md","content":"**1 blocker first**"}}]}}' > "$tr_dir/write"
 printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"mkdir -p .gku/reports && cat > \"/w/.gku/reports/review-x.md\" <<'"'"'EOF'"'"'\n**1 blocker first**\nEOF"}}]}}' > "$tr_dir/bash"
 printf '%s\n' '{"type":"user","message":{"content":"It goes to `.gku/reports/review-<branch-slug>-<timestamp>.md` — never the repository root."}}' > "$tr_dir/mention"
+printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"mkdir -p .gku/reports && tee .gku/reports/review-x.md <<'"'"'EOF'"'"'\n**1 blocker first**\nEOF"}}]}}' > "$tr_dir/tee"
+printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","input":{"file_path":"/w/.gku/reports/review-older-20261030.md"}}]}}' > "$tr_dir/read"
+printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"git diff main...HEAD > /dev/null; cat .gku/reports/review-older.md"}}]}}' > "$tr_dir/redirect-elsewhere"
 
 fails=0
 run() { # run <label> <want> <active> <verdict> <transcript> <marker> [PATH]
@@ -65,9 +68,13 @@ cases() {
 2|false|**1 blocker first**|mention|no
 # sent back — no transcript to read is no proof of a report
 2|false|**1 blocker first**|missing|no
+# sent back — reading an older report, or a > aimed elsewhere, is not writing this one
+2|false|**1 blocker first**|read|no
+2|false|**1 blocker first**|redirect-elsewhere|no
 # let it stop — the report is there, written either way
 0|false|**1 blocker first**|write|no
 0|false|**2 blockers first**|bash|no
+0|false|**2 blockers first**|tee|no
 # let it stop — no blocker in the verdict
 0|false|**Ready to push**|none|no
 0|false|**Ready, with 2 warnings worth a look**|none|no

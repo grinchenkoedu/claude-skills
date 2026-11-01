@@ -53,13 +53,15 @@ fi
 printf '%s' "$verdict" | grep -Eiq '(^|[^a-z])blockers?([^a-z]|$)' || exit 0
 printf '%s' "$verdict" | grep -Eiq '(^|[^a-z])(no|zero|0) blockers?' && exit 0
 
-# Written already? Only a Write's file_path or a Bash redirect or tee counts.
+# Written already? Only the Write tool aimed at the report, or a Bash redirect or tee whose
+# target is the report, counts — a Read of an older one, or a > elsewhere in the same command,
+# does not. Claude Code writes a tool call as "name":"Write","input":{"file_path":….
 transcript="$(field agent_transcript_path '.agent_transcript_path')"
 # The docs show the path with a literal ~/ in it; the shell will not expand that.
 [ "${transcript#\~/}" != "$transcript" ] && transcript="$HOME/${transcript#\~/}"
 if [ -f "$transcript" ] && grep -Eq \
-  -e '"file_path"[[:space:]]*:[[:space:]]*"[^"]*\.gku/reports/review-' \
-  -e '"command"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*(>|tee )([^"\\]|\\.)*\.gku/reports/review-' \
+  -e '"name"[[:space:]]*:[[:space:]]*"Write"[[:space:]]*,[[:space:]]*"input"[[:space:]]*:[[:space:]]*\{[[:space:]]*"file_path"[[:space:]]*:[[:space:]]*"[^"]*\.gku/reports/review-' \
+  -e '"command"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*(>>?|tee( -a)?)[[:space:]]*(\\")?[^"[:space:];|&]*\.gku/reports/review-' \
   "$transcript"; then
   exit 0
 fi
