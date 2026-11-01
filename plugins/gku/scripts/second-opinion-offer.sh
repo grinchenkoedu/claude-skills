@@ -41,7 +41,13 @@ case "$event" in
     [ -f "$pending" ] || exit 0
     noted="$(cat "$pending" 2>/dev/null)"; rm -f "$pending"
     # A note from another prompt is stale — that review's stop never came. Drop it.
-    [ "$noted" = "$(str prompt_id)" ] || exit 0 ;;
+    [ "$noted" = "$(str prompt_id)" ] || exit 0
+    # A review that stopped early — on the base branch, no changes, an error — has no verdict,
+    # and nothing to give a second opinion on. A verdict names a blocker or says "ready", in the
+    # first five lines with text, as review-report.sh reads it.
+    str last_assistant_message | awk '{ gsub(/\\n/, "\n"); print }' |
+      awk 'NF { n++; if (tolower($0) ~ /blocker|ready/) { found = 1; exit } } n >= 5 { exit }
+           END { exit !found }' || exit 0 ;;
   PostToolUse)
     printf '%s' "$input" | grep -Eq '"skill"[[:space:]]*:[[:space:]]*"gku:review"' || exit 0 ;;
   *) exit 0 ;;
@@ -67,7 +73,7 @@ fi
 
 ref="$plugin/reference/second-opinion.md"
 ref="${ref//\\/\\\\}"; ref="${ref//\"/\\\"}"
-msg="gku: the /gku:review answer above is complete. Second-opinion agents installed here: $agents. Ask the developer one yes/no question: should these agents review the same diff too? Say that the code goes to those agents' vendors. Do not ask if the review found a committed secret; say why instead. On yes, follow $ref. Do not repeat or summarise the review."
+msg="gku: the /gku:review answer above is complete. Second-opinion agents installed here: $agents. Ask the developer one yes/no question: should these agents review the same diff too? Say that the code goes to those agents' vendors. Do not ask if the review stopped before reviewing a diff; say nothing then. Do not ask if the review found a committed secret; say why instead. On yes, follow $ref. Do not repeat or summarise the review."
 if [ "$event" = Stop ]; then
   printf '{"decision":"block","reason":"%s"}\n' "$msg"
 else

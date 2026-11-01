@@ -37,11 +37,11 @@ setup() { # setup <label> <agents, comma-separated> <auto-run marker yes|no>
     > "$plug/bin/gku-agents"
   chmod +x "$plug/bin/gku-agents"
 }
-send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id]
-  local want="$1" ev="$2" subject="${3-}" pid="${4-p1}" payload out got=silent a
+send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id] [stop's message]
+  local want="$1" ev="$2" subject="${3-}" pid="${4-p1}" said="${5-**2 blockers first**}" payload out got=silent a
   case "$ev" in
     UserPromptSubmit) payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"$subject\"}" ;;
-    Stop)             payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"**2 blockers first**\"}" ;;
+    Stop)             payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"$said\"}" ;;
     PostToolUse)      payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$subject\"},\"tool_response\":\"x\"}" ;;
   esac
   out="$(printf '%s' "$payload" | TMPDIR="$work/tmp" "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
@@ -74,6 +74,16 @@ send block  Stop
 setup typed-leading-space copilot no
 send silent UserPromptSubmit '  /gku:review'
 send block  Stop
+
+# A review with a verdict below a heading still gets it; one that stopped early does not.
+setup heading-then-verdict agy no
+send silent UserPromptSubmit '/gku:review'
+send block  Stop '' p1 '# Review\n\n**Ready to push**'
+for early in 'You are on `main` — switch to your branch first.' 'No changes against `main`.'; do
+  setup "early-stop" agy no
+  send silent UserPromptSubmit '/gku:review'
+  send silent Stop '' p1 "$early"
+done
 
 # The model calls it: the offer arrives as context, and no stop blocks after it.
 setup model-called opencode no
