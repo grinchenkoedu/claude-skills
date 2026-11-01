@@ -299,6 +299,14 @@ report, end with its absolute path on its own line. Lead with the verdict:
 
 > **Ready to push** — or — **2 blockers first** — or — **Ready, with 3 warnings worth a look**
 
+**Its label stays English in every language.** The plugin's hooks read the verdict line for the
+word `blocker` or `Ready` — `scripts/review-report.sh` to send a blocker review back for its
+report, `scripts/second-opinion-offer.sh` to make the offer — and a verdict they cannot read is
+one they do nothing about. In another language, open the line with the English label and let
+the rest follow the run's language (`reference/language.md`, rule 4):
+
+> **2 BLOCKERS** — спочатку виправити — or — **Ready** — можна пушити, 3 попередження варто глянути
+
 When step 2b ran, the criteria come next, before any finding — one row each:
 
 | Criterion | Status | Shown by |
@@ -359,7 +367,7 @@ Keep it under ~25 lines when clean, ~40 with findings. It is a message to a coll
   is the code, not the flag.
 - **Write the review in the developer's language** (`reference/language.md` — Ukrainian over
   Russian when the two are mixed). Quote code and comments in their original language, whatever
-  that is.
+  that is. The verdict's label and the severity labels stay English — step 6 says why.
 - **No diff dumps.** One sentence per finding.
 - **The security pass is part of every review.** Not only with a flag, not only for "security
   changes" — a date-formatting fix can still echo a request value unescaped. See step 3b.

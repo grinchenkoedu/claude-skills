@@ -89,6 +89,18 @@ for early in 'You are on `main` — switch to your branch first.' 'No changes ag
   send silent Stop '' p1 "$early"
 done
 
+# A review in another language keeps the English label on its verdict line (reference/language.md
+# rule 4): that word is what the hook reads. Without it the offer never comes — the miss the rule
+# exists for, kept here as a case so the gap stays visible.
+for said in '**2 BLOCKERS** — спочатку виправити' '**Ready** — можна пушити, 2 попередження варто глянути'; do
+  setup "labelled-uk-verdict" copilot no
+  send silent UserPromptSubmit '/gku:review'
+  send block  Stop '' p1 "$said"
+done
+setup unlabelled-uk-verdict copilot no
+send silent UserPromptSubmit '/gku:review'
+send silent Stop '' p1 '**2 блокери спочатку**'
+
 # The model calls it: the offer arrives as context, and no stop blocks after it.
 setup model-called opencode no
 send context PostToolUse 'gku:review'

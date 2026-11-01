@@ -64,6 +64,10 @@ cases() {
 2|false|**2 blockers first**|none|no
 2|false|**1 blocker first**|none|no
 2|false|**Don't push yet: there's 1 blocker.**|none|no
+# sent back — a review in another language keeps the English label on the verdict line
+# (reference/language.md rule 4); that word is what this hook reads
+2|false|**2 BLOCKERS** — спочатку виправити|none|no
+2|false|**1 BLOCKER** — не пушити, поки не виправлено|none|no
 # sent back — a heading or a note above the verdict does not hide it
 2|false|# Review of feature/x\n\n**1 blocker first**|none|no
 2|false|No task file, so no criteria to check.\n**2 blockers first**|none|no
@@ -83,6 +87,10 @@ cases() {
 0|false|**Ready, with 2 warnings worth a look**|none|no
 0|false|**Ready to push** — no blockers|none|no
 0|false|# Review of feature/x\n\n**Ready to push**|none|no
+0|false|**Ready** — можна пушити, 2 попередження варто глянути|none|no
+# let it stop — the miss the English-label rule exists for: a verdict with no English word in it
+# is one this hook cannot read, so a blocker written as "блокери" alone is never sent back
+0|false|**2 блокери спочатку**|none|no
 # let it stop — the verdict is clean; a BLOCKER heading further down is the body, not the verdict
 0|false|**Ready, with 1 warning worth a look**\n\n**BLOCKER** none\n- x|none|no
 # let it stop — a retry already, or nobody watching

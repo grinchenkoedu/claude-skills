@@ -41,9 +41,13 @@ if [ -f "$lang_md" ]; then
   has "$langf" 'і ї є ґ' || note 'language.md: no telltale Ukrainian letters, so the mix cannot be told apart'
   has "$langf" 'ы э ё ъ' || note 'language.md: no telltale Russian letters, so the mix cannot be told apart'
   has "$langf" 'Structure stays English' || note 'language.md: nothing keeps the structure other skills grep in English'
-  for token in 'Modify:' 'Ruling:' 'Mode: manual' '[answered]'; do
+  for token in 'Modify:' 'Ruling:' 'Mode: manual' '[answered]' 'BLOCKER' 'Ready'; do
     has "$langf" "$token" || note "language.md: $token is not listed as structure that stays English"
   done
+  # The two hooks in plugins/gku/scripts read the review's verdict line for the English word;
+  # the rule has to say that, or a translated verdict is one the hooks do nothing about.
+  has "$langf" "the plugin's hooks read that word" \
+    || note 'language.md: does not say why the verdict label stays English'
   has "$langf" 'commit subjects and bodies' || note 'language.md: commits are not said to follow the language'
   has "$langf" 'pull request titles' || note 'language.md: pull request titles are not said to follow the language'
   has "$langf" 'keeps its form, not its language' \
@@ -83,6 +87,19 @@ for s in implement pr; do
 done
 has "$(flat "$skills/pr/SKILL.md")" 'their format, not their language' \
   || note 'pr: copies the language of recent titles along with their format'
+
+# --- the one word the hooks read ---------------------------------------------
+
+# review-report.sh and second-opinion-offer.sh find the verdict by `blocker` or `ready`; a
+# review in Ukrainian keeps the English label on that line, or neither hook fires for it.
+revf="$(flat "$skills/review/SKILL.md")"
+has "$revf" 'Its label stays English in every language' \
+  || note 'review: step 6 lets a translated verdict hide from the hooks'
+has "$revf" '2 BLOCKERS — спочатку' \
+  || note 'review: step 6 shows no verdict in another language with the English label'
+for hook in review-report.sh second-opinion-offer.sh; do
+  has "$revf" "scripts/$hook" || note "review: step 6 does not name $hook as a reader of the verdict"
+done
 
 if [ "$fails" -eq 0 ]; then
   printf "language: one rule, every skill points at it, and the task file carries it\n"
