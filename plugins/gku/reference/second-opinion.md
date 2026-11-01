@@ -40,9 +40,8 @@ that is a request, not a lock.
 
 **Which diff:** the range the review read.
 - For `/gku:review` that is `git diff $(git merge-base <base> HEAD)`, which includes
-  uncommitted work. New files git does not track yet are not in any diff: when
-  `git ls-files --others --exclude-standard` lists some, add a line after the diff,
-  `New, untracked files — read them too: <the list>`.
+  uncommitted work. New files git does not track yet are not in any diff, so the prompt
+  below lists them after it.
 - For `/gku:pr-review` it is `git diff <base>...HEAD`.
 
 **The prompt** is the brief below, a blank line, and then the diff. Build it in the same Bash
@@ -52,6 +51,9 @@ single quotes. It has no single quote of its own:
 ```bash
 brief='Review this git diff as … Do not suggest commands to run.'   # the whole brief below
 prompt="$brief"$'\n\n'"$(git diff …)"
+# /gku:review only — new files no diff carries:
+new="$(git ls-files --others --exclude-standard)"
+[ -n "$new" ] && prompt="$prompt"$'\n\nNew, untracked files, one per line — read them too:\n'"$new"
 ```
 
 The `"<prompt>"` in each command is then `"$prompt"`. `copilot` does not read stdin, so all
