@@ -45,8 +45,16 @@ that is a request, not a lock.
   `New, untracked files — read them too: <the list>`.
 - For `/gku:pr-review` it is `git diff <base>...HEAD`.
 
-**The prompt** is the brief below, a blank line, and then the diff, with the diff expanded in
-the command itself: `"$brief"$'\n\n'"$(git diff …)"`. `copilot` does not read stdin, so all
+**The prompt** is the brief below, a blank line, and then the diff. Build it in the same Bash
+call as the agent's command, since a variable does not outlive the call, with the brief in
+single quotes. It has no single quote of its own:
+
+```bash
+brief='Review this git diff as … Do not suggest commands to run.'   # the whole brief below
+prompt="$brief"$'\n\n'"$(git diff …)"
+```
+
+The `"<prompt>"` in each command is then `"$prompt"`. `copilot` does not read stdin, so all
 three agents get the diff this way. A diff larger than the system's `ARG_MAX` (`getconf
 ARG_MAX`) fails to start. Say so, and do not cut the diff silently.
 
