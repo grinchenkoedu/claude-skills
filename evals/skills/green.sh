@@ -7,8 +7,8 @@
 # the assertion that failed, or wraps the error in a catch that swallows it. Two
 # halves keep that visible. implement and fix forbid it in their rules, and say
 # a silenced check counts the same as a weakened test. review flags both patterns
-# in your own diff, and --auto's self-review looks for them, because a self-review
-# is the one review an unattended run gets. A reason clears a finding only where
+# in your own diff, and --auto's review rounds look for them, because those are
+# the only reviews an unattended run gets. A reason clears a finding only where
 # review can read it; under --auto the run clears neither for itself, it hands them
 # to a person in its Notes.
 #
@@ -45,7 +45,7 @@ printf '%s' "$rev" | grep -q 'a check silenced instead of satisfied' || note 're
 # That review lives in auto.md, the file an --auto run reads.
 [ -f "$skills/implement/auto.md" ] || { printf 'no implement/auto.md under %s\n' "$skills" >&2; exit 1; }
 impf="$(flat "$skills/implement/auto.md")"
-printf '%s' "$impf" | grep -q 'goes green without being right' || note 'implement: the --auto self-review does not look for an edited test or a silenced check'
+printf '%s' "$impf" | grep -q 'goes green without being right' || note 'implement: the --auto review round does not look for an edited test or a silenced check'
 printf '%s' "$impf" | grep -q 'This run cannot clear either for itself' ||
   note 'implement: an --auto run can clear its own edited test or suppression with a reason it wrote'
 printf '%s' "$impf" | grep -q 'goes under `## Notes` with its reason' ||

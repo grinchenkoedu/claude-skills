@@ -7,7 +7,7 @@ runs: 1
 execution:
   max_turns: 40
   timeout_seconds: 1200
-  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, Agent]
   prompt: "/gku:fix clamp 15 0 10 prints 0, it should print 10"
 context:
   scaffold_script: setup.sh

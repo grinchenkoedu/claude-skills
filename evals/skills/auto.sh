@@ -54,8 +54,9 @@ inauto 'rm -f "$root/.gku/auto-run"' || note 'implement: --auto never removes th
 # The shape of an unattended run.
 inauto 'Ask everything at the start' || note 'implement: --auto does not front-load its questions, so it will stop mid-run instead'
 inauto 'at most three rounds' || note 'implement: the review-fix-test cycle has no bound and can grind forever'
-inauto 'Review the diff from scratch' || note 'implement: --auto has no review step, so nothing reads the diff before the pull request'
-inauto 'This is a self-review: say so' || note 'implement: --auto passes its own review off as an independent one'
+inauto 'Review the diff in a fresh context' || note 'implement: --auto has no review step, so nothing reads the diff before the pull request'
+inauto 'dispatch `gku:reviewer`' || note 'implement: --auto reviews its own diff in the context that wrote it'
+inauto 'which rounds `gku:reviewer` reviewed' || note 'implement: --auto calls its review independent without saying which rounds were'
 inauto '## When an autonomous run stops' || note 'implement: --auto never says what is worth stopping for'
 inauto 'Stopping is not halting' || note 'implement: a stopped run leaves the work nowhere the developer can pick it up'
 
