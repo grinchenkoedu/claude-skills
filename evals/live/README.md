@@ -7,7 +7,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 
 | Case | What it proves |
 |---|---|
-| `review-catches-defect` | `/gku:review` reports a planted defect the tests miss, and edits nothing |
+| `review-catches-defect` | `/gku:review` reports a planted defect the tests miss, writes the report a blocker calls for, and changes no code |
 | `review-quiet-on-correct` | `/gku:review` says "Ready to push" on a correct, tested change that checks its input |
 | `fix-red-first` | `/gku:fix` shows its test failing before the fix and passing after |
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
@@ -77,6 +77,15 @@ files, `Agent` granted in every case. `--json` reports `costUsd`, `turns` and
 function validating its input and the verdict graded by regex, three runs on 2026-11-01:
 0.06 USD · 0 turns · 15 s · 3/3, nits only.
 
+`review-catches-defect` changed after it too. Its `writes-nothing` grader counted Write calls,
+so it failed the run on `main` that wrote the blocker report with Write and missed the two that
+wrote it through Bash. The new graders check that a report exists under `.gku/reports/`, that no
+other file was created, and that `lib/math.sh` still has the defect. They show a regression
+#53 brought: the forked reviewer on Sonnet writes the report the skill asks for in 1 run of 3
+(three runs each on 2026-11-01: 0/3, then 1/3 with the rule ahead of the answer, then 1/3 with
+its own step 5b), where the inline review on `main` wrote it in 3 of 3. About 0.055 USD and 21 s
+a run.
+
 What the rows say, and what they do not:
 
 - **A review on its own costs about a quarter.** Most of that is the model: the fork runs on
@@ -91,9 +100,10 @@ What the rows say, and what they do not:
 - The failures are graders and variance, both sides: `review-quiet-on-correct` rated a real
   `$(( ))` injection a WARNING in 2 runs before and 1 after, against a fixture that called it
   correct (see the line under the table); `review-catches-defect` before wrote the report the
-  skill asks for on a blocker, which `writes-nothing` counts against it; `fix-red-first` after
-  has one `reports-both-lines` judge FAIL. `fix-red-first` and `review-after-long-build` are
-  scored with the graders now in their case files, re-applied to the kept traces: the judges
-  they replace failed a correct run on each side.
+  skill asks for on a blocker, which its old `writes-nothing` grader counted against it (see
+  under the table); `fix-red-first` after has one `reports-both-lines` judge FAIL.
+  `fix-red-first` and `review-after-long-build` are scored with the graders now in their case
+  files, re-applied to the kept traces: the judges they replace failed a correct run on each
+  side.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
