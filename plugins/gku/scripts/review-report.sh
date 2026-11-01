@@ -43,12 +43,15 @@ common="$(cd "$dir" 2>/dev/null && git rev-parse --git-common-dir 2>/dev/null)"
 [ -n "$common" ] && root="$(cd "$dir" && cd "$common/.." 2>/dev/null && pwd)"
 [ -f "${root:-$dir}/.gku/auto-run" ] && exit 0
 
-# The verdict is the first line with text in it. Without jq the message is
-# still JSON-escaped, so its \n escapes become the line breaks here.
+# The verdict: of the first five lines with text in them, the first that names a blocker or
+# says "ready". A heading above it is passed over, and the body's own BLOCKER sections, further
+# down, are never reached. Without jq the message is still JSON-escaped, so its \n escapes
+# become the line breaks here.
+pick='NF { n++; if (tolower($0) ~ /blocker|ready/) { print; exit } } n >= 5 { exit }'
 if [ -n "$has_jq" ]; then
-  verdict="$(printf '%s' "$input" | jq -r '.last_assistant_message // empty' 2>/dev/null | awk 'NF { print; exit }')"
+  verdict="$(printf '%s' "$input" | jq -r '.last_assistant_message // empty' 2>/dev/null | awk "$pick")"
 else
-  verdict="$(field last_assistant_message '.last_assistant_message' | awk '{ gsub(/\\n/, "\n"); print }' | awk 'NF { print; exit }')"
+  verdict="$(field last_assistant_message '.last_assistant_message' | awk '{ gsub(/\\n/, "\n"); print }' | awk "$pick")"
 fi
 printf '%s' "$verdict" | grep -Eiq '(^|[^a-z])blockers?([^a-z]|$)' || exit 0
 printf '%s' "$verdict" | grep -Eiq '(^|[^a-z])(no|zero|0) blockers?' && exit 0

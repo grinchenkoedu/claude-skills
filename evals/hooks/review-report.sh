@@ -64,6 +64,9 @@ cases() {
 2|false|**2 blockers first**|none|no
 2|false|**1 blocker first**|none|no
 2|false|**Don't push yet: there's 1 blocker.**|none|no
+# sent back — a heading or a note above the verdict does not hide it
+2|false|# Review of feature/x\n\n**1 blocker first**|none|no
+2|false|No task file, so no criteria to check.\n**2 blockers first**|none|no
 # sent back — the skill text names the path, which is not a write
 2|false|**1 blocker first**|mention|no
 # sent back — no transcript to read is no proof of a report
@@ -79,6 +82,9 @@ cases() {
 0|false|**Ready to push**|none|no
 0|false|**Ready, with 2 warnings worth a look**|none|no
 0|false|**Ready to push** — no blockers|none|no
+0|false|# Review of feature/x\n\n**Ready to push**|none|no
+# let it stop — the verdict is clean; a BLOCKER heading further down is the body, not the verdict
+0|false|**Ready, with 1 warning worth a look**\n\n**BLOCKER** none\n- x|none|no
 # let it stop — a retry already, or nobody watching
 0|true|**2 blockers first**|none|no
 0|false|**2 blockers first**|none|yes
