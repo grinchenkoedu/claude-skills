@@ -884,6 +884,14 @@ instead:
   a verdict that names a blocker, with no report written, is sent back once to write it. It
   fires for that agent only, never on your own work, and stays out of an unattended `--auto`
   run.
+- **A second opinion from another agent, when you want one.** `bin/gku-agents` lists the agent
+  CLIs installed here that gku can run read-only — `agy`, `copilot` and `opencode`. When it
+  finds one, `/gku:review` and `/gku:pr-review` end by offering it. If you say yes, you pick the
+  agents, and each one reads the same diff in a read-only mode a probe proved; your code goes
+  to that agent's vendor, which is why it is asked, never assumed.
+  `reference/second-opinion.md` checks every finding it returns against the code before
+  reporting it. It is never offered under `--auto`, or when the review found a committed
+  secret.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a
