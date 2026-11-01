@@ -82,6 +82,7 @@ done
 case " $listed " in *' gemini '*) note 'gku-agents: lists gemini, which was left out on purpose' ;; esac
 has "$ref" 'agy -p "<prompt>" --mode plan' || note 'reference: agy runs without --mode plan'
 has "$ref" '--deny-tool shell --deny-tool write' || note 'reference: copilot runs with shell or write allowed'
+has "$ref" '--disable-builtin-mcps --available-tools view glob grep' || note 'reference: copilot runs with MCP or non-read tools available'
 has "$ref" '"permission":{"*":"deny"' || note 'reference: opencode runs without denying every tool first'
 for grant in '--dangerously-skip-permissions' '--yolo' '--allow-all ' '--allow-all-paths' \
              '--approval-mode yolo' '"bash":"allow"' '"edit":"allow"'; do

@@ -60,7 +60,7 @@ flag, and do not add one that grants a tool:
 | Agent | Command |
 |---|---|
 | `agy` | `agy -p "<prompt>" --mode plan --print-timeout 600s --output-format json` — the review is `.response` |
-| `copilot` | `copilot -p "<prompt>" -s --allow-all-tools --deny-tool shell --deny-tool write --deny-tool url` — the deny rules override the allow |
+| `copilot` | `copilot -p "<prompt>" -s --allow-all-tools --disable-builtin-mcps --available-tools view glob grep --deny-tool shell --deny-tool write --deny-tool url` — only the three read tools exist, no MCP server is loaded, and the deny rules override the allow |
 | `opencode` | `OPENCODE_CONFIG_CONTENT='{"agent":{"gku-second-opinion":{"mode":"primary","description":"read-only reviewer","permission":{"*":"deny","read":"allow","grep":"allow","glob":"allow","list":"allow"}}}}' opencode run --agent gku-second-opinion "<prompt>"` |
 
 **Models and limits:**
