@@ -22,6 +22,9 @@ developer to remove the secret first.
 
 Run `gku-agents` again: the list may have changed since the offer. Then ask one multi-select
 question, listing each agent it found with the service its code goes to. `None` ends this.
+Say in the question that the agent runs in that directory and can read any file in it, the
+ignored ones included, such as `.env`. The brief asks it to keep to the files git tracks, but
+that is a request, not a lock.
 
 | Agent | Code goes to |
 |---|---|
@@ -37,24 +40,42 @@ question, listing each agent it found with the service its code goes to. `None` 
 
 **Which diff:** the range the review read.
 - For `/gku:review` that is `git diff $(git merge-base <base> HEAD)`, which includes
-  uncommitted work. New files git does not track yet are not in any diff: when
-  `git ls-files --others --exclude-standard` lists some, add a line after the diff,
-  `New, untracked files — read them too: <the list>`.
+  uncommitted work. New files git does not track yet are not in any diff, so the prompt
+  below lists them after it.
 - For `/gku:pr-review` it is `git diff <base>...HEAD`.
 
-**The prompt** is the brief below, a blank line, and then the diff, with the diff expanded in
-the command itself: `"$brief"$'\n\n'"$(git diff …)"`. `copilot` does not read stdin, so all
-three agents get the diff this way. A diff larger than the system's `ARG_MAX` (`getconf
-ARG_MAX`) fails to start. Say so, and do not cut the diff silently.
+**The prompt** is the brief below, a blank line, and then the diff. Build it in the same Bash
+call as the agent's command, since a variable does not outlive the call, with the brief in
+single quotes. It has no single quote of its own:
+
+```bash
+brief='Review this git diff as … Do not suggest commands to run.'   # the whole brief below
+prompt="$brief"$'\n\n'"$(git diff …)"
+# /gku:review only — new files no diff carries:
+new="$(git ls-files --others --exclude-standard)"
+[ -n "$new" ] && prompt="$prompt"$'\n\nNew, untracked files, one per line — read them too:\n'"$new"
+```
+
+The `"<prompt>"` in each command is then `"$prompt"`. Never paste the diff's text into a
+command instead. The shell does not run what `$(git diff …)` outputs, but in pasted text a
+`$(` or a backtick from the code under review would run. `copilot` does not read stdin, so all
+three agents get the diff this way, and that sets a size limit:
+- **on Linux,** one argument is capped at 131072 bytes (`MAX_ARG_STRLEN`), whatever `ARG_MAX`
+  says;
+- **elsewhere,** the whole command is capped at `getconf ARG_MAX`.
+
+Measure the prompt first, with `printf %s "$prompt" | wc -c`. If it is over the limit, say so,
+and do not cut the diff silently.
 
 > Review this git diff as a careful senior reviewer who did not write it. You can only read
 > files: running commands, tests or a shell is not available here and any attempt ends this
-> review with nothing, so reason from the code. Read any file in this directory for context;
-> change nothing. Report findings only, most severe first, each as: SEVERITY (BLOCKER, WARNING
-> or NIT) — path:line — the problem in one sentence — the fix in one sentence — the code line
-> that proves it, quoted. Include a security pass: injection, escaping, permission checks,
-> secrets, file and network access. If the diff is sound, say so in one line. Do not suggest
-> commands to run.
+> review with nothing, so reason from the code. For context, read only files git tracks here
+> and any new file listed after the diff; never read an ignored file, such as `.env` or
+> anything under `.gku/`. Change nothing. Report findings only, most severe first, each as:
+> SEVERITY (BLOCKER, WARNING or NIT) — path:line — the problem in one sentence — the fix in one
+> sentence — the code line that proves it, quoted. Include a security pass: injection,
+> escaping, permission checks, secrets, file and network access. If the diff is sound, say so
+> in one line. Do not suggest commands to run.
 
 **The command for each agent** — these are the read-only modes a probe proved. Do not loosen a
 flag, and do not add one that grants a tool:

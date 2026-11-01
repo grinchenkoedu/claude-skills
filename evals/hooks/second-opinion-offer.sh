@@ -38,11 +38,12 @@ setup() { # setup <label> <agents, comma-separated> <auto-run marker yes|no>
   chmod +x "$plug/bin/gku-agents"
 }
 send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id] [stop's message]
-  local want="$1" ev="$2" subject="${3-}" pid="${4-p1}" said="${5-**2 blockers first**}" payload out got=silent a
+  local want="$1" ev="$2" subject="${3-}" pid="${4-p1}" said="${5-**2 blockers first**}" payload out got=silent a idf
+  idf="\"prompt_id\":\"$pid\","; [ "$pid" = - ] && idf=""   # "-": a payload with no prompt_id
   case "$ev" in
-    UserPromptSubmit) payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"$subject\"}" ;;
-    Stop)             payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"$said\"}" ;;
-    PostToolUse)      payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$subject\"},\"tool_response\":\"x\"}" ;;
+    UserPromptSubmit) payload="{\"session_id\":\"s-1\",$idf\"cwd\":\"$dir\",\"hook_event_name\":\"UserPromptSubmit\",\"prompt\":\"$subject\"}" ;;
+    Stop)             payload="{\"session_id\":\"s-1\",$idf\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"$said\"}" ;;
+    PostToolUse)      payload="{\"session_id\":\"s-1\",$idf\"cwd\":\"$dir\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$subject\"},\"tool_response\":\"x\"}" ;;
   esac
   out="$(printf '%s' "$payload" | XDG_RUNTIME_DIR="$work/tmp" "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
   if [ -n "$out" ]; then
@@ -110,6 +111,11 @@ setup stale-note agy no
 send silent UserPromptSubmit '/gku:review' p1
 send silent Stop '' p2
 send silent Stop '' p1
+
+# No prompt_id to tie the note to its stop: no note, so no offer, rather than one that may be stale.
+setup no-prompt-id agy no
+send silent UserPromptSubmit '/gku:review' -
+send silent Stop '' -
 
 # Nothing installed, or nobody watching: no offer by either route.
 setup no-agents '' no
