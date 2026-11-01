@@ -277,8 +277,8 @@ class or receiver.
 
 ## Step 6 — Say it
 
-Return the review as your answer — it lands in the conversation — not in a file. Lead with the
-verdict:
+Return the review as your answer — it lands in the conversation; the one file this step writes
+is the report at its end. Lead with the verdict:
 
 > **Ready to push** — or — **2 blockers first** — or — **Ready, with 3 warnings worth a look**
 
