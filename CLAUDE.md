@@ -1,7 +1,8 @@
 # claude-skills — notes for Claude
 
 A Claude Code plugin, not an application: eleven skills as markdown under `plugins/gku/skills/`,
-shared rules under `plugins/gku/reference/`, two shell scripts, and eval suites that assert the
+shared rules under `plugins/gku/reference/`, three agents, five shell scripts (three hooks under
+`plugins/gku/scripts/`, two helpers under `plugins/gku/bin/`), and eval suites that assert the
 skills still say what they claim. Nothing here runs a product — the "runtime" is a Claude Code
 session that has the plugin installed.
 
@@ -31,6 +32,11 @@ rules for this repository. Do not edit them to change how a skill behaves.
 - **A change to a `SKILL.md` or to `reference/` is code that runs in every session on every
   machine that updates the plugin.** Review it as such. `reference/exec.md` is read at the first
   step of every skill that runs a command, so its length is paid on every run — keep it short.
+- **The scripts `hooks/hooks.json` names run on every prompt, every stop and every skill call in
+  every session the plugin is installed in** — not only in gku runs. That makes
+  `scripts/second-opinion-offer.sh` and `scripts/review-report.sh` the hottest path in the
+  plugin, hotter than `reference/exec.md`: the cheap gate comes first, the common case exits 0
+  silently and fast, and `evals/hooks/` asserts every event it must stay silent on.
 - **One eval suite per rule**, at `evals/<area>/<name>.sh`: each prints one summary line and
   exits non-zero the moment its rule stops holding. Adding a convention to a skill means adding
   or extending a suite; `bash evals/run-all.sh` runs them all and CI runs the same command.
