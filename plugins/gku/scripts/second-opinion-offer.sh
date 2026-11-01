@@ -69,7 +69,10 @@ agents="$("$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):
 [ -n "$agents" ] || exit 0
 
 if [ "$event" = UserPromptSubmit ]; then
-  mkdir -p "$state" 2>/dev/null && str prompt_id > "$pending" 2>/dev/null
+  # No prompt_id, nothing to tie the note to its own stop: no note, rather than one a later
+  # stop could take for its own.
+  id="$(str prompt_id)"
+  [ -n "$id" ] && mkdir -p "$state" 2>/dev/null && printf '%s\n' "$id" > "$pending" 2>/dev/null
   exit 0
 fi
 
