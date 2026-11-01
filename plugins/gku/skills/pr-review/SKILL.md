@@ -131,8 +131,9 @@ with comments authored by `Copilot`).
   style; it approves changes containing infinite loops and broken permissions. Never let it
   soften your verdict.
 
-With `--deep`, one sub-agent on a small fast model may look up callers of changed symbols.
-Otherwise `grep` the worktree yourself for renamed and removed names only.
+With `--deep`, dispatch `gku:scout` with the changed names, old and new, and wait for its
+answer: it looks up their callers and consumers in the worktree; you judge them. Otherwise
+`grep` the worktree yourself for renamed and removed names only.
 
 ## Step 6 — Say it, briefly
 

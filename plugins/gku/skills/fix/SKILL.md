@@ -170,7 +170,7 @@ outstanding, and only for:
 **Scale the investigation to the request.** A missing null check needs a grep and a test run;
 a report of corrupted records needs the row count and the cause before anything is written. The
 cost discipline in `reference/repo-profile.md` still holds — five files read in full, and no
-sub-agent but the reviewer step 2 may dispatch.
+sub-agent but the reviewer and the runner this skill names.
 
 With `--dry-run`, stop here: report the diagnosis, the evidence, and the fix you would make.
 
