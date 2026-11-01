@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: review-quiet-on-correct
-description: "/gku:review stays quiet on a correct, tested change: no blocker, no invented defect."
+description: "/gku:review stays quiet on a correct, tested and input-checked change: its verdict is Ready to push — no blocker, no warning; nits allowed."
 tags: [review]
 plugins: ["../../../plugins/gku"]
 runs: 1
@@ -12,9 +12,13 @@ execution:
 context:
   scaffold_script: setup.sh
 graders:
+  # The verdict, not a judge: /gku:review step 6 says "Ready to push" only with no blocker and
+  # no warning, and the judge this replaces split its votes on near-identical replies.
   - name: no-invented-defect
-    type: llm
-    criteria: "The review raises no BLOCKER and does not claim that percent or its tests are wrong. Nits, style remarks and suggestions are acceptable; a claimed bug in correct code fails."
+    type: regex
+    target: last_message
+    pattern: 'Ready to push'
+    flags: i
   - name: read-only
     type: tool_used
     tool: Edit
