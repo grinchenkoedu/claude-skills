@@ -344,24 +344,10 @@ it is there if they would rather it were applied for them.
 Suggest it; do not run it. This skill does not edit, and the developer decides whether a finding
 is worth acting on.
 
-**Then offer a second opinion, when there is one to offer.** These are the agent CLIs installed
-here that gku can run read-only:
-
-!`gku-agents 2>/dev/null || true`
-
-Offer nothing in any of these cases:
-- the list above is empty;
-- you were dispatched, and read this file because a brief named it — the line above never ran,
-  and nobody is there to say yes;
-- the findings include a committed secret.
-
-Otherwise, put one line after the next step and above the report path, naming the agents found:
-
-> **Second opinion:** `agy` and `copilot` can review this diff too — it is sent to their
-> vendors. Say which, and follow `<plugin root>/reference/second-opinion.md`.
-
-The plugin root is two directories above this skill's base directory. Write it out as an
-absolute path: the session that takes up the offer never saw this file.
+**Do not offer a second opinion yourself.** The plugin's hook,
+`scripts/second-opinion-offer.sh`, has already told the session that started this review which
+agents are installed, and that session asks the developer once your answer is back. A line from
+you would only repeat it.
 
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
 

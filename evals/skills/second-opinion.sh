@@ -7,10 +7,11 @@
 # when there is one to run read-only. The offer sends the developer's code to
 # an outside vendor, so what is checked is the consent around it and the
 # read-only commands, not the wording:
-#   - /gku:review and /gku:pr-review inject gku-agents and point at
-#     reference/second-opinion.md; neither offers on an empty list or a committed
-#     secret, the review never offers when dispatched, and the offer sits above the
-#     report path the review-report hook expects last;
+#   - /gku:review's offer comes from the plugin's hook, wired on UserPromptSubmit
+#     and on PostToolUse for Skill, which withholds it on a committed secret; the
+#     forked reviewer offers nothing itself, since a fork drops a closing line;
+#   - /gku:pr-review injects gku-agents, points at reference/second-opinion.md, and
+#     withholds the offer on an empty list or a committed secret;
 #   - pr-review asks before step 7 removes the worktree the agents read;
 #   - every agent gku-agents can list has its read-only command in the reference,
 #     with the flags a probe proved and none that grant a tool;
@@ -36,17 +37,33 @@ lister="$plugin/bin/gku-agents"
 [ -n "$ref" ] || note 'reference/second-opinion.md is missing'
 
 inject='!`gku-agents 2>/dev/null || true`'
-for s in review pr-review; do
-  body="$rev"; [ "$s" = pr-review ] && body="$prr"
-  has "$body" "$inject" || note "$s: does not inject gku-agents, so it cannot know what to offer"
-  has "$body" 'reference/second-opinion.md' || note "$s: does not point at reference/second-opinion.md"
-  has "$body" 'committed secret' || note "$s: does not withhold the offer when the findings hold a committed secret"
-done
-has "$rev" 'list above is empty' || note 'review: offers with nothing installed'
-has "$rev" 'you were dispatched' || note 'review: a dispatched review may offer, with nobody to say yes'
-has "$rev" 'above the report path' || note 'review: the offer may land below the report path the hook expects last'
-has "$rev" 'absolute path' || note 'review: the offer may name a relative path the main session cannot resolve'
-has "$agent" 'Dispatched, you offer no second opinion' || note 'reviewer.md: a dispatched reviewer may offer'
+has "$prr" "$inject" || note 'pr-review: does not inject gku-agents, so it cannot know what to offer'
+has "$prr" 'reference/second-opinion.md' || note 'pr-review: does not point at reference/second-opinion.md'
+has "$prr" 'committed secret' || note 'pr-review: does not withhold the offer when the findings hold a committed secret'
+has "$prr" 'If the list is empty' || note 'pr-review: offers with nothing installed'
+
+# /gku:review: the hook offers, the fork does not.
+has "$rev" "$inject" && note 'review: the fork injects gku-agents, though it is not the one that offers'
+has "$rev" 'Do not offer a second opinion yourself' || note 'review: the fork may offer, repeating the hook'
+has "$agent" 'You never offer a second opinion' || note 'reviewer.md: the reviewer may offer'
+hooks="$plugin/hooks/hooks.json"
+offer="$plugin/scripts/second-opinion-offer.sh"
+[ -x "$offer" ] || note 'scripts/second-opinion-offer.sh is missing or not executable'
+if command -v python3 >/dev/null 2>&1; then
+  python3 - "$hooks" <<'PY' || note 'hooks.json: second-opinion-offer.sh is not wired on UserPromptSubmit and on PostToolUse for Skill'
+import json, sys
+h = json.load(open(sys.argv[1]))["hooks"]
+def wired(event, matcher=None):
+    return any((matcher is None or e.get("matcher") == matcher)
+               and any("second-opinion-offer.sh" in x.get("command", "") for x in e.get("hooks", []))
+               for e in h.get(event, []))
+sys.exit(0 if wired("UserPromptSubmit") and wired("PostToolUse", "Skill") else 1)
+PY
+else
+  grep -q 'second-opinion-offer.sh' "$hooks" 2>/dev/null || note 'hooks.json: second-opinion-offer.sh is not wired'
+fi
+has "$(flat "$offer")" 'committed secret' || note 'the offer hook does not withhold the offer on a committed secret'
+has "$(flat "$offer")" 'auto-run' || note 'the offer hook speaks during an unattended run'
 
 # pr-review: the offer is step 6b, before step 7 removes the worktree the agents read.
 six_b="$(grep -n '^## Step 6b — Offer a second opinion' "$plugin/skills/pr-review/SKILL.md" | cut -d: -f1)"

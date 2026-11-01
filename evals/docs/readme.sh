@@ -42,7 +42,8 @@ for doc in README.md README.uk.md; do
     'gku:scout' \
     'hooks/hooks.json' \
     'gku-agents' \
-    'second-opinion.md'
+    'second-opinion.md' \
+    'second-opinion-offer.sh'
   do
     grep -qE "$token" "$f" || note "$doc: never mentions ${token%%|*}"
   done

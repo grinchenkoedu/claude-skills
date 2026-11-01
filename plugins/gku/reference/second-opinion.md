@@ -1,8 +1,13 @@
 # A second opinion — another agent reads the same diff
 
-`/gku:review` and `/gku:pr-review` end by offering this when `gku-agents` lists an agent CLI
-gku can run read-only. A different model, from a different vendor, misses different things;
-this is how its findings reach the conversation without being taken on trust.
+Both review skills end with this offer when `gku-agents` lists an agent CLI gku can run
+read-only:
+- for `/gku:review`, the plugin's hook `scripts/second-opinion-offer.sh` gives the offer to the
+  session that started the review, because the forked reviewer drops a closing line;
+- `/gku:pr-review` makes the offer at its step 6b.
+
+A different model, from a different vendor, misses different things. This is how its findings
+reach the conversation without being taken on trust.
 
 **You are here because the developer said yes to that offer.** Saying yes is consent to send
 code to an outside service, and it covers this run only. Never start this unasked, never under
