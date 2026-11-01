@@ -14,6 +14,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `implement-auto-review-trap` | `--auto` catches a defect an earlier step left and the tests miss |
 | `implement-auto-reading-trap` | `--auto` catches an earlier step's change to code the task protects, which no test or criterion shows |
 | `review-after-long-build` | `/gku:review` run after a build in the same session still names that change |
+| `review-offers-second-opinion` | after a typed `/gku:review`, the session asks once whether the agent CLIs installed here should review the diff too, and runs none — needs `agy`, `copilot` or `opencode` on the machine; `setup.sh` stops with the reason otherwise |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
@@ -93,8 +94,8 @@ the three, so the hook is what holds the rule. A blocker review now costs about 
 37 s instead of 0.055 and 21 s. A clean one is not sent back: `review-quiet-on-correct`, one run,
 "Ready to push", 0.05 USD.
 
-The second-opinion offer (`scripts/second-opinion-offer.sh`) was checked by hand, since a run
-that waits for an answer cannot be graded, on a `review-catches-defect` scaffold on 2026-11-01:
+The second-opinion offer (`scripts/second-opinion-offer.sh`) was first checked by hand on a
+`review-catches-defect` scaffold on 2026-11-01:
 
 - **When the offer was the fork's own closing line,** the review came back without it.
 - **When it came from a `UserPromptSubmit` context,** the fork received it and the caller did
@@ -103,6 +104,14 @@ that waits for an answer cannot be graded, on a `review-catches-defect` scaffold
 - **With the `Stop` hold,** the caller took one turn and asked, naming `agy`, `copilot` and
   `opencode` and their vendors. That was 0.126 USD and 29 s, against 0.115–0.119 without the
   offer.
+
+`review-offers-second-opinion` now grades that last point: the run ends on the question, which
+is what the session's one turn is, and the judge reads it. It rests on the agent CLIs really
+installed on the machine — no stub — so it runs where `gku-agents` lists one and its `setup.sh`
+stops with the reason elsewhere; like every case here it stays out of CI. One run on 2026-11-01,
+with `agy`, `copilot` and `opencode` installed: 0.11 USD · 1 turn · 31 s · 1/1 — the review came
+back with its blocker, the session asked once, named the three and their vendors, and the kept
+trace shows no agent run — the judge reads the last message only, so that part is read by hand.
 
 Then `reference/second-opinion.md` was run with `agy`:
 
