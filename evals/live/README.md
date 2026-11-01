@@ -90,8 +90,8 @@ What the rows say, and what they do not:
   what the inline review missed; the gain measured is context and cost, not catches.
 - The failures are graders and variance, both sides: `review-quiet-on-correct` rated a real
   `$(( ))` injection a WARNING in 2 runs before and 1 after, against a fixture that called it
-  correct (see the line under the table); `review-catches-defect` before wrote the report the skill
-  asks for on a blocker, which `writes-nothing` counts against it; `fix-red-first` after has one
+  correct (see the line under the table); `review-catches-defect` before wrote the report the
+  skill asks for on a blocker, which `writes-nothing` counts against it; `fix-red-first` after has one
   `reports-both-lines` judge FAIL. `fix-red-first` and `review-after-long-build` are scored with
   the graders now in their case files, re-applied to the kept traces: the judges they replace
   failed a correct run on each side.

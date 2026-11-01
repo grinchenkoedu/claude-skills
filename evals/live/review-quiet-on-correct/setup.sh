@@ -2,7 +2,8 @@
 # A branch that adds a correct, tested function — nothing in it is wrong. Correct includes its
 # input: an unvalidated argument in $(( )) runs as code, which the security checklist rates a
 # WARNING even with no untrusted caller yet, so percent takes decimal whole numbers of at most
-# 15 digits (part * 100 cannot overflow), read in base 10 (bash reads 010 as octal), or returns 1.
+# 15 digits, so part * 100 cannot overflow, read in base 10, since bash reads 010 as octal;
+# anything else returns 1.
 set -eu
 . "$(dirname "$0")/../fixture.sh"
 git switch -q -c feature/percent
