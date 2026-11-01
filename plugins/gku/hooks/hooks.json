@@ -1,0 +1,13 @@
+{
+  "description": "Sends a gku:reviewer answer that names a blocker back once when it wrote no report — /gku:review's step 5b, enforced. It fires for gku:reviewer only.",
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "gku:reviewer",
+        "hooks": [
+          { "type": "command", "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/review-report.sh\"" }
+        ]
+      }
+    ]
+  }
+}
