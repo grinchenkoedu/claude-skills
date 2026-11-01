@@ -322,6 +322,13 @@ it here. Carry on with the rest of the list.
 Run the profile's test command, wrapped in its `timeoutTool` where there is one. **A hang is a
 failure.** When there is no timeout tool, say so rather than dropping the bound silently.
 
+**Hand a long run to `gku:runner`** — the Agent tool, then wait for its answer. The brief is the
+exact command, through `exec.prefix` and wrapped in the `timeoutTool` or saying there is none,
+and the directory to run it in. It returns the exit code, the result line and the failures
+verbatim, so the suite's whole output never lands in this session. A suite whose whole output is
+a few lines stays here, and so does the red-then-green proof of step 6: it is the evidence the
+developer reads.
+
 Quote the runner's actual result line as evidence. Not "tests pass" — the line it printed;
 `reference/exec.md` says what counts as fresh evidence, including why a green suite is not
 proof that the reported bug is gone.

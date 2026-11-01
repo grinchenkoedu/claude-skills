@@ -103,8 +103,11 @@ gap, and the report must say so** — silence is not coverage.
 
 ## Step 4 — Run the tests
 
-Run the profile's test command, wrapped in its `timeoutTool`. Prefer the scoped form first
-(the tests covering what changed), then widen if it is quick.
+Run the profile's test command, wrapped in its `timeoutTool`. Prefer the scoped form first (the
+tests covering what changed), then widen if it is quick. A wide run that prints more than a few
+lines — and the same command on the base branch, below — goes to `gku:runner` with the Agent
+tool: the brief is the exact command through `exec.prefix` and the directory, and it returns the
+exit code, the result line and the failures verbatim. Wait for its answer.
 
 - **Quote the runner's actual result line.** "Tests pass" is not evidence; `OK (43 tests, 118
   assertions)` is.

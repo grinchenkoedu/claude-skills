@@ -22,8 +22,9 @@ it too. A bare `php` or `pytest` for one quick check is how a run tests the wron
 
 A claim about tests, lint, a build, a fixed bug or a met criterion is made **only with output
 run in this turn, quoted**; "should", "probably", "looks correct", "Done!" and "all green"
-without that line are not claims. The proof a bug is fixed is the original symptom re-run — a
-green suite is not it, since the suite had no test for the bug.
+without that line are not claims. A line `gku:runner` returns verbatim from a run it made this
+turn is that output. The proof a bug is fixed is the original symptom re-run — a green suite is
+not it, since the suite had no test for the bug.
 
 ## Host fallback
 

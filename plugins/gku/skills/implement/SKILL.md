@@ -258,6 +258,12 @@ Run the profile's test command. Wrap it with the profile's `timeoutTool` where t
 **a hang is a failure**, not a reason to wait. When there is no timeout tool available, say so
 rather than dropping the timeout silently.
 
+**Hand a long run to `gku:runner`** — the Agent tool, then wait for its answer. The brief is the
+exact command, through `exec.prefix` and wrapped in the `timeoutTool` or saying there is none,
+and the directory to run it in. It returns the exit code, the result line and the failures
+verbatim, so the suite's whole output never lands in this session. A scoped run, and a suite
+whose whole output is a few lines, stay here — dispatching them costs more than they print.
+
 Quote the actual result line as evidence. Not "tests pass" — the line the runner printed.
 That is `reference/exec.md`'s rule on fresh evidence, and it covers every claim in step 6's
 report: the build, the lint, each criterion.

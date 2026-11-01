@@ -52,7 +52,8 @@ a question asked into an empty room stops the run for nothing.
 3. **Fix** what it found — smallest change per finding, one commit each, the way `/gku:fix`
    does. A finding you disagree with is answered with the file and line that answers it, not
    silently dropped.
-4. **Prove it** — lint and the profile's test command, results quoted (`reference/exec.md`).
+4. **Prove it** — lint and the profile's test command, through `gku:runner` as step 5 says,
+   results quoted (`reference/exec.md`).
 
 Repeat 2–4 until a round finds nothing worth fixing, **at most three rounds**. A finding that
 survives two rounds of fixing will not fall to a third: stop and report it with what you tried.
