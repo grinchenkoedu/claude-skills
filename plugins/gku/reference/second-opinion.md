@@ -22,6 +22,9 @@ developer to remove the secret first.
 
 Run `gku-agents` again: the list may have changed since the offer. Then ask one multi-select
 question, listing each agent it found with the service its code goes to. `None` ends this.
+Say in the question that the agent runs in that directory and can read any file in it, the
+ignored ones included, such as `.env`. The brief asks it to keep to the files git tracks, but
+that is a request, not a lock.
 
 | Agent | Code goes to |
 |---|---|
@@ -49,12 +52,13 @@ ARG_MAX`) fails to start. Say so, and do not cut the diff silently.
 
 > Review this git diff as a careful senior reviewer who did not write it. You can only read
 > files: running commands, tests or a shell is not available here and any attempt ends this
-> review with nothing, so reason from the code. Read any file in this directory for context;
-> change nothing. Report findings only, most severe first, each as: SEVERITY (BLOCKER, WARNING
-> or NIT) — path:line — the problem in one sentence — the fix in one sentence — the code line
-> that proves it, quoted. Include a security pass: injection, escaping, permission checks,
-> secrets, file and network access. If the diff is sound, say so in one line. Do not suggest
-> commands to run.
+> review with nothing, so reason from the code. For context, read only files git tracks here
+> and any new file listed after the diff; never read an ignored file, such as `.env` or
+> anything under `.gku/`. Change nothing. Report findings only, most severe first, each as:
+> SEVERITY (BLOCKER, WARNING or NIT) — path:line — the problem in one sentence — the fix in one
+> sentence — the code line that proves it, quoted. Include a security pass: injection,
+> escaping, permission checks, secrets, file and network access. If the diff is sound, say so
+> in one line. Do not suggest commands to run.
 
 **The command for each agent** — these are the read-only modes a probe proved. Do not loosen a
 flag, and do not add one that grants a tool:
