@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: review-catches-defect
-description: "/gku:review finds a defect the tests miss: clamp returns the lower bound above the range."
+description: "/gku:review finds a defect the tests miss (clamp returns the lower bound above the range), writes the report a blocker calls for, and changes no code."
 tags: [review]
 plugins: ["../../../plugins/gku"]
 runs: 1
@@ -20,8 +20,20 @@ graders:
     tool: Edit
     min: 0
     max: 0
-  - name: writes-nothing
-    type: tool_used
-    tool: Write
-    min: 0
-    max: 0
+  # The defect is a blocker, so /gku:review writes a report under .gku/reports/ — and nothing
+  # else. A Write count could not say that: it failed the run that followed the rule with Write
+  # and missed the ones that wrote the report through Bash. These look at the result instead.
+  - name: reports-the-blocker
+    type: file_exists
+    path: ".gku/reports/review-*.md"
+    exists: true
+  - name: writes-only-its-report
+    type: regex
+    target: files
+    match: not_contains
+    pattern: '^(?!.*\.gku/reports/).+$'
+    flags: m
+  - name: code-untouched
+    type: regex
+    target: { source: file, path: lib/math.sh }
+    pattern: '-gt "\$hi" \]; then\s+echo "\$lo"'

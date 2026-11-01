@@ -275,10 +275,26 @@ a caller the plan listed and the build missed breaks as surely as one nobody lis
 whole tree, skipping what step 2 skips. A name too common to search alone is searched with its
 class or receiver.
 
+## Step 5b — Write the report, when the review needs one
+
+Write a report file **only** with `--report`, or when there is at least one blocker. Decide that
+now, from the findings above — not after step 6, because step 6's answer is the last thing you
+send, and a report left for after it is never written.
+
+Neither applies → skip to step 6. Either does:
+
+1. Make the directory and check it is ignored, as `reference/reports.md` in this plugin says.
+2. Write the review — what step 6 is about to return, in full — to
+   `.gku/reports/review-<branch-slug>-<timestamp>.md` with the Write tool. Never the repository
+   root.
+3. Keep its absolute path; step 6 ends with it.
+
+A review with a blocker and no report file is unfinished.
+
 ## Step 6 — Say it
 
-Return the review as your answer — it lands in the conversation — not in a file. Lead with the
-verdict:
+Return the review as your answer — it lands in the conversation — and when step 5b wrote a
+report, end with its absolute path on its own line. Lead with the verdict:
 
 > **Ready to push** — or — **2 blockers first** — or — **Ready, with 3 warnings worth a look**
 
@@ -328,11 +344,6 @@ Suggest it; do not run it. This skill does not edit, and the developer decides w
 is worth acting on.
 
 Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
-
-Write a report file **only** with `--report`, or when there is at least one blocker. It goes to
-`.gku/reports/review-<branch-slug>-<timestamp>.md` — never the repository root — per
-`reference/reports.md` in this plugin, which also covers creating the directory and making sure
-it is ignored. Print its absolute path.
 
 ## Rules
 

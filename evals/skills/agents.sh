@@ -47,6 +47,13 @@ rev="$skills/review/SKILL.md"
 [ "$(field "$rev" context)" = fork ] || note 'review: does not run in a fresh context (context: fork)'
 [ "$(field "$rev" agent)" = gku:reviewer ] || note 'review: forks onto something other than gku:reviewer'
 [ "$(field "$rev" background)" = false ] || note 'review: forks in the background, so its answer arrives after the turn'
+# The fork returns the review as its answer and still writes the report on a blocker: a line
+# telling it "not in a file" is what made it skip the report once.
+revf="$(flat "$rev")"
+printf '%s' "$revf" | grep -qF 'with `--report`, or when there is at least one blocker' ||
+  note 'review: no longer writes a report on a blocker'
+printf '%s' "$revf" | grep -qF 'not in a file' &&
+  note 'review: says "not in a file", which a forked reviewer reads as no report on a blocker'
 
 # The skills that review without being /gku:review dispatch the same agent, with
 # facts only — a brief that says what to expect is the bias the fork avoids.
