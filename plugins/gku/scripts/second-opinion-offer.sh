@@ -19,8 +19,9 @@
 # marks an unattended run, and gku-agents lists at least one agent. It runs on
 # every prompt, every stop and every skill call in every session the plugin is
 # on, so each event's cheap check comes first and nothing else runs otherwise.
-# The pending note lives in $TMPDIR, keyed by session, never in the repository,
-# and the Stop removes it before blocking — one offer per review, whatever
+# The pending note lives in a directory only this user can write — $XDG_RUNTIME_DIR where the
+# system gives one, ~/.cache otherwise, never a shared /tmp — keyed by session and never in the
+# repository, and the Stop removes it before blocking: one offer per review, whatever
 # stop_hook_active says.
 
 input="$(cat)"
@@ -30,7 +31,8 @@ str() { # str <key> — that JSON string value, still escaped
 }
 event="$(str hook_event_name)"
 session="$(str session_id | tr -cd 'A-Za-z0-9-')"
-pending="${TMPDIR:-/tmp}/gku-second-opinion-${session:-none}"
+state="${XDG_RUNTIME_DIR:-$HOME/.cache}/gku"
+pending="$state/second-opinion-${session:-none}"
 
 # The cheap check for each event: is this /gku:review?
 case "$event" in
@@ -67,7 +69,7 @@ agents="$("$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):
 [ -n "$agents" ] || exit 0
 
 if [ "$event" = UserPromptSubmit ]; then
-  str prompt_id > "$pending" 2>/dev/null
+  mkdir -p "$state" 2>/dev/null && str prompt_id > "$pending" 2>/dev/null
   exit 0
 fi
 

@@ -10,7 +10,7 @@
 # session, and what each must print: "silent", "block" (a Stop decision naming
 # every installed agent and the reference's absolute path) or "context" (a
 # PostToolUse additionalContext saying the same). The script runs from a copy of
-# the plugin's layout, with a stub gku-agents beside it and its own TMPDIR.
+# the plugin's layout, with a stub gku-agents beside it and its own XDG_RUNTIME_DIR.
 #
 # Exits 0 when every case matches, 1 otherwise, naming each mismatch.
 
@@ -44,7 +44,7 @@ send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id
     Stop)             payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"Stop\",\"stop_hook_active\":false,\"last_assistant_message\":\"$said\"}" ;;
     PostToolUse)      payload="{\"session_id\":\"s-1\",\"prompt_id\":\"$pid\",\"cwd\":\"$dir\",\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Skill\",\"tool_input\":{\"skill\":\"$subject\"},\"tool_response\":\"x\"}" ;;
   esac
-  out="$(printf '%s' "$payload" | TMPDIR="$work/tmp" "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
+  out="$(printf '%s' "$payload" | XDG_RUNTIME_DIR="$work/tmp" "$plug/scripts/second-opinion-offer.sh" 2>/dev/null)"
   if [ -n "$out" ]; then
     case "$out" in
       *'"decision":"block"'*) got=block ;;
@@ -64,6 +64,9 @@ send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id
 # A typed review: silent on the prompt, one block on its stop, nothing on the next.
 setup typed agy,copilot,opencode no
 send silent UserPromptSubmit '/gku:review'
+# …and its note is in this user's own directory, not a shared /tmp.
+ls "$work/tmp/gku/second-opinion-s-1" >/dev/null 2>&1 ||
+  { printf 'FAIL  typed: no note under XDG_RUNTIME_DIR/gku\n'; fails=$((fails + 1)); }
 send block  Stop
 send silent Stop
 
