@@ -55,8 +55,13 @@ prompt="$brief"$'\n\n'"$(git diff …)"
 ```
 
 The `"<prompt>"` in each command is then `"$prompt"`. `copilot` does not read stdin, so all
-three agents get the diff this way. A diff larger than the system's `ARG_MAX` (`getconf
-ARG_MAX`) fails to start. Say so, and do not cut the diff silently.
+three agents get the diff this way, and that sets a size limit:
+- **on Linux,** one argument is capped at 131072 bytes (`MAX_ARG_STRLEN`), whatever `ARG_MAX`
+  says;
+- **elsewhere,** the whole command is capped at `getconf ARG_MAX`.
+
+Measure the prompt first, with `printf %s "$prompt" | wc -c`. If it is over the limit, say so,
+and do not cut the diff silently.
 
 > Review this git diff as a careful senior reviewer who did not write it. You can only read
 > files: running commands, tests or a shell is not available here and any attempt ends this
