@@ -55,6 +55,9 @@ send() { # send <want silent|block|context> <event> [prompt or skill] [prompt_id
     printf '%s' "$out" | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null || got=invalid-json
     case "$out" in *"$plug/reference/second-opinion.md"*) ;; *) got="$got-no-reference" ;; esac
     for a in ${agents//,/ }; do case "$out" in *"$a"*) ;; *) got="$got-missing-$a" ;; esac; done
+    # The offer is one AskUserQuestion dialog with None on it; asked in prose it gets missed.
+    case "$out" in *AskUserQuestion*) ;; *) got="$got-no-dialog" ;; esac
+    case "$out" in *None*) ;; *) got="$got-no-none" ;; esac
   fi
   if [ "$got" != "$want" ]; then
     printf 'FAIL  %-28s %-16s %-22s want=%s got=%s\n' "$label" "$ev" "${subject:--}" "$want" "$got"

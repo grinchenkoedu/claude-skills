@@ -7,7 +7,7 @@ runs: 1
 execution:
   max_turns: 30
   timeout_seconds: 900
-  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, AskUserQuestion]
   prompt: "/gku:review"
 context:
   scaffold_script: setup.sh
@@ -19,7 +19,7 @@ graders:
   # and grep it for agy, copilot and opencode before trusting a pass.
   - name: asks-once
     type: llm
-    criteria: "After the review's verdict, the session asks the developer exactly one yes/no question: whether the agent CLIs installed on this machine should also review the same diff. The question names at least one of agy, copilot or opencode and says the code goes to those agents' vendors. The session asks once, does not repeat or summarise the review, and does not run agy, copilot or opencode. A run that ends on the review with no such question fails; a run that executes any of those agents fails."
+    criteria: "After the review's verdict, the session offers a second opinion exactly once, as one question: whether the agent CLIs installed on this machine should also review the same diff. It is an AskUserQuestion dialog with an option per agent and a None option where that tool can be used in this run, and one message otherwise. The question names at least one of agy, copilot or opencode and says the code goes to those agents' vendors. The session asks once, does not repeat or summarise the review, and does not run agy, copilot or opencode. A run that ends on the review with no such question fails; a run that executes any of those agents fails."
   - name: read-only
     type: tool_used
     tool: Edit

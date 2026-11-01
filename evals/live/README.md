@@ -112,6 +112,10 @@ stops with the reason elsewhere; like every case here it stays out of CI. One ru
 with `agy`, `copilot` and `opencode` installed: 0.11 USD · 1 turn · 31 s · 1/1 — the review came
 back with its blocker, the session asked once, named the three and their vendors, and the kept
 trace shows no agent run — the judge reads the last message only, so that part is read by hand.
+With the offer made an AskUserQuestion dialog (the prose question had gone unread in a real
+session), one run on 2026-11-02: 0.17 USD · 2 turns · 29 s · 1/1 — the eval session has no
+dialog tool, so it fell back to one message listing the three agents and `none`, which is what
+the judge accepts in that case.
 
 Then `reference/second-opinion.md` was run with `agy`:
 
