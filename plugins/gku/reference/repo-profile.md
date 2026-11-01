@@ -306,8 +306,11 @@ Each of these missing, in code that writes to the database, is a blocker — not
 These skills are built to be run often on a modest plan, so every one of them obeys the same
 limits. If you are extending a skill, keep them.
 
-- **No sub-agents by default.** At most one, only behind an explicit `--deep` flag, and pinned
-  to a small fast model since its job is mechanical scanning.
+- **Sub-agents only as the plugin's own, each pinned to a model in `plugins/gku/agents/`.**
+  `gku:reviewer` (Sonnet) does every review, in a fresh context; `gku:runner` (Haiku) runs a
+  long test or lint and returns only its failures; `gku:scout` (Haiku) sweeps, only behind
+  `--deep`. Never a general-purpose agent, never two at once. The guard does not see a
+  sub-agent's commands, so each agent's prompt forbids them itself.
 - **Never spawn background agent fleets or workflow runs.** A single session does the work.
 - **Read the diff, not the repository.** Full-file reads are capped at the five highest-risk
   files; everything else is judged from the diff. `/gku:audit` is the one exception — it has no

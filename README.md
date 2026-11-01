@@ -12,8 +12,9 @@ pull request, deal with the comments on yours, and prove the result actually wor
 
 They work in any repository — nothing here is tied to a particular project, language or
 framework. They are also written to be **economical**, so they are usable on a modest Claude
-plan: no background agent swarms, no parallel sub-agents by default, and answers in the chat
-instead of a pile of generated report files. That is measured, not only promised: the cases in
+plan: no background agent swarms, no parallel sub-agents, and answers in the chat instead of a
+pile of generated report files. The few sub-agents they use are their own, each on a pinned
+model, and each there to keep your session's context short rather than to add work. That is measured, not only promised: the cases in
 `evals/live/` run the skills in real sessions, and `evals/live/README.md` says how to measure
 them on your own model and plan.
 
@@ -542,7 +543,8 @@ land without it; a plan that turns out not to reach its goal comes back to you b
 is built differently; everything else is reported at the end and left alone. An implementation
 that wanders is one nobody can review.
 
-**`--auto` runs the whole cycle unattended** — build, review its own diff, fix what that found,
+**`--auto` runs the whole cycle unattended** — build, have `gku:reviewer` review the diff in a
+fresh context, fix what that found,
 run the tests, and round again until nothing is left — then pushes the branch and opens the pull
 request. A task big enough to need several branches gets several pull requests, each based on
 the one before it and saying so. It asks everything it needs at the start, in one batch, and
@@ -565,9 +567,14 @@ watching, merging happens when you ask for it, and not a moment earlier.
 /gku:review
 /gku:review --deep
 /gku:review --report
+/gku:review --manual
 ```
 
-**The one to use every day.** Run it before you push. It reads your changes, applies your
+**The one to use every day.** Run it before you push. It runs in a **fresh context**, on the
+plugin's own `gku:reviewer` agent: it never saw the conversation that wrote the change, so it
+judges the diff rather than the intentions behind it, and your long session is not re-read to
+do it. When the branch has a task file, it first says which **acceptance criteria** the diff
+meets — met, partly, missing — with the line that shows each. Then it applies your
 repository's own conventions (from `AGENTS.md`, `CLAUDE.md` or whatever the project has), and
 gives you a list sorted by severity:
 
@@ -599,8 +606,14 @@ standing between a syntax error and a live site. It will tell you when the linte
 language version than the project targets — passing a PHP 8 parser proves nothing about a
 project that declares `>=7.4`.
 
-`--deep` allows one helper agent to double-check callers of code you renamed or whose
-signature you changed. It costs more; use it when you have touched shared code.
+It checks **who depends on what changed**: callers of a function you renamed, removed or whose
+signature you changed, and consumers of a contract — a field in serialized output, an API or
+web-service definition, an event, a configuration key or its default, a database column. One it
+cannot see, such as a public API's outside users, is named rather than assumed safe. `--deep`
+hands that sweep to `gku:scout` over the whole tree; it costs more, so use it when you have
+touched shared code. A mistake the repository is likely to repeat gets a proposed line for
+`.gku/learned.md`, which `/gku:fix` records when it fixes the finding. `--manual` says the
+branch was built by hand, since the review cannot see you say so in the chat.
 
 It ends by naming the next command — `/gku:fix` when there is something to fix, `/gku:pr` when
 there is not. It never applies anything itself.
@@ -857,7 +870,14 @@ instead:
   as long as it runs, and while that file is there `gh pr merge`, `gh release`, `gh workflow run`
   and the `gh api` call that merges are all refused. In a session you are watching, a merge you
   ask for is yours to ask for and the guard stays out of it. `gh pr ready` is allowed either way:
-  `/gku:pr` offers it when the work behind a draft is finished.
+  `/gku:pr` offers it when the work behind a draft is finished. **The guard sees the main
+  session only**: a skill's hook does not reach a sub-agent's commands, so each of the agents
+  below forbids the same commands in its own instructions, and none has a job that needs one.
+- **Three agents of its own**, in `plugins/gku/agents/`, each on a pinned model. `gku:reviewer`
+  (Sonnet, may write only its report) is what `/gku:review` runs on, and what `/gku:fix` and
+  each `--auto` review round dispatch. `gku:runner` (Haiku) runs a long test suite or lint and
+  returns the exit code, the result line and the failures verbatim, so the full output never
+  enters your session. `gku:scout` (Haiku) does the mechanical sweep, and only with `--deep`.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a
@@ -894,7 +914,10 @@ workflows, reading whole repositories) are deliberately absent.
 
 How they keep the cost down:
 
-- **No sub-agents by default.** At most one, only when you ask with `--deep`.
+- **Sub-agents only where they save context, never in parallel.** A review runs on
+  `gku:reviewer` in a fresh context, so it does not re-read a long session; a long test run goes
+  to `gku:runner` on a small model and comes back as its failures; `gku:scout` sweeps only when
+  you ask with `--deep`. Each is pinned to its model in its own file.
 - **The stack is detected once**, then cached in `.claude/repo-profile.json` and reused by every
   skill. Add that file to `.gitignore` — it describes your machine.
 - **Reading is capped.** At most five files read in full; everything else judged from the
@@ -1001,7 +1024,8 @@ frontmatter.
 Keep to the conventions the existing skills follow, because they are what make these usable on
 a limited plan:
 
-- no sub-agents by default, at most one behind `--deep`;
+- sub-agents only as the plugin's own, under `plugins/gku/agents/`, each pinned to the
+  cheapest model that does its job — never a general-purpose one, never several at once;
 - no background workflows or agent fleets;
 - read the diff, not the repository, with an explicit cap;
 - no internet unless the skill is about the internet — and then capped, with nothing private in
