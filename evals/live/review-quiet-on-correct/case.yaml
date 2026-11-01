@@ -14,8 +14,8 @@ context:
 graders:
   # The verdict, not a judge: /gku:review step 6 says "Ready to push" only with no blocker and
   # no warning, and the judge this replaces split its votes on near-identical replies. Anchored
-  # to the start, where the verdict leads: unanchored, "ready to push once that is fixed" after a
-  # blocker would pass.
+  # to the start, where the verdict leads: unanchored, a blocker followed by "ready to push once
+  # that is fixed" would pass.
   - name: verdict-ready-to-push
     type: regex
     target: last_message
