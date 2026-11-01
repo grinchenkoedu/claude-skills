@@ -281,7 +281,8 @@ Write a report file **only** with `--report`, or when there is at least one bloc
 now, from the findings above — not after step 6, because step 6's answer is the last thing you
 send, and a report left for after it is never written.
 
-Neither applies → skip to step 6. Either does:
+Neither applies, or the brief of an unattended `--auto` run says to write no report → skip to
+step 6; the plugin's hook leaves an unattended run alone too. Otherwise:
 
 1. Make the directory and check it is ignored, as `reference/reports.md` in this plugin says.
 2. Write the review — what step 6 is about to return, in full — to
