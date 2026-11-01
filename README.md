@@ -878,6 +878,12 @@ instead:
   each `--auto` review round dispatch. `gku:runner` (Haiku) runs a long test suite or lint and
   returns the exit code, the result line and the failures verbatim, so the full output never
   enters your session. `gku:scout` (Haiku) does the mechanical sweep, and only with `--deep`.
+- **A hook that holds the reviewer to its report.** `/gku:review` writes a report under
+  `.gku/reports/` whenever it finds a blocker, and a forked reviewer forgets that more often than
+  not. `plugins/gku/hooks/hooks.json` runs `scripts/review-report.sh` when `gku:reviewer` stops:
+  a verdict that names a blocker, with no report written, is sent back once to write it. It
+  fires for that agent only, never on your own work, and stays out of an unattended `--auto`
+  run.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a

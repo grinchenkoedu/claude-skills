@@ -39,7 +39,8 @@ for doc in README.md README.uk.md; do
     'evals/live/README.md' \
     'gku:reviewer' \
     'gku:runner' \
-    'gku:scout'
+    'gku:scout' \
+    'hooks/hooks.json'
   do
     grep -qE "$token" "$f" || note "$doc: never mentions ${token%%|*}"
   done
