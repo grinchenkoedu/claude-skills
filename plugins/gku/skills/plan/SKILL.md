@@ -34,7 +34,8 @@ Quotes are optional — arguments are not shell-parsed, so the text arrives as t
 They are only useful for marking where prose ends when a flag follows it.
 - `--review` — a brief that already proposes a solution: judge that proposal instead of
   designing a fresh one (see step 7).
-- `--deep` — allow one sub-agent for mechanical code search on a large unfamiliar area.
+- `--deep` — hand the code search over a large unfamiliar area to `gku:scout`, the plugin's
+  sweeping agent on a small fast model.
 - `--manual` — write the plan for a **person** to build by hand rather than for
   `/gku:implement`: the same investigation, a different file (see step 6b).
 
@@ -96,9 +97,9 @@ solves this is the best possible outcome: point at it and stop. Look before you 
 
 Read the profile's `standardsDoc` for the conventions the plan must follow.
 
-With `--deep`, one sub-agent on a small fast model may sweep a large unfamiliar area for
-relevant files. Otherwise search yourself — in a repository this size, `grep` is faster than
-a sub-agent and costs nothing.
+With `--deep`, dispatch `gku:scout` with the terms and the area, and wait for its answer: it
+sweeps a large unfamiliar area and returns the files and lines; you judge them. Otherwise search
+yourself — in a repository this size, `grep` is faster than a sub-agent and costs nothing.
 
 ## Step 3 — Check the facts
 

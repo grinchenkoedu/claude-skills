@@ -35,19 +35,25 @@ a question asked into an empty room stops the run for nothing.
 **The cycle, per branch.** Build → review → fix → prove:
 
 1. **Build** the steps as step 3 says, committing as each lands.
-2. **Review the diff from scratch** — `git diff <base>...HEAD`, read as if somebody else wrote
-   it, against the plan's criteria, the repository's conventions and
-   `reference/security-checklist.md` — and for the two ways a build goes green without being
-   right: an existing test edited to pass (`/gku:review` step 4), a check silenced instead of
-   satisfied (step 3's WARNING list there). This run cannot clear either for itself: one it
-   keeps goes under `## Notes` with its reason, for a person to judge, and is not a finding for
-   the next round. Judge the diff, not your memory of writing it. This is a self-review: say
-   so in the report and in the pull request, because it is weaker than a `/gku:review` that
-   comes to the code fresh, and a body that hides that oversells the change.
+2. **Review the diff in a fresh context** — dispatch `gku:reviewer` with the Agent tool and wait
+   for its answer. It never saw the build, so it judges the diff rather than a memory of writing
+   it, and the build's long context is not re-read for it. The brief gives the absolute path of
+   `review/SKILL.md` beside this skill's base directory; the range — `<base>...HEAD` in round 1,
+   the fix commits since the previous round's HEAD after that; the task file's path; and that
+   nobody is watching, so it writes no report file. Nothing else — not what you think the
+   commits do, nor what an earlier round found: a reviewer told what to expect checks that, and
+   the fresh look is lost. It reviews the way `/gku:review` does: the plan's criteria first, the
+   conventions, `reference/security-checklist.md`, and the two ways a build goes green without
+   being right — an existing test edited to pass, a check silenced instead of satisfied. This
+   run cannot clear either for itself: one it keeps goes under `## Notes` with its reason, for a
+   person to judge, and is not a finding for the next round. Say in the report and in the pull
+   request which rounds `gku:reviewer` reviewed — a body that calls a review independent should
+   be able to show it.
 3. **Fix** what it found — smallest change per finding, one commit each, the way `/gku:fix`
    does. A finding you disagree with is answered with the file and line that answers it, not
    silently dropped.
-4. **Prove it** — lint and the profile's test command, results quoted (`reference/exec.md`).
+4. **Prove it** — lint and the profile's test command, through `gku:runner` as step 5 says,
+   results quoted (`reference/exec.md`).
 
 Repeat 2–4 until a round finds nothing worth fixing, **at most three rounds**. A finding that
 survives two rounds of fixing will not fall to a third: stop and report it with what you tried.

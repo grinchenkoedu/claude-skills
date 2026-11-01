@@ -7,15 +7,23 @@ runs: 1
 execution:
   max_turns: 40
   timeout_seconds: 1200
-  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write]
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, Agent]
   prompt: "/gku:fix clamp 15 0 10 prints 0, it should print 10"
 context:
   scaffold_script: setup.sh
 graders:
-  - name: red-before-green
-    type: llm
-    focus: trace
-    criteria: "Before lib/math.sh is edited, a test for clamp above the upper bound is written and run, and that run fails. After lib/math.sh is edited, the same test runs and passes. Both runs appear in the trace in that order."
+  # The judge of an llm grader sees only the first and last 12 messages of a
+  # trace, and the red run sits in the middle; these two see all of it.
+  - name: red-run-printed
+    type: regex
+    target: trace
+    # A tool result's content, not stdout: a Bash call that exits non-zero — the
+    # red run usually does — is recorded with no stdout field at all.
+    pattern: '"type":"tool_result","content":"(?:[^"\\]|\\.)*FAIL clamp above'
+  - name: tests-run-before-the-edit
+    type: tool_order
+    before: { tool: Bash, input_match: 'tests/run\.sh' }
+    after: { tool: Edit, input_match: 'lib/math\.sh' }
   - name: reports-both-lines
     type: llm
     criteria: "The final report quotes the test's failing result from before the fix and its passing result after it."

@@ -44,10 +44,12 @@ flat "$skills/review/SKILL.md" | grep -q 'Modify: paths' || note 'review: does n
 plf="$(flat "$skills/plan/SKILL.md")"
 printf '%s' "$plf" | grep -q 'lists those callers under Modify:' || note 'plan: a step that changes a signature does not list its callers'
 revf="$(flat "$skills/review/SKILL.md")"
-printf '%s' "$revf" | grep -q 'symbols and those with a changed signature' ||
+printf '%s' "$revf" | grep -q 'every one whose signature changed' &&
+  printf '%s' "$revf" | grep -q 'for what is renamed, removed or changed only' ||
   note 'review: the caller grep skips symbols whose signature changed'
-printf '%s' "$revf" | grep -q 'every call site. It returns the list; you judge it' ||
-  note 'review: the --deep sub-agent decides which callers break, or skips changed signatures'
+printf '%s' "$revf" | grep -q 'gku:scout with the list of names, old and new' &&
+  printf '%s' "$revf" | grep -q 'returns the hits; you judge them' ||
+  note 'review: the --deep scout decides which callers break, or is not given the names'
 printf '%s' "$revf" | grep -q 'grep the whole tree' ||
   note 'review: a changed signature is grepped in Modify: paths only, where the plan already fixed the callers'
 printf '%s' "$revf" | grep -q 'skipping what step 2 skips' ||

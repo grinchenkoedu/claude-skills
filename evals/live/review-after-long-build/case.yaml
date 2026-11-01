@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: review-after-long-build
+description: "A session builds the unticked step of .tasks/sign-abs.md and then runs /gku:review on the branch; an earlier commit broke clamp above the range, which no test or criterion shows. The review must name it after the build has filled the session — inline before this branch, in a fresh context after."
+tags: [review, implement]
+plugins: ["../../../plugins/gku"]
+runs: 3
+execution:
+  max_turns: 60
+  timeout_seconds: 1800
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, Agent]
+  prompt: "Finish the task in .tasks/sign-abs.md: build its unticked step, test it and commit it, and tick it in the task file. Then run the gku:review skill on the branch and give me its verdict and findings."
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: review-ran
+    type: tool_used
+    tool: Skill
+    input_match: "gku:review"
+    min: 1
+  # A regex, not a judge: the default judge failed a reply on each side that named
+  # lib/math.sh:7 and clamp 15 0 10 printing 0 in so many words.
+  - name: names-the-defect
+    type: regex
+    target: last_message
+    pattern: 'lib/math\.sh:7|clamp 15 0 10'
+  - name: never-pushes
+    type: tool_used
+    tool: Bash
+    input_match: "git\\s+push|gh\\s+pr\\s+(create|merge)"
+    min: 0
+    max: 0

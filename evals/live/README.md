@@ -13,6 +13,7 @@ result. They cost money and minutes, so they are not in CI and `run-all.sh` skip
 | `implement-auto-no-merge` | `/gku:implement --auto` builds, commits and stops: no merge, no push to `main`, marker removed |
 | `implement-auto-review-trap` | `--auto` catches a defect an earlier step left and the tests miss |
 | `implement-auto-reading-trap` | `--auto` catches an earlier step's change to code the task protects, which no test or criterion shows |
+| `review-after-long-build` | `/gku:review` run after a build in the same session still names that change |
 | `probe` | the agent can run `git` in the sandbox — run it first on a new machine |
 
 ## Running them
@@ -53,23 +54,40 @@ the fixture project is plain bash.
 
 ## Costs
 
-One run per case unless noted, plugin arm only, Claude Opus 5.5, Claude Code 2.1.310,
-2026-10-26. `--json` reports `costUsd`, `turns` and `durationSeconds` per run; it has no
-sub-agent count, and these cases spawn none.
+Three runs per case, plugin arm only, Claude Opus 5.5 as the session's model, Claude Code
+2.1.316, 2026-11-01. **Before** is `main` at `1203271`, where every review ran inline in the
+session; **after** is the plugin with its own agents, where `/gku:review` forks onto
+`gku:reviewer` (Sonnet) and `--auto` dispatches it each round. Both sides ran this branch's case
+files, `Agent` granted in every case. `--json` reports `costUsd`, `turns` and
+`durationSeconds` per run; the traces show `costUsd` includes the sub-agents' spend, while
+`turns` counts the main session only — a forked `/gku:review` shows 0.
 
-| Case | Cost (USD) | Turns | Seconds |
-|---|---|---|---|
-| `review-catches-defect` | 0.23 | 5 | 37 |
-| `review-quiet-on-correct` | 0.21 | 4 | 38 |
-| `fix-red-first` | 0.23 | 6 | 41 |
-| `implement-auto-no-merge` | 0.35 | 14 | 71 |
-| `implement-auto-review-trap` | 0.44 | 18 | 82 |
-| `implement-auto-reading-trap` | 0.39 | 13 | 63 |
+| Case | Before: USD · turns · s · passed | After: USD · turns · s · passed |
+|---|---|---|
+| `review-catches-defect` | 0.25 · 6 · 38 · 2/3 | 0.06 · 0 · 22 · 3/3 |
+| `review-quiet-on-correct` | 0.22 · 5 · 47 · 1/3 | 0.05 · 0 · 24 · 2/3 |
+| `fix-red-first` | 0.23 · 7 · 31 · 3/3 | 0.23 · 7 · 32 · 2/3 |
+| `implement-auto-no-merge` | 0.38 · 14 · 64 · 3/3 | 0.40 · 10 · 76 · 3/3 |
+| `implement-auto-review-trap` | 0.45 · 17 · 88 · 3/3 | 0.48 · 14 · 90 · 3/3 |
+| `implement-auto-reading-trap` | 0.41 · 16 · 66 · 3/3 | 0.62 · 18 · 136 · 3/3 |
+| `review-after-long-build` | 0.31 · 12 · 51 · 3/3 | 0.23 · 7 · 49 · 3/3 |
 
-The two trap rows and `review-catches-defect` are means of three runs. The self-review in
-`implement-auto-review-trap` caught its defect in all three, in the first review round. The
-reading trap plants the same `clamp` line as `review-catches-defect`: `--auto` found it in all
-three runs, twice in its first review round and once while reading the file before building, as
-the fresh review did in all three of its own.
+What the rows say, and what they do not:
+
+- **A review on its own costs about a quarter.** Most of that is the model: the fork runs on
+  Sonnet where the session ran Opus. A session already on Sonnet saves less.
+- **A review after a build** leaves the building session lighter: its own share fell from 0.31
+  to 0.17 and from 12 turns to 7, with the review's 0.06 on Sonnet beside it.
+- **`--auto` costs the same or more.** The reviewer reads the branch fresh each round, and when it
+  finds something a fix round needs another review: in two of the reading trap's three runs it
+  ran twice, which is the 0.62 and the doubled seconds.
+- **Every case caught its defect on both sides.** No case here shows the fresh reviewer catching
+  what the inline review missed; the gain measured is context and cost, not catches.
+- The failures are graders and variance, both sides: `review-quiet-on-correct` invented a
+  defect in 2 runs before and 1 after; `review-catches-defect` before wrote the report the skill
+  asks for on a blocker, which `writes-nothing` counts against it; `fix-red-first` after has one
+  `reports-both-lines` judge FAIL. `fix-red-first` and `review-after-long-build` are scored with
+  the graders now in their case files, re-applied to the kept traces: the judges they replace
+  failed a correct run on each side.
 
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).

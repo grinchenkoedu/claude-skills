@@ -36,7 +36,10 @@ for doc in README.md README.uk.md; do
     '\-\-manual' \
     'reference/language.md' \
     'evals/run-all.sh' \
-    'evals/live/README.md'
+    'evals/live/README.md' \
+    'gku:reviewer' \
+    'gku:runner' \
+    'gku:scout'
   do
     grep -qE "$token" "$f" || note "$doc: never mentions ${token%%|*}"
   done

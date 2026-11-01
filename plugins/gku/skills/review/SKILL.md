@@ -1,9 +1,12 @@
 ---
 name: review
-description: Review your own changes before you push or open a pull request — a severity-rated list of what to fix, checked against the repository's own conventions, a lint pass over the changed files, its tests, a security pass over the well-known flaws (injection, escaping, login and permission checks, CSRF, secrets, files, outbound requests), and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
-argument-hint: "[branch] [--target <base>] [--deep] [--report]"
+description: Review your own changes before you push or open a pull request, in a fresh context that never saw them being written — a severity-rated list of what to fix, which acceptance criteria the diff meets, checked against the repository's own conventions, a lint pass over the changed files, its tests, a security pass over the well-known flaws (injection, escaping, login and permission checks, CSRF, secrets, files, outbound requests), and the failure modes that green tests miss. Ends by naming the next step. Review-only; never edits, commits or pushes.
+argument-hint: "[branch] [--target <base>] [--manual] [--deep] [--report]"
 user-invocable: true
 disallowed-tools: Edit, NotebookEdit
+context: fork
+agent: gku:reviewer
+background: false
 ---
 
 # /gku:review — check your own work before anyone else sees it
@@ -13,12 +16,20 @@ reviewer would say, so you fix it before a bot or a colleague finds it.
 
 Review-only. It never edits your code, never commits, never pushes, never posts anything.
 
+**It runs in a fresh context**, on the plugin's `gku:reviewer` agent: it does not see the
+conversation that wrote the change, and nothing from that conversation costs it a token. What it
+needs, it reads — the branch, the task file, the commit bodies, and the arguments below. The
+review comes back into the conversation as its answer, where `/gku:fix` finds it.
+
 ## Arguments
 
 - `branch` — branch to review. Defaults to the current one.
 - `--target <base>` — what to compare against. Defaults to the profile's base branch.
-- `--deep` — allow one sub-agent to cross-check callers of changed code. Costs more; use it
-  for changes that touch shared code.
+- `--manual` — the branch was built by hand. The task file's `**Mode:** manual` line says the
+  same; this is how you say it when there is no task file, since the review cannot see you say
+  it in the conversation.
+- `--deep` — hand step 5's caller and consumer lookup to `gku:scout`, on a small fast model, to
+  sweep the whole tree. Costs more; use it for changes that touch shared code.
 - `--report` — also write a report file under `.gku/reports/`. By default the review stays in
   the conversation.
 
@@ -83,11 +94,11 @@ file that merely mentions the marker — a plan *about* manual mode, a brief quo
 review that mistakes one of those for a hand-built branch stops recommending the skill the
 developer wanted.
 
-Or take the developer's word for it in the conversation. No match is not proof of the
-opposite: `.tasks/` is git-ignored, so another machine, a deleted plan or the worktree
-`/gku:pr-review` reads has no file to find. Review it as an ordinary branch then — and if the
-diff looks hand-built and you had nothing to check, say so in one line rather than assuming
-either way.
+Or take the developer's word for it: `--manual` in the arguments, or the line the brief that
+dispatched this review carries. No match is not proof of the opposite: `.tasks/` is git-ignored,
+so another machine, a deleted plan or the worktree `/gku:pr-review` reads has no file to find.
+Review it as an ordinary branch then — and if the diff looks hand-built and you had nothing to
+check, say so in one line rather than assuming either way.
 
 Then decide what to read. Do not read everything — rank by risk and read down the list until
 the budget is spent:
@@ -106,6 +117,20 @@ the budget is spent:
 review which files you judged from the diff alone. An honest limit beats a silent one.
 
 Skip `vendor/`, `node_modules/`, build output, and anything generated.
+
+## Step 2b — The criteria, before the code
+
+When a task file matches the branch, check its acceptance criteria before anything else. A
+diff can be clean, tested and well named and still not do what was asked; that is the miss no
+later step looks for.
+
+For each criterion: **met**, **partly**, **missing** or **not yet** (its step is unticked — a
+branch mid-build is not judged on work nobody has claimed), and the line that shows it — the
+code, the test that asserts it, or the command whose output does. "Met" with no line is
+"partly". A criterion a ticked step claims and the diff does not meet is a WARNING; a BLOCKER
+when the criterion guards data, a permission or the live site.
+
+No task file → say so in one line, and skip it. The commit messages are not criteria.
 
 ## Step 3 — Review against this repository
 
@@ -219,17 +244,29 @@ found here costs a minute; found in production it costs a white page.
 - No `lint` command, or `exec` fell back to a host without the toolchain → skip it and say the
   review is unlinted. Never report a lint that did not run.
 
-## Step 5 — Cross-check (only with `--deep`)
+## Step 5 — Who else depends on what changed
 
-One sub-agent, on a small fast model, doing mechanical lookup only: for each function, class
-or method the diff renamed, moved or removed, find everything that still refers to the old
-name — and for each whose signature changed (a parameter added, dropped or reordered, a return
-type changed), every call site. It returns the list; you judge it. A reference to an old name
-is a BLOCKER, and so is a call site the new signature breaks.
+A change that passes every test here can still break whoever reads what it produces. Two kinds
+of dependant, both checked:
 
-Without `--deep`, do this yourself with `grep` for the *renamed and removed* symbols and those
-with a changed signature only — that is the case where a missed caller breaks the site — and
-skip the rest.
+- **Callers** — every function, class or method the diff renamed, moved or removed, and every
+  one whose signature changed (a parameter added, dropped or reordered, a return type changed).
+- **Consumers of a contract** — a shape something outside the changed lines relies on: the
+  fields of serialized output (JSON, XML, an array stored or returned), an API or web-service
+  definition (a route, `db/services.php`, an OpenAPI file), an event's name or payload, a
+  configuration key or its default, a database column's name or type. Changed or removed — not
+  added; a new optional field breaks nobody.
+
+For each, find the dependants with `grep` and judge them. A reference to an old name, a call
+the new signature breaks, a consumer reading a field that is gone or now means something else —
+each is a BLOCKER. A contract whose consumers live outside this repository — a public API, a
+mobile app, another service — cannot be grepped: say so, and a breaking change to it with no
+version or deprecation path is a WARNING that names who has to be told.
+
+**With `--deep`**, dispatch `gku:scout` with the list of names, old and new, and wait for its
+answer: it sweeps the whole tree and returns the hits; you judge them. Without `--deep`, grep
+yourself, for what is renamed, removed or changed only — that is where a missed dependant breaks
+the site — and skip the rest.
 
 **The task file narrows it.** When the branch has one, its steps name their `Modify:` paths;
 those are where a moved symbol was moved *from*, so grep them first. It is the difference
@@ -240,13 +277,29 @@ class or receiver.
 
 ## Step 6 — Say it
 
-Write the review **in the conversation**, not to a file. Lead with the verdict:
+Return the review as your answer — it lands in the conversation — not in a file. Lead with the
+verdict:
 
 > **Ready to push** — or — **2 blockers first** — or — **Ready, with 3 warnings worth a look**
+
+When step 2b ran, the criteria come next, before any finding — one row each:
+
+| Criterion | Status | Shown by |
+|---|---|---|
+| <the criterion, shortened> | met / partly / missing / not yet | `<path:line>` or the command |
 
 Then, per finding, one bullet: absolute `path:line`, one sentence on the problem, one
 sentence on the fix, and the line of evidence. Group by severity, blockers first. Collapse
 nits into a single short list.
+
+**When a finding is a kind of mistake this repository will make again** — the same defect in a
+second place, or a rule the standards doc does not state and this diff broke — propose one line
+for `.gku/learned.md`, dated, about the repository rather than this change:
+
+> Proposed for `.gku/learned.md`: `<date> — <the rule, in one line>`
+
+Propose it; do not write it. `/gku:fix` records it when it fixes the finding. Most reviews have
+nothing to propose; say nothing then.
 
 Close with one line naming what you checked and did not find problems in — conventions, lint,
 tests, data safety, wiring, **and the security pass by its parts** (injection, escaping,
