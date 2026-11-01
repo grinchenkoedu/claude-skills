@@ -93,6 +93,25 @@ the three, so the hook is what holds the rule. A blocker review now costs about 
 37 s instead of 0.055 and 21 s. A clean one is not sent back: `review-quiet-on-correct`, one run,
 "Ready to push", 0.05 USD.
 
+The second-opinion offer (`scripts/second-opinion-offer.sh`) was checked by hand, since a run
+that waits for an answer cannot be graded, on a `review-catches-defect` scaffold on 2026-11-01:
+
+- **When the offer was the fork's own closing line,** the review came back without it.
+- **When it came from a `UserPromptSubmit` context,** the fork received it and the caller did
+  not: a typed forked skill runs as a local command, and the main model took no turn
+  (`turns 0`).
+- **With the `Stop` hold,** the caller took one turn and asked, naming `agy`, `copilot` and
+  `opencode` and their vendors. That was 0.126 USD and 29 s, against 0.115–0.119 without the
+  offer.
+
+Then `reference/second-opinion.md` was run with `agy`:
+
+- **Its first brief came back empty.** `agy` tried a command, the headless mode denied it, and
+  the turn ended with no answer.
+- **The brief that says commands are unavailable** returned the clamp blocker at
+  `lib/math.sh:7`, which agrees with the review, in 59 s and about 50k `agy` tokens. The
+  scaffold was unchanged.
+
 What the rows say, and what they do not:
 
 - **A review on its own costs about a quarter.** Most of that is the model: the fork runs on

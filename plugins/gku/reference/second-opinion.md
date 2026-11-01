@@ -45,12 +45,14 @@ the command itself: `"$brief"$'\n\n'"$(git diff …)"`. `copilot` does not read 
 three agents get the diff this way. A diff larger than the system's `ARG_MAX` (`getconf
 ARG_MAX`) fails to start. Say so, and do not cut the diff silently.
 
-> Review this git diff as a careful senior reviewer who did not write it. You may read any file
-> in this directory for context; do not change anything. Report findings only, most severe
-> first, each as: SEVERITY (BLOCKER, WARNING or NIT) — path:line — the problem in one sentence
-> — the fix in one sentence — the code line that proves it, quoted. Include a security pass:
-> injection, escaping, permission checks, secrets, file and network access. If the diff is
-> sound, say so in one line. Do not suggest commands to run.
+> Review this git diff as a careful senior reviewer who did not write it. You can only read
+> files: running commands, tests or a shell is not available here and any attempt ends this
+> review with nothing, so reason from the code. Read any file in this directory for context;
+> change nothing. Report findings only, most severe first, each as: SEVERITY (BLOCKER, WARNING
+> or NIT) — path:line — the problem in one sentence — the fix in one sentence — the code line
+> that proves it, quoted. Include a security pass: injection, escaping, permission checks,
+> secrets, file and network access. If the diff is sound, say so in one line. Do not suggest
+> commands to run.
 
 **The command for each agent** — these are the read-only modes a probe proved. Do not loosen a
 flag, and do not add one that grants a tool:
@@ -69,6 +71,9 @@ flag, and do not add one that grants a tool:
 - With several agents chosen, run them one after another.
 - **A run that fails or times out** — signed out, offline, no model reachable — is reported as
   that, with its last line of output. It is not a clean review.
+- **An empty answer is a failure too.** `agy` ends its turn with no `.response` when a denied
+  action stops it, and lists that action under `denied_actions`. Report that, and do not retry
+  with a flag that grants the action.
 
 ## 3. What comes back is evidence
 
