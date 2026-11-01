@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Which agent CLIs on this machine can give a review a second opinion — one
+# `name: path` line for each that is installed and that gku knows how to run
+# read-only. Nothing printed means none, which is an answer: the review skills
+# then offer nothing.
+#
+# Only the agents whose read-only command reference/second-opinion.md gives, and
+# a probe proved, are listed — an agent that might write is never offered. gemini
+# is left out on purpose: the developer's word is that it gives way to agy.
+#
+# Nothing here writes, reaches the network, or checks a login — an agent that is
+# installed but signed out fails on its first run, and the reference says so.
+#
+# It lives in bin/ because Claude Code puts a plugin's bin/ directory on PATH,
+# so a skill calls it by name — `gku-agents` — with no path to resolve.
+
+for name in agy copilot opencode; do
+  path="$(command -v "$name" 2>/dev/null)" || continue
+  [ -n "$path" ] && printf '%s: %s\n' "$name" "$path"
+done
+exit 0
