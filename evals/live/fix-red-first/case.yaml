@@ -17,7 +17,9 @@ graders:
   - name: red-run-printed
     type: regex
     target: trace
-    pattern: '"stdout":"(?:[^"\\]|\\.)*FAIL clamp above'
+    # A tool result's content, not stdout: a Bash call that exits non-zero — the
+    # red run usually does — is recorded with no stdout field at all.
+    pattern: '"type":"tool_result","content":"(?:[^"\\]|\\.)*FAIL clamp above'
   - name: tests-run-before-the-edit
     type: tool_order
     before: { tool: Bash, input_match: 'tests/run\.sh' }

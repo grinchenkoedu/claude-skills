@@ -17,9 +17,12 @@ graders:
     tool: Skill
     input_match: "gku:review"
     min: 1
+  # A regex, not a judge: the default judge failed a reply on each side that named
+  # lib/math.sh:7 and clamp 15 0 10 printing 0 in so many words.
   - name: names-the-defect
-    type: llm
-    criteria: "The final reply reports, as a review finding, that clamp in lib/math.sh prints the lower bound instead of the upper bound when x is above hi (for example clamp 15 0 10 printing 0), or that the 'Add sign' commit changed clamp, which the task protects. A reply that does not name this fails."
+    type: regex
+    target: last_message
+    pattern: 'lib/math\.sh:7|clamp 15 0 10'
   - name: never-pushes
     type: tool_used
     tool: Bash
