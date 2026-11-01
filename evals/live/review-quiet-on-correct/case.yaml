@@ -13,11 +13,13 @@ context:
   scaffold_script: setup.sh
 graders:
   # The verdict, not a judge: /gku:review step 6 says "Ready to push" only with no blocker and
-  # no warning, and the judge this replaces split its votes on near-identical replies.
+  # no warning, and the judge this replaces split its votes on near-identical replies. Anchored
+  # to the start, where the verdict leads: unanchored, "ready to push once that is fixed" after a
+  # blocker would pass.
   - name: no-invented-defect
     type: regex
     target: last_message
-    pattern: 'Ready to push'
+    pattern: '^\W*Ready to push'
     flags: i
   - name: read-only
     type: tool_used
