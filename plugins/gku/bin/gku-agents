@@ -8,11 +8,20 @@
 # a probe proved, are listed — an agent that might write is never offered. gemini
 # is left out on purpose: the developer's word is that it gives way to agy.
 #
+# A checkout can turn the offer off: a file `.gku/no-second-opinion` at the
+# primary repository's root — the parent of `git rev-parse --git-common-dir`,
+# so a linked worktree reads it there too, as the hooks read `.gku/auto-run` —
+# and nothing is listed, whatever is installed. It is read from the working
+# directory, so a caller asking for another checkout runs this from it.
+#
 # Nothing here writes, reaches the network, or checks a login — an agent that is
 # installed but signed out fails on its first run, and the reference says so.
 #
 # It lives in bin/ because Claude Code puts a plugin's bin/ directory on PATH,
 # so a skill calls it by name — `gku-agents` — with no path to resolve.
+
+common="$(git rev-parse --git-common-dir 2>/dev/null)"
+[ -n "$common" ] && [ -f "$common/../.gku/no-second-opinion" ] && exit 0
 
 for name in agy copilot opencode; do
   path="$(command -v "$name" 2>/dev/null)" || continue
