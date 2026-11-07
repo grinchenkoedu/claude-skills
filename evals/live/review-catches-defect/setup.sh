@@ -17,3 +17,6 @@ clamp() {
 }
 SH
 git commit -qam 'Tidy clamp'
+# This case measures the review alone. With an agent CLI installed the second-opinion offer
+# would take the session's last message, which the judge reads; the marker keeps it quiet.
+mkdir -p .gku && : > .gku/no-second-opinion

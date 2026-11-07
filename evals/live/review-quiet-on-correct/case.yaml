@@ -11,6 +11,7 @@ execution:
   prompt: "/gku:review"
 context:
   scaffold_script: setup.sh
+# The scaffold leaves .gku/no-second-opinion, so no second-opinion offer takes the last message.
 graders:
   # The verdict, not a judge: /gku:review step 6 says "Ready to push" only with no blocker and
   # no warning, and the judge this replaces split its votes on near-identical replies. Anchored

@@ -11,6 +11,7 @@ execution:
   prompt: "/gku:review"
 context:
   scaffold_script: setup.sh
+# The scaffold leaves .gku/no-second-opinion, so no second-opinion offer takes the last message.
 graders:
   - name: finds-the-defect
     type: llm
