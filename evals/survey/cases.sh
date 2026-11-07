@@ -60,6 +60,9 @@ want database-markers 'src/Repo.php'  'php library'
 wantnot database-markers 'CONTRIBUTING.md' 'php library'   # prose about a database is not a database
 printf '%s\n' "$out" | grep -q 'vendor/bin/phpunit' || note "php library: the CI run lines should be quoted"
 case "$(row timeout-tool)" in timeout|gtimeout|none) ;; *) note "php library: timeout-tool must be timeout, gtimeout or none" ;; esac
+# A library has no application entry point: the php-app row must be empty, or the family table,
+# which checks php-app before php-library, would take it for an application.
+[ -z "$(row php-app)" ] || note "php library: php-app row must be empty, got '$(row php-app)'"
 
 # It writes nothing: the fixture is unchanged after the run.
 ( cd "$fix" && [ -z "$(git status --porcelain)" ] ) || note 'the survey changed the tree it surveyed'
@@ -81,6 +84,34 @@ out="$(cd "$mood" && bash "$survey")"
 want moodle    'plugin'      'moodle plugin'
 want manifests 'version.php' 'moodle plugin'
 want database-markers 'db/install.xml' 'moodle plugin'
+
+# A Laravel-shaped application: the template's scope is wider than the in-house layout, and
+# the php-app row has to name the entry points that show it.
+lara="$(mktemp -d)"; fixtures+=("$lara")
+mkdir -p "$lara/app/Http" "$lara/routes" "$lara/public"
+printf '{"name":"x/app","type":"project"}\n' > "$lara/composer.json"
+printf '#!/usr/bin/env php\n<?php\n'          > "$lara/artisan"
+printf '<?php\n'                              > "$lara/public/index.php"
+( cd "$lara" && git init -q . )
+out="$(cd "$lara" && bash "$survey")"
+want php-app       'artisan'          'laravel app'
+want php-app       'public/index.php' 'laravel app'
+want composer-type 'project'          'laravel app'
+want entry-points  'artisan'          'laravel app'
+want moodle        'no'               'laravel app'
+
+# A Symfony-shaped application: src/ and tests/ like a library, so only the entry point and the
+# table's order keep it out of php-library.
+sym="$(mktemp -d)"; fixtures+=("$sym")
+mkdir -p "$sym/bin" "$sym/src" "$sym/tests" "$sym/config" "$sym/public"
+printf '{"name":"x/app","type":"project"}\n' > "$sym/composer.json"
+printf '#!/usr/bin/env php\n<?php\n'          > "$sym/bin/console"
+printf '<?php\n'                              > "$sym/public/index.php"
+( cd "$sym" && git init -q . )
+out="$(cd "$sym" && bash "$survey")"
+want php-app        'bin/console' 'symfony app'
+want entry-points   'bin/console' 'symfony app'
+want library-layout 'src'         'symfony app'
 
 # A command that hangs must not hang the skill this runs before. The fake docker
 # here sleeps for 30s; the survey has to give up on it and finish anyway — and on
