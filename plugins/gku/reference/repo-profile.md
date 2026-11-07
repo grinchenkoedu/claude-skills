@@ -103,7 +103,7 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 |---|---|---|
 | `version.php` with `$plugin->component` + `db/`, `lang/` | `moodle-plugin` | Code cannot run standalone; it needs a Moodle install around it |
 | `wp-content/`, a `style.css` theme header, `functions.php`, or a CMS dependency | `cms` | Built on a core you do not own; the update path is also the security path |
-| `composer.json` that does not say `type: library`, **and** one of: `artisan`, `bin/console`, `application/core/` + `run`, or `type: project` | `php-app` | A PHP application — Laravel, Symfony, a front-controller app, or the in-house MVC layout; the entry point found is its CLI |
+| `composer.json` that does not say `type: library`, **and** one of: `artisan`, `bin/console`, `application/core/` + `run`, or `type: project` | `php-app` | A PHP application — Laravel, Symfony, the in-house MVC layout, or a front-controller app; a CLI found is its entry point, `public/index.php` its HTTP front controller |
 | `composer.json` with `type: library` or with no `type` at all — `library` is Composer's default — or only `src/` + `tests/` | `php-library` | Importable package, tests are the whole runtime surface |
 | `requirements.txt` / `pyproject.toml` | `python-app` | |
 | `package.json` with no PHP | `node` | |
@@ -231,10 +231,11 @@ library.
   caches or tasks, or touching `amd/src/`, `styles.css` or `lang/` requires bumping
   `$plugin->version` in `version.php` or the live site will not see it. This is the single most
   common way a correct-looking change fails in production — treat a missing bump as a blocker.
-- **`php-app`** — the entry point the marker found is the CLI: `./run` with `application/`
+- **`php-app`** — its entry point is the CLI the marker found: `./run` with `application/`
   (`controllers/`, `models/`, `views/`, `commands/`, `core/`), `php artisan` with `app/`, or
-  `bin/console` with `src/`. A repository of this family may have **no tests at all**; skills
-  must not report "tests pass" when what happened is "there are no tests".
+  `bin/console` with `src/`; a front-controller app has `public/index.php` over HTTP instead.
+  A repository of this family may have **no tests at all**; skills must not report "tests
+  pass" when what happened is "there are no tests".
 - **`php-library`** — CI already runs the suite on every push. The tests are the contract.
 
 ## Run things in a container
