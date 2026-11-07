@@ -357,7 +357,8 @@ is worth acting on.
 developer once your answer is back, naming the agents installed. A line from you would only
 repeat it.
 
-Keep it under ~25 lines when clean, ~40 with findings. It is a message to a colleague.
+Keep it short. It is a message to a colleague: a clean review is a few lines, and one with
+findings is as long as its findings and no longer.
 
 ## Rules
 

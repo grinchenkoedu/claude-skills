@@ -99,7 +99,7 @@ Read the profile's `standardsDoc` for the conventions the plan must follow.
 
 With `--deep`, dispatch `gku:scout` with the terms and the area, and wait for its answer: it
 sweeps a large unfamiliar area and returns the files and lines; you judge them. Otherwise search
-yourself — in a repository this size, `grep` is faster than a sub-agent and costs nothing.
+yourself — `grep` is faster than a sub-agent and costs nothing.
 
 ## Step 3 — Check the facts
 
