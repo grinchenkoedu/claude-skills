@@ -67,6 +67,20 @@ case "$(row timeout-tool)" in timeout|gtimeout|none) ;; *) note "php library: ti
 # It writes nothing: the fixture is unchanged after the run.
 ( cd "$fix" && [ -z "$(git status --porcelain)" ] ) || note 'the survey changed the tree it surveyed'
 
+# A library with no composer type and a demo page under public/. Composer takes a missing type
+# as library, and the family table reads it so: the php-app row names the demo page and nothing
+# else, and the composer-type row is empty, which is what keeps this a php-library.
+demo="$(mktemp -d)"; fixtures+=("$demo")
+mkdir -p "$demo/src" "$demo/tests" "$demo/public"
+printf '{"name":"x/y"}\n' > "$demo/composer.json"
+printf '<?php\n'          > "$demo/public/index.php"
+( cd "$demo" && git init -q . )
+out="$(cd "$demo" && bash "$survey")"
+want php-app 'public/index.php' 'typeless library'
+rest="$(row php-app | sed 's#public/index.php##; s/[[:space:]]//g')"
+[ -z "$rest" ] || note "typeless library: php-app row must name only the demo page, got '$(row php-app)'"
+[ -z "$(row composer-type)" ] || note "typeless library: composer-type row must be empty, got '$(row composer-type)'"
+
 # A directory that is not a repository at all.
 bare="$(mktemp -d)"; fixtures+=("$bare")
 out="$(cd "$bare" && bash "$survey" 2>/dev/null)" || note 'a non-repository directory made the survey exit non-zero'

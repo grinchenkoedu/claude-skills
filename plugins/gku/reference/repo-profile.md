@@ -103,16 +103,21 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 |---|---|---|
 | `version.php` with `$plugin->component` + `db/`, `lang/` | `moodle-plugin` | Code cannot run standalone; it needs a Moodle install around it |
 | `wp-content/`, a `style.css` theme header, `functions.php`, or a CMS dependency | `cms` | Built on a core you do not own; the update path is also the security path |
-| `composer.json` whose `type` is not `library`, **and** an entry point: `artisan`, `bin/console`, `public/index.php`, `application/core/` + `run`, or `type: project` | `php-app` | A PHP application — Laravel, Symfony, a front-controller app, or the in-house MVC layout; the entry point found is its CLI |
-| `composer.json` with `type: library`, or only `src/` + `tests/` and none of the entry points above | `php-library` | Importable package, tests are the whole runtime surface |
+| `composer.json` that does not say `type: library`, **and** one of: `artisan`, `bin/console`, `application/core/` + `run`, or `type: project` | `php-app` | A PHP application — Laravel, Symfony, a front-controller app, or the in-house MVC layout; the entry point found is its CLI |
+| `composer.json` with `type: library` or with no `type` at all — `library` is Composer's default — or only `src/` + `tests/` | `php-library` | Importable package, tests are the whole runtime surface |
 | `requirements.txt` / `pyproject.toml` | `python-app` | |
 | `package.json` with no PHP | `node` | |
 | none of the above | `other` | Say so plainly; skills degrade rather than guess |
 
 The rows are checked in this order, and the first that holds wins: a Symfony application has
 `src/` and `tests/` like a library, and only its entry point, read first, keeps it out of
-`php-library`. A bare root `index.php` is not a marker on purpose — Moodle core, WordPress core
-and a library's demo page all carry one, and each would be handed PHP rules that fight its own.
+`php-library`. The survey's `php-app` row lists the files; `type: project` comes from its
+`composer-type` row, which is empty when `composer.json` has no `type`. A bare root `index.php`
+is not a marker on purpose — Moodle core, WordPress core and a library's demo page all carry
+one, and each would be handed PHP rules that fight its own. Nor is `public/index.php` on its
+own: the applications above share it, so the row lists it, but a library with no `type` can
+carry one as a demo page, and without a CLI or `type: project` beside it the repository is a
+library.
 
 4. **Execution environment — decide this before the commands themselves.** See
    "Run things in a container" below. In precedence order:
