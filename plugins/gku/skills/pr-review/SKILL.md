@@ -145,7 +145,8 @@ Then each blocker in two or three sentences: what breaks, when, and the directio
 with an absolute `path:line`. Smells get one line each. Add a short note on what is done well —
 it keeps the review fair. Close with one line on what the earlier layers already covered.
 
-Under ~25 lines for a clean PR, ~40 with findings.
+Short: a clean review is a few lines, and one with findings is as long as its findings and no
+longer.
 
 Write a report file only when there is at least one blocker, or four or more findings, or
 `--report` was passed. It goes to `.gku/reports/pr-review-pr-<n>-<timestamp>.md` in the
