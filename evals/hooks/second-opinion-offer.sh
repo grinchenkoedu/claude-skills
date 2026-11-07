@@ -33,7 +33,11 @@ setup() { # setup <label> <agents, comma-separated> <auto-run marker yes|no>
   dir="$work/cwd"; rm -rf "$dir" "$work/tmp"; mkdir -p "$dir" "$work/tmp"
   ( cd "$dir" && git init -q . )
   [ "$3" = yes ] && mkdir -p "$dir/.gku" && printf 'started\n' > "$dir/.gku/auto-run"
-  { printf '#!/bin/sh\n'; for a in ${agents//,/ }; do printf 'echo "%s: /x/%s"\n' "$a" "$a"; done; } \
+  # The stub answers only from the session's directory: the real gku-agents reads the
+  # .gku/no-second-opinion marker from where it runs, so a hook asking from anywhere else
+  # would read another checkout's answer.
+  { printf '#!/bin/sh\n[ "$PWD" = "%s" ] || exit 0\n' "$dir"
+    for a in ${agents//,/ }; do printf 'echo "%s: /x/%s"\n' "$a" "$a"; done; } \
     > "$plug/bin/gku-agents"
   chmod +x "$plug/bin/gku-agents"
 }

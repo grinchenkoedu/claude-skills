@@ -11,6 +11,7 @@ execution:
   prompt: "Finish the task in .tasks/sign-abs.md: build its unticked step, test it and commit it, and tick it in the task file. Then run the gku:review skill on the branch and give me its verdict and findings."
 context:
   scaffold_script: setup.sh
+# The scaffold leaves .gku/no-second-opinion, so no second-opinion offer takes the last message.
 graders:
   - name: review-ran
     type: tool_used

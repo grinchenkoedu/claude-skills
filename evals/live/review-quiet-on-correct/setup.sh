@@ -36,3 +36,7 @@ check 'percent rejects 16 digits' 'rc=1' "$(percent 1000000000000000 1; echo "rc
 SH
 git add -A
 git commit -qm 'Add percent'
+# This case measures the review alone. With an agent CLI installed the second-opinion offer
+# would take the session's last message, which the verdict regex reads; the marker keeps it
+# quiet.
+mkdir -p .gku && : > .gku/no-second-opinion

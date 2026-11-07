@@ -900,7 +900,9 @@ instead:
   while the run lasts the diff sits in the agent's command line, where any account on your
   machine can read it. `reference/second-opinion.md` checks every finding it returns against
   the code before reporting it. It is never offered under `--auto`, or when the review found a
-  committed secret.
+  committed secret. A checkout whose code must never leave the machine turns the offer off for
+  good: an empty `.gku/no-second-opinion` file at the repository root, and `gku-agents` lists
+  nothing there, whatever is installed.
 - **Frontmatter that matches the descriptions.** The six skills that write carry
   `disable-model-invocation`, so Claude never fires them on its own — they are commands you type.
   The six that promise to read carry `disallowed-tools: Edit, NotebookEdit`: they may write a

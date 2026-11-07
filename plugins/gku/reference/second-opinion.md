@@ -12,7 +12,9 @@ reach the conversation without being taken on trust.
 **The offer is the dialog in section 1, and an agent chosen on it is the consent** to send code
 to an outside service; it covers this run only. Never start a run unasked, never under
 `/gku:implement --auto`, and never for a review that was dispatched rather than run by the
-developer. Nobody is there to consent.
+developer. Nobody is there to consent. And never in a checkout that turned the offer off: an
+empty `.gku/no-second-opinion` at the primary repository's root makes `gku-agents` list
+nothing, and with no list there is nothing to ask.
 
 **One exception overrides the yes:** if the review found a committed secret, stop. The diff
 carries the secret, and sending it would publish it to that vendor. Say so, and leave it to the

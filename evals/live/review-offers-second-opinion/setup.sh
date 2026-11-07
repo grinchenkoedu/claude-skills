@@ -12,3 +12,5 @@ if [ -z "$agents" ]; then
 fi
 printf 'agents the offer can name:\n%s\n' "$agents" >&2
 . "$here/../review-catches-defect/setup.sh"
+# The one case that wants the offer: the scaffold it sources turns it off, so turn it back on.
+rm -f .gku/no-second-opinion

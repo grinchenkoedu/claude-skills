@@ -19,6 +19,9 @@
 # marks an unattended run, and gku-agents lists at least one agent. It runs on
 # every prompt, every stop and every skill call in every session the plugin is
 # on, so each event's cheap check comes first and nothing else runs otherwise.
+# gku-agents is asked from the session's directory: it reads the checkout's
+# .gku/no-second-opinion marker from where it runs, and this hook's own
+# directory is not the checkout.
 # The pending note lives in a directory only this user can write — $XDG_RUNTIME_DIR where the
 # system gives one, ~/.cache otherwise, never a shared /tmp — keyed by session and never in the
 # repository, and the Stop removes it before blocking: one offer per review, whatever
@@ -65,7 +68,7 @@ common="$(cd "$dir" 2>/dev/null && git rev-parse --git-common-dir 2>/dev/null)"
 [ -f "${root:-$dir}/.gku/auto-run" ] && exit 0
 
 plugin="$(cd "$(dirname "$0")/.." && pwd)"
-agents="$("$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):.*/\1/p' | paste -s -d ',' - | sed 's/,/, /g')"
+agents="$(cd "$dir" 2>/dev/null && "$plugin/bin/gku-agents" 2>/dev/null | sed -n 's/^\([a-z][a-z0-9-]*\):.*/\1/p' | paste -s -d ',' - | sed 's/,/, /g')"
 [ -n "$agents" ] || exit 0
 
 if [ "$event" = UserPromptSubmit ]; then
