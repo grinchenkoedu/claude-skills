@@ -84,7 +84,7 @@ say profile-tracked "$(git ls-files --error-unmatch .claude/repo-profile.json >/
 # 3. Family markers
 say manifests "$(present composer.json composer.lock package.json package-lock.json yarn.lock pnpm-lock.yaml pyproject.toml requirements.txt setup.py Pipfile poetry.lock Cargo.toml go.mod Gemfile Makefile version.php)"
 say moodle "$( [ -f version.php ] && grep -q 'plugin->component' version.php 2>/dev/null && echo 'plugin (version.php has $plugin->component)' || echo no)"
-say php-app "$(present application/core application/controllers run)"
+say php-app "$(present application/core application/controllers run artisan bin/console public/index.php)"
 say cms "$(present wp-content functions.php style.css)"
 say library-layout "$(present src tests)"
 say composer-type "$( [ -f composer.json ] && grep -m1 '"type"' composer.json | sed 's/^[[:space:]]*//')"
@@ -106,7 +106,7 @@ say docker "$(command -v docker >/dev/null 2>&1 && (bound 5 docker info --format
 say host-runtimes "$(for c in php python3 node ruby go composer npm; do command -v $c >/dev/null 2>&1 && printf '%s=%s ' "$c" "$($c --version 2>&1 | head -1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -1)"; done)"
 
 # 6/8. Runtime surface and whether a database is in play
-say entry-points "$(present run bin cli main.py app.py index.php public/index.php)"
+say entry-points "$(present run bin cli artisan bin/console main.py app.py index.php public/index.php)"
 say database-markers "$(present schema.sql migrations alembic db/install.xml db/upgrade.php db/tables)$(bound 10 git grep -l -E '\$DB->|get_records?\(|PDO|sqlalchemy|knex|\bSELECT\b' -- '*.php' '*.py' '*.js' '*.ts' '*.rb' '*.go' '*.java' '*.sql' ':!vendor' ':!node_modules' 2>/dev/null | head -3 | tr '\n' ' ')"
 
 # 7. timeoutTool — decided at the top, by behaviour

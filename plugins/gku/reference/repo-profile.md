@@ -104,11 +104,21 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
 |---|---|---|
 | `version.php` with `$plugin->component` + `db/`, `lang/` | `moodle-plugin` | Code cannot run standalone; it needs a Moodle install around it |
 | `wp-content/`, a `style.css` theme header, `functions.php`, or a CMS dependency | `cms` | Built on a core you do not own; the update path is also the security path |
-| `composer.json` **and** `application/core/` + `run` | `php-app` | In-house MVC app; `./run` is the CLI entry point |
-| `composer.json` with `type: library` / only `src/` + `tests/` | `php-library` | Importable package, tests are the whole runtime surface |
+| `composer.json` that does not say `type: library`, **and** one of: `artisan`, `bin/console`, `application/core/` + `run`, or `type: project` | `php-app` | A PHP application — Laravel, Symfony, the in-house MVC layout, or a front-controller app; a CLI found is its entry point, `public/index.php` its HTTP front controller |
+| `composer.json` with `type: library` or with no `type` at all — `library` is Composer's default — or only `src/` + `tests/` | `php-library` | Importable package, tests are the whole runtime surface |
 | `requirements.txt` / `pyproject.toml` | `python-app` | |
 | `package.json` with no PHP | `node` | |
 | none of the above | `other` | Say so plainly; skills degrade rather than guess |
+
+The rows are checked in this order, and the first that holds wins: a Symfony application has
+`src/` and `tests/` like a library, and only its entry point, read first, keeps it out of
+`php-library`. The survey's `php-app` row lists the files; `type: project` comes from its
+`composer-type` row, which is empty when `composer.json` has no `type`. A bare root `index.php`
+is not a marker on purpose — Moodle core, WordPress core and a library's demo page all carry
+one, and each would be handed PHP rules that fight its own. Nor is `public/index.php` on its
+own: the applications above share it, so the row lists it, but a library with no `type` can
+carry one as a demo page, and without a CLI or `type: project` beside it the repository is a
+library.
 
 4. **Execution environment — decide this before the commands themselves.** See
    "Run things in a container" below. In precedence order:
@@ -222,9 +232,11 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
   caches or tasks, or touching `amd/src/`, `styles.css` or `lang/` requires bumping
   `$plugin->version` in `version.php` or the live site will not see it. This is the single most
   common way a correct-looking change fails in production — treat a missing bump as a blocker.
-- **`php-app`** — `application/` holds `controllers/`, `models/`, `views/`, `commands/`,
-  `core/`. `./run` dispatches CLI commands. A repository of this family may have **no tests
-  at all**; skills must not report "tests pass" when what happened is "there are no tests".
+- **`php-app`** — its entry point is the CLI the marker found: `./run` with `application/`
+  (`controllers/`, `models/`, `views/`, `commands/`, `core/`), `php artisan` with `app/`, or
+  `bin/console` with `src/`; a front-controller app has `public/index.php` over HTTP instead.
+  A repository of this family may have **no tests at all**; skills must not report "tests
+  pass" when what happened is "there are no tests".
 - **`php-library`** — CI already runs the suite on every push. The tests are the contract.
 
 ## Run things in a container
