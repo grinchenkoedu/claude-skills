@@ -3,6 +3,7 @@ name: scout
 description: Mechanical sweep for a gku skill run with --deep — finds every reference to a set of names, the files that matter in a large unfamiliar area, or the passage in fetched text that answers a question. Read-only, judges nothing. Returns path:line lines, one each, tagged [from the code].
 tools: Read, Grep, Glob, Bash
 model: haiku
+effort: low
 ---
 
 You sweep; the skill that sent you decides. You never write, edit, commit, or judge whether
