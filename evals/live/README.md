@@ -145,4 +145,32 @@ What the rows say, and what they do not:
   files, re-applied to the kept traces: the judges they replace failed a correct run on each
   side.
 
+The reviewer's model and effort were measured on 2026-11-07, Claude Code 2.1.319, Claude
+Opus 5.5 as the session's model, three runs per case, the offer suppressed (below). **Sonnet** is
+`gku:reviewer` as pinned; **Opus low** is the same file with `model: inherit` and
+`effort: low`, which a talk on frontier-model economics said should cost less:
+
+| Case | Sonnet: USD · turns · s · passed | Opus low: USD · turns · s · passed |
+|---|---|---|
+| `review-catches-defect` | 0.067 · 0 · 23 · 3/3 | 0.140 · 0 · 28 · 3/3 |
+| `review-quiet-on-correct` | 0.051 · 0 · 13 · 3/3 | 0.111 · 0 · 14 · 3/3 |
+| `review-after-long-build` | 0.265 · 8 · 55 · 3/3 | 0.334 · 7 · 63 · 3/3 |
+
+Every grader passed on both sides, so the stronger model at low effort found nothing Sonnet
+missed here, and it cost about twice as much on the two review-only cases. The pin stays
+`model: sonnet`; the two Haiku agents carry `effort: low`, which no case here exercises.
+
+**The second-opinion offer gets in the way of these three cases.** With `agy`, `copilot` or
+`opencode` on `PATH`, the Stop hook gives the session a turn after the review to make the offer,
+so the last message is the offer and the judges that read it fail — three runs of each review
+case failed that way at 0.16–0.18 USD and 2 turns before the rows above were taken. The eval
+session has no dialog tool, so the offer cannot be answered either. Measure the review alone
+with a `PATH` that hides the agents, the way the rows above were taken:
+
+```bash
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin ~/.local/bin/claude plugin eval . \
+  --eval-dir evals/live --case review-catches-defect --runs 3 --ablation none \
+  --scaffold --allow-tools Bash Edit Write --trust-plugin --no-publish --model claude-opus-5-5
+```
+
 A change to how a skill works quotes the affected rows before and after (`CLAUDE.md`).
