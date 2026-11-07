@@ -878,6 +878,10 @@ instead:
   each `--auto` review round dispatch. `gku:runner` (Haiku) runs a long test suite or lint and
   returns the exit code, the result line and the failures verbatim, so the full output never
   enters your session. `gku:scout` (Haiku) does the mechanical sweep, and only with `--deep`.
+  The two Haiku agents carry `effort: low` in their frontmatter: each starts its own
+  conversation, so the pin costs nothing, and their work is mechanical. No skill carries one —
+  a skill runs inside your conversation, and a changed effort rewrites the session's cache on
+  the way in and again on the way out, so a skill runs at whatever `/effort` you set.
 - **A hook that holds the reviewer to its report.** `/gku:review` writes a report under
   `.gku/reports/` whenever it finds a blocker, and a forked reviewer forgets that more often than
   not. `plugins/gku/hooks/hooks.json` runs `scripts/review-report.sh` when `gku:reviewer` stops:
@@ -952,16 +956,28 @@ How they keep the cost down:
 
 Practical advice:
 
-1. **Stay on Sonnet.** Nothing here needs a larger model. Check with `/model`.
-2. **Use `/clear` between unrelated tasks.** A long conversation is re-sent with every
+1. **The strongest model your plan allows, at `/effort low`.** A stronger model at low effort
+   usually spends fewer tokens than a weaker one at high effort, and does better work with them.
+   Start low; raise it with `/effort` only for the skills where verification earns its
+   tokens — `/gku:review`, `/gku:verify`, `/gku:audit`. Check with `/model`.
+2. **Set the model and the effort when the session starts, not between tasks.** Every request
+   re-sends the conversation, and the part the cache already holds costs a tenth or less. A
+   switch of model or of effort mid-session throws that cache away, so the next request pays for
+   the whole conversation again.
+3. **Use `/clear` between unrelated tasks.** A long conversation is re-sent with every
    message, so an unrelated three-hour history makes every request more expensive.
-3. **Run `/gku:review` often and `--deep` rarely.** The plain version catches most of it.
+4. **Run `/gku:review` often and `--deep` rarely.** The plain version catches most of it.
    `/gku:fix` deliberately does not re-review afterwards — one review, one fix pass, then decide.
    Looping the two is the easiest way to burn a limit on diminishing returns.
-4. **Prefer `/gku:implement` on a written task file** over a vague sentence — it gets it right the
+5. **Prefer `/gku:implement` on a written task file** over a vague sentence — it gets it right the
    first time more often, and a redo costs more than a good brief.
-5. **If you hit a limit mid-build, do not start over.** Wait for the reset and use
+6. **If you hit a limit mid-build, do not start over.** Wait for the reset and use
    `--continue`.
+7. **After `/gku:init`, run `/doctor prompt-audit` on your own instructions.** It reads your
+   `CLAUDE.md`, rules and skills for text written for older models — "think step by step",
+   "double-check your work", two rules that contradict each other — and proposes the edits.
+   Those lines cost tokens on every request and make current models worse, not better. Read
+   what it proposes before accepting it; the family block `/gku:init` writes is already clean.
 
 ## Troubleshooting
 
@@ -1043,8 +1059,9 @@ frontmatter.
 Keep to the conventions the existing skills follow, because they are what make these usable on
 a limited plan:
 
-- sub-agents only as the plugin's own, under `plugins/gku/agents/`, each pinned to the
-  cheapest model that does its job — never a general-purpose one, never several at once;
+- sub-agents only as the plugin's own, under `plugins/gku/agents/`, each pinned to the model
+  and effort that do its job for the fewest tokens, measured in `evals/live` rather than
+  assumed — never a general-purpose one, never several at once;
 - no background workflows or agent fleets;
 - read the diff, not the repository, with an explicit cap;
 - no internet unless the skill is about the internet — and then capped, with nothing private in
