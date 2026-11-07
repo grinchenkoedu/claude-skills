@@ -161,16 +161,29 @@ Every grader passed on both sides, so the stronger model at low effort found not
 missed here, and it cost about twice as much on the two review-only cases. The pin stays
 `model: sonnet`; the two Haiku agents carry `effort: low`, which no case here exercises.
 
-**The second-opinion offer gets in the way of these three cases.** With `agy`, `copilot` or
-`opencode` on `PATH`, the Stop hook gives the session a turn after the review to make the offer,
-so the last message is the offer and the judges that read it fail — three runs of each review
-case failed that way at 0.16–0.18 USD and 2 turns before the rows above were taken. The eval
-session has no dialog tool, so the offer cannot be answered either. Measure the review alone
-with a `PATH` that hides the agents, the way the rows above were taken:
+**The second-opinion offer used to get in the way of these three cases.** With `agy`,
+`copilot` or `opencode` on `PATH`, the Stop hook gives the session a turn after the review to
+make the offer, so the last message was the offer and the judges that read it failed — three
+runs of each review case failed that way at 0.16–0.18 USD and 2 turns on 2026-11-07, and the
+rows above were taken with a `PATH` that hid the agents. The eval session has no dialog tool,
+so the offer cannot be answered either. Now each of the three scaffolds leaves
+`.gku/no-second-opinion` in the sandbox, the marker that makes `gku-agents` list nothing
+(`README.md`, "A second opinion"), and the plain command measures the review alone.
+`review-offers-second-opinion` sources the first scaffold and removes the marker: it is the
+case that wants the offer. Taken the same day with the three agents on `PATH` and no override,
+the reviewer on Sonnet, three runs each:
+
+| Case | USD · turns · s · passed |
+|---|---|
+| `review-catches-defect` | 0.079 · 0 · 26 · 3/3 |
+| `review-quiet-on-correct` | 0.052 · 0 · 13 · 3/3 |
+| `review-after-long-build` | 0.274 · 7 · 59 · 3/3 |
+
+`review-offers-second-opinion`, one run: 0.175 USD, 2 turns, 35 s, 3/3, and the kept trace
+ran none of the agents. The same catches as the Sonnet column above, with no `PATH` to arrange:
 
 ```bash
-PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin ~/.local/bin/claude plugin eval . \
-  --eval-dir evals/live --case review-catches-defect --runs 3 --ablation none \
+claude plugin eval . --eval-dir evals/live --case review-catches-defect --runs 3 --ablation none \
   --scaffold --allow-tools Bash Edit Write --trust-plugin --no-publish --model claude-opus-5-5
 ```
 
