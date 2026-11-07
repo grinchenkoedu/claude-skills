@@ -973,9 +973,9 @@ Check `gh auth status`. For a private repository you need access, and the token 
 `repo` scope. Re-authenticate with `gh auth login --scopes "repo,read:org"`.
 
 **A skill got the test command wrong.**
-It caches what it detected. Delete `.claude/repo-profile.json` and run again, or pass
-`--reprofile`. If the project's real command lives somewhere unusual, put it in the
-repository's `AGENTS.md` — the skills read that file.
+It caches what it detected. Delete `.claude/repo-profile.json` and run again. If the
+project's real command lives somewhere unusual, put it in the repository's `AGENTS.md` — the
+skills read that file.
 
 **`/gku:implement` refuses to start.**
 Usually uncommitted changes it did not make. Commit or stash them first — it will not build on

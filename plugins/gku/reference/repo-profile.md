@@ -9,9 +9,10 @@ every invocation is the single most wasteful thing these skills could do — so 
 
 `.claude/repo-profile.json` at the repository root.
 
-**Always read the cache first.** Only run detection when the file is missing, or when the
-user passes `--reprofile`, or when a command in it demonstrably no longer works (e.g. the
-test command errors with "not found"). After detection, write the file.
+**Always read the cache first.** Only run detection when the file is missing, or when a
+command in it demonstrably no longer works (e.g. the test command errors with "not found").
+To re-detect on purpose, delete the file and run any skill again. After detection, write the
+file.
 
 Add `.claude/repo-profile.json` to `.gitignore` if it is not already covered — it describes
 one developer's machine, not the project.
@@ -222,8 +223,8 @@ Stop as soon as the family is clear. This should be a handful of file checks, no
   `$plugin->version` in `version.php` or the live site will not see it. This is the single most
   common way a correct-looking change fails in production — treat a missing bump as a blocker.
 - **`php-app`** — `application/` holds `controllers/`, `models/`, `views/`, `commands/`,
-  `core/`. `./run` dispatches CLI commands. Several of these repositories have **no tests at
-  all**; skills must not report "tests pass" when what happened is "there are no tests".
+  `core/`. `./run` dispatches CLI commands. A repository of this family may have **no tests
+  at all**; skills must not report "tests pass" when what happened is "there are no tests".
 - **`php-library`** — CI already runs the suite on every push. The tests are the contract.
 
 ## Run things in a container
@@ -234,12 +235,12 @@ unavailable, and say so when you do.
 
 The reason is correctness before convenience:
 
-- **Version fidelity.** These projects target specific runtimes — a plugin written for PHP 7.4
+- **Version fidelity.** A project targets a specific runtime — a plugin written for PHP 7.4
   linted by a host PHP 8.4 will happily accept syntax that breaks in production, and a suite
   that passes on the host's version proves nothing about the version that actually runs. The
   container has the right one.
-- **The toolchain is in the image.** No local `php`, `composer`, `pytest` or `node` needed.
-  Several of these repositories are explicit that the host has no PHP at all.
+- **The toolchain is in the image.** No local `php`, `composer`, `pytest` or `node` needed;
+  a host may have no PHP at all.
 - **Same commands everywhere.** One recipe for macOS, Linux, WSL and Windows. Most of what
   makes Windows awkward — a missing `make`, a different `timeout`, absent Unix utilities —
   stops being a special case when the command runs in Linux inside a container.
