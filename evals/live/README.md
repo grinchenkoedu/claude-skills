@@ -148,7 +148,8 @@ What the rows say, and what they do not:
 The reviewer's model and effort were measured on 2026-11-07, Claude Code 2.1.319, Claude
 Opus 5.5 as the session's model, three runs per case, the offer suppressed (below). **Sonnet**
 is `gku:reviewer` as pinned; **Opus low** is the same file with `model: inherit` and
-`effort: low`, which a talk on frontier-model economics said should cost less:
+`effort: low`, the arm a "stronger model at lower effort costs less" rule of thumb predicts
+should win:
 
 | Case | Sonnet: USD · turns · s · passed | Opus low: USD · turns · s · passed |
 |---|---|---|

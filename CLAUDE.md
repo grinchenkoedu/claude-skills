@@ -65,7 +65,7 @@ rules for this repository. Do not edit them to change how a skill behaves.
   starts its own conversation, so its pin is free; a skill runs inside the session's, and a
   changed effort invalidates the cached messages on the way in and on the way back.
   `evals/agents/effort.sh` asserts it; the reviewer's pin follows the rows in
-  `evals/live/README.md`, not the talk that suggested them.
+  `evals/live/README.md`, not the rule of thumb that suggested them.
 - **Record a `Ruling:` line** in the commit body when you decide something the plan did not:
   what, why, and what it costs if wrong. `/gku:review` reads them back.
 - **The plugin manifest has no `version`, on purpose.** Claude Code then treats every commit as
