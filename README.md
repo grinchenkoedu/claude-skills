@@ -956,10 +956,12 @@ How they keep the cost down:
 
 Practical advice:
 
-1. **The strongest model your plan allows, at `/effort low`.** A stronger model at low effort
-   usually spends fewer tokens than a weaker one at high effort, and does better work with them.
-   Start low; raise it with `/effort` only for the skills where verification earns its
-   tokens — `/gku:review`, `/gku:verify`, `/gku:audit`. Check with `/model`.
+1. **Start at `/effort low`, on the model your plan allows.** "A stronger model at low effort
+   spends fewer tokens than a weaker one at high effort" is a claim to measure, not to assume:
+   on this plugin's own review cases the reviewer on Opus at low effort cost about twice what
+   it costs on Sonnet and caught nothing more (`evals/live/README.md`). What held up is the
+   effort: start low, and raise it with `/effort` only for the skills where verification earns
+   its tokens — `/gku:review`, `/gku:verify`, `/gku:audit`. Check with `/model`.
 2. **Set the model and the effort when the session starts, not between tasks.** Every request
    re-sends the conversation, and the part the cache already holds costs a tenth or less. A
    switch of model or of effort mid-session throws that cache away, so the next request pays for
