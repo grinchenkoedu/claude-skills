@@ -46,8 +46,9 @@ record the tracked file as the first finding. You need family, language, `standa
 
 Then take stock with `git ls-files`: how many files, of what kinds, in what layout, and where
 the family keeps its entry points — a Moodle plugin's root pages, `classes/external/`,
-`db/services.php` and `cli/`; a `php-app`'s `application/controllers/` and `commands/`; a
-`python-app`'s routes, views and `main.py`; a CMS's `functions.php` and templates. Skip
+`db/services.php` and `cli/`; a `php-app`'s controllers and commands — `application/`,
+`app/Http/` and `app/Console/`, or `src/Controller/` and `src/Command/`; a `python-app`'s
+routes, views and `main.py`; a CMS's `functions.php` and templates. Skip
 `vendor/`, `node_modules/`, build output and anything generated — those are audited as
 dependencies in step 2, not as code.
 
