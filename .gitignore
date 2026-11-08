@@ -16,3 +16,8 @@ PR_REVIEW_*.md
 
 # what `claude plugin eval` writes when no --output-dir is given
 evals/live/results/
+# a case that replays a transcript (context.history_file) gets the resumed session's own log
+# written beside it, named by session id and carrying the account's email and home paths;
+# history.jsonl is the fixture a case names on purpose, everything else there is harness output
+evals/live/*/*.jsonl
+!evals/live/*/history.jsonl
