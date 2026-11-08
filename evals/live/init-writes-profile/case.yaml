@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: init-writes-profile
+description: "/gku:init on a repository with no profile and no CLAUDE.md detects the project, writes a CLAUDE.md that names the right test command, touches no source file, and says plainly what it could not do. The eval sandbox denies every write under .claude/, so the profile cache itself cannot land here; evals/live/README.md records the headless run that measures it."
+tags: [init]
+plugins: ["../../../plugins/gku"]
+runs: 3
+execution:
+  # Pinned at the ceiling three measuring runs showed (10) plus one; no grader reads the turn
+  # count, so this cap is the only bound, and hitting it is recorded as a run error.
+  max_turns: 11
+  timeout_seconds: 900
+  allowed_tools: [Bash, Read, Grep, Glob, Edit, Write]
+  prompt: "/gku:init"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: claude-md-written
+    type: file_exists
+    path: "CLAUDE.md"
+    exists: true
+  # The fixture's one command, read from the file init wrote rather than from the report.
+  - name: claude-md-has-the-test-command
+    type: regex
+    target: { source: file, path: "CLAUDE.md" }
+    pattern: 'bash tests/run\.sh'
+  # init may only write CLAUDE.md and a stub AGENTS.md; the paths it created must not reach
+  # the library or its tests.
+  - name: touches-no-source
+    type: regex
+    target: files
+    match: not_contains
+    pattern: '(lib|tests)/'
+  - name: honest-report
+    type: llm
+    criteria: "The final report names the family as 'other' (no family template applied) and the test command as 'bash tests/run.sh'; it does not claim a lint, build or install command the fixture lacks (it has none); and it says plainly that the profile cache under .claude/ was not written, because the write was denied, rather than claiming it was written or staying silent about it."
