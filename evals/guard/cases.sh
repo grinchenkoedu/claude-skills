@@ -95,7 +95,7 @@ cases() {
 0|gh pr view 12 --json mergeable,mergeStateStatus
 0|gh pr list --search \"merge conflict\"
 0|gh pr comment 12 --body \"this needs a merge from main\"
-0|gh repo view --json isPrivate
+0|gh pr view --json number,state,url,title,body,isDraft,baseRefName,headRefName
 0|gh api repos/o/r/pulls/12/comments
 # allowed — nothing to do with git, or nothing to read
 0|ls -la
