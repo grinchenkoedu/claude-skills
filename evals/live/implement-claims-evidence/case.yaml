@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: implement-claims-evidence
+description: "/gku:implement without --auto ends with a report whose every claim of success sits beside a quoted result line from a command that ran — never a bare 'should pass' or 'all green'."
+tags: [implement, evidence]
+plugins: ["../../../plugins/gku"]
+runs: 3
+execution:
+  max_turns: 60
+  timeout_seconds: 1800
+  allowed_tools: [Bash, Read, Grep, Glob, Skill, Edit, Write, Agent]
+  prompt: "/gku:implement .tasks/add-sign.md"
+context:
+  scaffold_script: setup.sh
+graders:
+  - name: tests-run
+    type: tool_used
+    tool: Bash
+    input_match: 'tests/run\.sh'
+    min: 1
+  # The fixture's runner prints one line, "N passed, M failed"; the report has to carry it.
+  - name: result-line-quoted
+    type: regex
+    pattern: '[0-9]+ passed, 0 failed'
+  # The two phrasings the adopt plan's gate R4 names, plus their nearest neighbours.
+  - name: no-bare-claim
+    type: regex
+    match: not_contains
+    flags: i
+    pattern: 'all green|should (now )?(pass|work|be green)'
+  - name: claims-beside-evidence
+    type: llm
+    criteria: "Read the final report as a whole. It PASSES when each claim that the tests pass or that the change works is backed somewhere in the report by quoted output from a command the run executed — the runner's summary line (such as '5 passed, 0 failed'), or the values a call printed. The quote does not have to sit on the same line as the claim. It FAILS only when the report asserts success — including in the conditional: 'should pass', 'all green', 'will work' — and no quoted output in the report backs that assertion."
