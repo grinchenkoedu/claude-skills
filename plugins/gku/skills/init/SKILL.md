@@ -217,8 +217,9 @@ With `--dry-run`, print the file and write nothing.
 
 ## Rules
 
-- **Only ever write `CLAUDE.md` and a stub `AGENTS.md`.** No source files, no configuration,
-  no commits.
+- **Only ever write `CLAUDE.md`, a stub `AGENTS.md`, and the profile cache
+  `.claude/repo-profile.json` with its `.gitignore` line**, both as `reference/repo-profile.md`
+  says. No source files, no other configuration, no commits.
 - **Never overwrite outside the markers.** An existing hand-written file is asked about, not
   replaced.
 - **Never invent a command.** Detected or `none`, with the reason.
