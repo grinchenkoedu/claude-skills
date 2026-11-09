@@ -349,7 +349,8 @@ the report that it landed outside the plan.
   become a new plan; they are never appended to a plan that finished.
 - **Data-safety rules are not optional** — see `reference/repo-profile.md`. Anything writing in
   bulk needs dry-run by default, safe re-runs, and bounded scope with an expected row count.
-- **Never `--no-verify`, `--force`, or `--amend`.** A failing hook means fix the code.
+- **What the guard refuses stays refused** — `reference/exec.md` lists it. A refusal is a
+  reason to fix the code, never to find another spelling of the command.
 - **Never weaken or delete an existing test to get to green.** If a test now fails and it is
   right to change it, say so in a `Ruling:` in the commit body — that is where `/gku:review`
   looks for the reason. The same holds for any other check: a suppression, a cast that forces a

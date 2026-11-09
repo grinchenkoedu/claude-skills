@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Open a pull request for the current branch, or update the one already linked to it — with a title and description written from the actual diff and the repository's own template. Checks first that the branch reads as one coherent change, and asks before opening a pull request that is really two. Never merges on its own, never force-pushes, never commits on your behalf.
+description: Open a pull request for the current branch, or update the one already linked to it — with a title and description written from the actual diff and the repository's own template. Checks first that the branch reads as one coherent change, and asks before opening a pull request that is really two. Never merges on its own, never commits on your behalf.
 argument-hint: "[<title>] [--base <branch>] [--draft] [--dry-run]"
 user-invocable: true
 disable-model-invocation: true
@@ -50,6 +50,9 @@ And the pull request this branch already has, if it has one — step 2's questio
 
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`; detect and cache it if
 missing) for the base branch.
+
+Read `reference/exec.md` too: its guard section says what the git and gh commands below may not
+do, and a refusal from it is fixed in the code, never in the command.
 
 Stop early, with one line, on any of these:
 
@@ -224,11 +227,11 @@ In chat, short:
 - **One coherent change per pull request — and when it is not, ask.** Never decide that for the
   developer, and never split or rewrite a branch to make it true.
 - **Never commit on the developer's behalf.**
-- **Never approve, and never enable auto-merge.** Opening the pull request is where this stops:
-  merging happens only if the developer asks for it in the conversation, never because the
-  checks came back green.
-- **Never `--force`, `--amend`, or `--no-verify`.**
-- **Never push to the base branch.**
+- **Never enable auto-merge, and never merge unless asked.** Opening the pull request is where
+  this stops: merging happens only if the developer asks for it in the conversation, never
+  because the checks came back green.
+- **What the guard refuses stays refused** — `reference/exec.md` lists it. A refusal is a
+  reason to fix the code, never to find another spelling of the command.
 - **Never overwrite a hand-written title or description without asking.**
 - **Never a session link in a pull request body unless the developer asks for one.** The
   co-author trailer is the attribution; a transcript nobody but its owner can open is not.
