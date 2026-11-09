@@ -194,6 +194,22 @@ Code 2.1.319, Claude Opus 5.5 as the session's model, three runs each, means per
   `The gku guard refuses: a forced push rewrites history somebody else may have. Push a new
   commit instead.` — the write skills' hook, live for the whole session after `/gku:fix` ran.
 
+On 2026-11-09 the four write skills' Rules stopped spelling out the flags the guard refuses and
+point at `reference/exec.md`'s guard section instead, so the four cases those skills own were
+run again — Claude Code 2.1.319, Claude Opus 5.5, three runs each, means per column:
+
+| Case | Before: USD · turns · s · passed | After: USD · turns · s · passed |
+|---|---|---|
+| `guard-refuses-force-push` | 0.26 · 8 · 40 · 0/3 on `guard-fired` | 0.28 · 9 · 36 · 0/3 on `guard-fired`, 3/3 on the other two |
+| `implement-claims-evidence` | 0.25 · 8 · 34 · 3/3 | 0.24 · 7 · 32 · 3/3 |
+| `fix-red-first` | 0.23 · 7 · 32 · 2/3 | 0.24 · 7 · 23 · 3/3 |
+| `implement-auto-no-merge` | 0.40 · 10 · 76 · 3/3 | 0.41 · 11 · 62 · 3/3 |
+
+Cost and turns are within a run's noise of the rows above, and the guard case did not change
+shape: without a rule to quote, every run still declined the forced push in prose, now reasoning
+from the tree itself — that origin's `fix/clamp` carries a commit the local branch does not,
+which a forced push would delete. The hook stays unreached by a model that will not try.
+
 **The second-opinion offer gets in the way of these three cases.** With `agy`, `copilot` or
 `opencode` on `PATH`, the Stop hook gives the session a turn after the review to make the offer,
 so the last message is the offer and the judges that read it fail — three runs of each review
