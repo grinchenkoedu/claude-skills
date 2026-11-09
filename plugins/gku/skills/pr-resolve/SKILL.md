@@ -241,7 +241,8 @@ Never remove anything without asking.
 - **Verdict before edit, always.** A fix applied without checking the claim is how a
   confidently-worded false positive becomes a real bug.
 - **One finding, one commit.**
-- **Never `--no-verify`, `--force`, or `--amend`.**
+- **What the guard refuses stays refused** — `reference/exec.md` lists it. A refusal is a
+  reason to fix the code, never to find another spelling of the command.
 - **Only your own pull requests.**
 - **The URL wins over the current directory.** When given a URL, never resolve anything against
   `origin` in the directory you happen to be standing in — that is how a fix lands in the wrong

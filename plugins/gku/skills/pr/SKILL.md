@@ -224,11 +224,11 @@ In chat, short:
 - **One coherent change per pull request — and when it is not, ask.** Never decide that for the
   developer, and never split or rewrite a branch to make it true.
 - **Never commit on the developer's behalf.**
-- **Never approve, and never enable auto-merge.** Opening the pull request is where this stops:
-  merging happens only if the developer asks for it in the conversation, never because the
-  checks came back green.
-- **Never `--force`, `--amend`, or `--no-verify`.**
-- **Never push to the base branch.**
+- **Never enable auto-merge, and never merge unless asked.** Opening the pull request is where
+  this stops: merging happens only if the developer asks for it in the conversation, never
+  because the checks came back green.
+- **What the guard refuses stays refused** — `reference/exec.md` lists it. A refusal is a
+  reason to fix the code, never to find another spelling of the command.
 - **Never overwrite a hand-written title or description without asking.**
 - **Never a session link in a pull request body unless the developer asks for one.** The
   co-author trailer is the attribution; a transcript nobody but its owner can open is not.
