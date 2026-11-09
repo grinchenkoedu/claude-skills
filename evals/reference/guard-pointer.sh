@@ -56,6 +56,10 @@ sed -n '1,30p' "$guard" | grep -q 'reference/exec.md' || note 'guard.sh: the hea
 for s in implement fix pr pr-resolve; do
   f="$skills/$s/SKILL.md"
   [ -f "$f" ] || { note "$s: no SKILL.md"; continue; }
+  # A pointer into a file the skill never opens is a dead reference: somewhere before its
+  # Rules, the skill has to read exec.md (the 200 characters allow for a parenthesis between).
+  awk '/^## Rules/{exit} {print}' "$f" | flat | grep -Eq 'Read.{0,200}`reference/exec\.md`' ||
+    note "$s: never reads reference/exec.md, so its Rules point at a list the run never loads"
   rules="$(awk '/^## Rules/{p=1; next} /^## Edge cases/{p=0} p' "$f" | flat)"
   [ -n "$rules" ] || { note "$s: no Rules section before Edge cases"; continue; }
   { printf '%s' "$rules" | grep -q 'the guard' && printf '%s' "$rules" | grep -q 'reference/exec.md'; } ||

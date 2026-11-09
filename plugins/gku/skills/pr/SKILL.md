@@ -51,6 +51,9 @@ And the pull request this branch already has, if it has one — step 2's questio
 Read `.claude/repo-profile.json` (see `reference/repo-profile.md`; detect and cache it if
 missing) for the base branch.
 
+Read `reference/exec.md` too: its guard section says what the git and gh commands below may not
+do, and a refusal from it is fixed in the code, never in the command.
+
 Stop early, with one line, on any of these:
 
 - **`gh` is missing or not authenticated** (`gh auth status`) — fall back to step 7's manual
