@@ -37,7 +37,7 @@ if [ -z "$sec" ]; then
   note 'exec.md has no "## The guard" section'
 else
   prose="$(printf '%s\n' "$sec" | grep -c -v '^[[:space:]]*$')"
-  [ "$prose" -le 5 ] || note "exec.md: the guard section is $prose lines of prose; three were asked for, five is the cap"
+  [ "$prose" -le 5 ] || note "exec.md: the guard section is $prose lines of prose; five is the cap"
   secf="$(printf '%s' "$sec" | flat)"
   for want in 'forced push' '--amend' '--no-verify' 'base branch' 'approv' 'auto-run'; do
     printf '%s' "$secf" | grep -qF -e "$want" || note "exec.md: the guard section does not name '$want'"
