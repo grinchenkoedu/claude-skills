@@ -30,8 +30,9 @@ initf="$(flat "$init")"
 printf '%s' "$initf" | grep -q 'cache it per `reference/repo-profile.md`' || note 'init: step 1 no longer caches the profile'
 flat "$ref" | grep -q 'After detection, write the file' || note 'repo-profile: detection no longer ends in writing the cache'
 
-# The write list is the bold sentence that begins "Only ever write"; it has to name the cache too.
-rule="$(printf '%s' "$initf" | grep -o 'Only ever write[^*]*' | head -1)"
+# The write list is the bold sentence that begins "Only ever write", up to the closing `**`;
+# a single `*` of italics inside it must not cut the match short.
+rule="$(printf '%s' "$initf" | grep -o 'Only ever write.*' | sed 's/\*\*.*//')"
 [ -n "$rule" ] || note 'init: the Rules no longer say what the skill may write'
 printf '%s' "$rule" | grep -q 'repo-profile.json' || note "init: the write list forbids the cache step 1 asks for — '$rule'"
 
