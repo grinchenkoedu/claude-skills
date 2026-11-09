@@ -58,5 +58,5 @@ developer's machine and credentials — say so and ask first (`reference/untrust
 
 `/gku:implement`, `/gku:fix`, `/gku:pr` and `/gku:pr-resolve` register `scripts/guard.sh` on
 Bash for the rest of the session. It refuses a forced push, `--amend`, `--no-verify`, a push to
-the base branch and approving your own pull request; under `.gku/auto-run`, anything that merges
+the base branch and approving a pull request; under `.gku/auto-run`, anything that merges
 or ships. A refusal means the code needs fixing — never reword the command around it.
