@@ -64,7 +64,7 @@ for s in implement fix pr pr-resolve; do
   [ -n "$rules" ] || { note "$s: no Rules section before Edge cases"; continue; }
   { printf '%s' "$rules" | grep -q 'the guard' && printf '%s' "$rules" | grep -q 'reference/exec.md'; } ||
     note "$s: the Rules do not point at the guard section in reference/exec.md"
-  printf '%s' "$rules" | grep -Eq 'Never `--(no-verify|force|amend)`' &&
+  printf '%s' "$rules" | grep -Eq -e '--(no-verify|force|amend)' &&
     note "$s: the Rules still spell out the flags the guard refuses"
 done
 
