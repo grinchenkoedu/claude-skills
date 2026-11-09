@@ -35,6 +35,8 @@ flat "$ref" | grep -q 'After detection, write the file' || note 'repo-profile: d
 rule="$(printf '%s' "$initf" | grep -o 'Only ever write.*' | sed 's/\*\*.*//')"
 [ -n "$rule" ] || note 'init: the Rules no longer say what the skill may write'
 printf '%s' "$rule" | grep -q 'repo-profile.json' || note "init: the write list forbids the cache step 1 asks for — '$rule'"
+# And the .gitignore line the reference asks for beside it, or the same contradiction sits one line over.
+printf '%s' "$rule" | grep -q '\.gitignore' || note "init: the write list forbids the .gitignore line the reference asks for — '$rule'"
 
 if [ "$fails" -eq 0 ]; then
   printf 'init-writes: the write list allows the profile cache step 1 asks for\n'
