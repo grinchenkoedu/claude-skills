@@ -4,7 +4,7 @@
 # it for the rest of the session, on later turns as well.
 #
 # Reads the hook's JSON on stdin, looks at tool_input.command, and refuses
-# (exit 2, reason on stderr) what the Rules of those four skills forbid in prose:
+# (exit 2, reason on stderr) what reference/exec.md's "The guard" section lists:
 #   git push --force / --force-with-lease / -f
 #   git commit --amend
 #   --no-verify on any git command
