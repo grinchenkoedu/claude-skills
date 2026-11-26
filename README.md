@@ -217,9 +217,10 @@ The plugin route is easier to keep up to date. Use this only if you have a reaso
 
 `gku-hud` is a second plugin in the same marketplace, separate from `gku`: a pane beside the
 chat that lists the task files in `.tasks/`, with how many of their steps are ticked, and the
-reports in `.gku/reports/`, newest first. Select one to read it there. The buttons under it put
-the next command in the prompt box — `/gku:implement .tasks/<file> --continue` for a plan half
-built, `/gku:fix .gku/reports/<file>` for a review — and sending it is up to you.
+reports in `.gku/reports/`, newest first. Pressing a row opens it on its own, and `b` goes back
+to the list. The buttons under it put the next command in the prompt box —
+`/gku:implement .tasks/<file> --continue` for a plan half built, `/gku:fix .gku/reports/<file>`
+for a review — and sending it is up to you.
 
 ```
 /plugin install gku-hud@grinchenkoedu

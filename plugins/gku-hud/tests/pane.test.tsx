@@ -171,7 +171,7 @@ describe('the list', () => {
 })
 
 describe('the selection', () => {
-  test('pressing a task previews it, shows its steps, and offers what comes next', async ($, on) => {
+  test('pressing a task opens it, shows its steps, and offers what comes next; Back closes it', async ($, on) => {
     engine(on)
     project()
     await opened($)
@@ -181,8 +181,84 @@ describe('the selection', () => {
     expect((await ui.find({ type: 'Markdown' }))?.text).toContain('Export departments')
     expect((await ui.find({ type: 'Text', text: /^Steps / }))?.text).toBe('Steps ████░░░░░░░░ 1/3')
     expect(await ui.find({ type: 'Button', key: 'do-continue' })).toBeTruthy()
-    await ui.press({ key: 'task:export.md' })
+    await ui.press({ key: 'back' })
     expect(await ui.find({ type: 'Markdown' })).toBeFalsy()
+    expect(await ui.find({ type: 'Button', key: 'task:export.md' })).toBeTruthy()
+    await ui.unmount()
+  })
+
+  test('the list view draws rows only: no open file, no actions, no Back', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    expect(await ui.find({ type: 'Markdown' })).toBeFalsy()
+    expect(await ui.find({ type: 'Button', key: 'back' })).toBeFalsy()
+    expect(await ui.find({ type: 'Button', key: 'path' })).toBeFalsy()
+    expect(await ui.find({ type: 'Button', key: 'task:export.md' })).toBeTruthy()
+    await ui.unmount()
+  })
+
+  test('an open task is drawn alone, under a Back that b presses', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:export.md' })
+    const rows = (await ui.findAll({ type: 'Button' })).map(button => button.key).filter(key => /^(task|report):/.test(key ?? ''))
+    expect(rows).toEqual([])
+    expect(await ui.find({ type: 'Text', text: /^REPORTS$/ })).toBeFalsy()
+    expect((await ui.find({ type: 'Button', key: 'back' }))?.props.hotkey).toBe('b')
+    expect((await ui.find({ type: 'Text', text: /^Export departments$/ }))?.text).toBe('Export departments')
+    expect((await ui.find({ type: 'Text', text: /1\/3 · feature · 2h/ }))?.text).toBe('1/3 · feature · 2h')
+    await ui.unmount()
+  })
+
+  test('a report opens the same way, with its skill as the title', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'report:review-my-branch-20261126-0800.md' })
+    expect(await ui.find({ type: 'Button', key: 'task:export.md' })).toBeFalsy()
+    expect((await ui.find({ type: 'Text', text: /^review$/ }))?.text).toBe('review')
+    expect((await ui.find({ type: 'Text', text: /my-branch · 3h/ }))?.text).toBe('my-branch · 3h')
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(REVIEW)
+    expect(await ui.find({ type: 'Button', key: 'do-fix' })).toBeTruthy()
+    await ui.unmount()
+  })
+
+  // The kit has no implementation for a plugin scrolling or focusing its own pane: every
+  // $.ui.scroll and $.ui.focus the module makes from a press rejects here
+  // ("no implementation for ui.scroll"). That is the failure this test needs. Whether a
+  // real engine moves the window and the ring is checked by hand: see the task's How to check it.
+  test('a scroll or focus the engine cannot make changes nothing else: the view still switches', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:export.md' })
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(PLAN)
+    expect(await ui.find({ type: 'Button', key: 'back' })).toBeTruthy()
+    await ui.press({ key: 'back' })
+    expect(await ui.find({ type: 'Button', key: 'task:export.md' })).toBeTruthy()
+    expect(await ui.find({ type: 'Markdown' })).toBeFalsy()
+    await ui.press({ key: 'task:older.md' })
+    expect((await ui.find({ type: 'Markdown' }))?.text).toContain('# Older')
+    await ui.unmount()
+  })
+
+  test('Refresh in an open item rereads it and keeps it open', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:export.md' })
+    world.files[`${ROOT}/.tasks/export.md`] = PLAN.replace('2. two', '2. [x] two')
+    await ui.press({ key: 'refresh' })
+    expect(await ui.find({ type: 'Button', key: 'back' })).toBeTruthy()
+    expect((await ui.find({ type: 'Markdown' }))?.text).toContain('2. [x] two')
+    expect((await ui.find({ type: 'Text', text: /^Steps / }))?.text).toBe('Steps ████████░░░░ 2/3')
     await ui.unmount()
   })
 
@@ -194,6 +270,7 @@ describe('the selection', () => {
     await ui.press({ key: 'task:export.md' })
     await ui.press({ key: 'do-continue' })
     expect(world.filled).toEqual(['/gku:implement .tasks/export.md --continue'])
+    await ui.press({ key: 'back' })
     await ui.press({ key: 'report:review-my-branch-20261126-0800.md' })
     await ui.press({ key: 'do-fix' })
     expect(world.filled.at(-1)).toBe('/gku:fix .gku/reports/review-my-branch-20261126-0800.md')
@@ -264,10 +341,10 @@ describe('the selection', () => {
 
     test('both engines show the same text', async ($, on) => {
       const whole = await previewOf($, on, WIDE, false)
-      // The same session, its reads now ranged: deselect, then select again to reread.
+      // The same session, its reads now ranged: back to the list, then open it again to reread.
       world.honoursLength = true
       const ui = await $.ui.mount(PANE())
-      await ui.press({ key: 'task:older.md' })
+      await ui.press({ key: 'back' })
       await ui.press({ key: 'task:older.md' })
       const ranged = (await ui.find({ type: 'Markdown' }))?.text ?? ''
       await ui.unmount()
@@ -290,6 +367,7 @@ describe('the selection', () => {
     await ui.press({ key: 'task:export.md' })
     expect(await ui.find({ type: 'Button', key: 'do-continue' })).toBeFalsy()
     expect(await ui.find({ type: 'Text', text: /A manual plan: you build it by hand/ })).toBeTruthy()
+    await ui.press({ key: 'back' })
     await ui.press({ key: 'task:older.md' })
     expect(await ui.find({ type: 'Text', text: /A manual plan/ })).toBeFalsy()
     await ui.unmount()
@@ -315,6 +393,7 @@ describe('the selection', () => {
     world.gates[`${ROOT}/.tasks/older.md`] = new Promise<void>(resolve => { release = resolve })
     const ui = await $.ui.mount(PANE())
     await ui.press({ key: 'task:older.md' })
+    await ui.press({ key: 'back' })
     await ui.press({ key: 'task:export.md' })
     release()
     for (let i = 0; i < 50; i++) await Promise.resolve()
