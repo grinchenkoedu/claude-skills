@@ -88,6 +88,11 @@ async function readPreview($: EngineInterface, item: Item): Promise<Preview | nu
   return { key: keyOf(item), text: cut.isCut ? `${cut.text}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : cut.text }
 }
 
+/** Writes a preview only while its file is still the one selected: a slower read of an earlier one is dropped. */
+async function showPreview($: EngineInterface, key: string, text: Preview | null): Promise<void> {
+  if ((await read($, selected)) === key) await update($, preview, () => text)
+}
+
 /** Rescans, keeps the selection if its file is still there, and rereads its preview. */
 async function refresh($: EngineInterface): Promise<void> {
   const found = await scanProject($)
@@ -98,8 +103,7 @@ async function refresh($: EngineInterface): Promise<void> {
     await update($, preview, () => null)
     return
   }
-  const text = await readPreview($, item)
-  await update($, preview, () => text)
+  await showPreview($, keyOf(item), await readPreview($, item))
 }
 
 async function select($: EngineInterface, key: string): Promise<void> {
@@ -110,8 +114,7 @@ async function select($: EngineInterface, key: string): Promise<void> {
   }
   await update($, selected, () => key)
   const item = findItem(await read($, scan), key)
-  const text = item === undefined ? null : await readPreview($, item)
-  await update($, preview, () => text)
+  await showPreview($, key, item === undefined ? null : await readPreview($, item))
 }
 
 /** Puts the command in the prompt box, never over a draft, and never sends it. */

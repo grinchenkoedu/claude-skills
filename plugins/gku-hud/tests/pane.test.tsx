@@ -27,6 +27,8 @@ type World = {
   isShown: boolean
   /** Reads honour `length`, as 2.1.332's do; left false, a read hands the whole file over, as 2.1.316's does. */
   honoursLength: boolean
+  /** Reads of these paths wait until the promise settles: a slow disk, for a race. */
+  gates: Record<string, Promise<void>>
 }
 
 let world: World
@@ -34,7 +36,7 @@ let world: World
 const file = (name: string, hoursAgo: number, size = 100): Entry => ({ name, kind: 'file', size, mtimeMs: NOW - hoursAgo * HOUR, isLink: false })
 
 function engine(on: On): void {
-  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], forbidden: [], toasts: [], opened: [], isShown: true, honoursLength: false }
+  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], forbidden: [], toasts: [], opened: [], isShown: true, honoursLength: false, gates: {} }
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('session.root', () => ({ value: ROOT }))
   on('clock.now', () => ({ value: NOW }))
@@ -43,8 +45,9 @@ function engine(on: On): void {
     if (entries === undefined) throw new Error('ENOENT')
     return { value: entries }
   })
-  on('fs.read', (_, e) => {
+  on('fs.read', async (_, e) => {
     world.reads.push({ path: e.path, ...(e.length === undefined ? {} : { length: e.length }) })
+    await world.gates[e.path]
     const text = world.files[e.path]
     if (text === undefined) throw new Error('ENOENT')
     if (!world.honoursLength || e.length === undefined) return { value: text }
@@ -301,6 +304,22 @@ describe('the selection', () => {
     const ui = await $.ui.mount(PANE())
     await ui.press({ key: 'task:older.md' })
     expect((await ui.find({ type: 'Markdown' }))?.text).toBe(exact)
+    await ui.unmount()
+  })
+
+  test('a slow read of an earlier selection never overwrites the later one', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    let release = () => {}
+    world.gates[`${ROOT}/.tasks/older.md`] = new Promise<void>(resolve => { release = resolve })
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:older.md' })
+    await ui.press({ key: 'task:export.md' })
+    release()
+    for (let i = 0; i < 50; i++) await Promise.resolve()
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(PLAN)
+    expect(await ui.find({ type: 'Text', text: /Could not read the file/ })).toBeFalsy()
     await ui.unmount()
   })
 
