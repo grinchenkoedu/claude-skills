@@ -222,6 +222,20 @@ describe('the selection', () => {
     await ui.unmount()
   })
 
+  test('a manual plan not yet finished says why it offers no build', async ($, on) => {
+    engine(on)
+    project()
+    world.files[`${ROOT}/.tasks/export.md`] = PLAN.replace('**Type:** feature', '**Type:** feature\n**Mode:** manual')
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:export.md' })
+    expect(await ui.find({ type: 'Button', key: 'do-continue' })).toBeFalsy()
+    expect(await ui.find({ type: 'Text', text: /A manual plan: you build it by hand/ })).toBeTruthy()
+    await ui.press({ key: 'task:older.md' })
+    expect(await ui.find({ type: 'Text', text: /A manual plan/ })).toBeFalsy()
+    await ui.unmount()
+  })
+
   test('Path shows the project-relative path', async ($, on) => {
     engine(on)
     project()

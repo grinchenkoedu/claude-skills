@@ -88,6 +88,9 @@ export function drawPane($: EngineInterface, e: RenderInput<'Pane'>, view: PaneV
             <Button key="path" label="Path" dimColor onPress={() => on.onPath(selected)} />
           </Box>
           {actions.length === 0 ? null : <Text dimColor wrap="wrap">A button puts its command in the prompt; you send it.</Text>}
+          {actions.length === 0 && selected.kind === 'task' && selected.isManual
+            ? <Text dimColor wrap="wrap">A manual plan: you build it by hand, and /gku:implement stops on it.</Text>
+            : null}
           {preview === null || preview.key !== selectedKey
             ? <Text dimColor>Could not read the file.</Text>
             : <Box marginTop={1}><Markdown key="preview" text={preview.text} onLinkPress={() => undefined} /></Box>}
