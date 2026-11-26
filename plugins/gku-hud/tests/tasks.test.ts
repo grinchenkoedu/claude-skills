@@ -101,7 +101,7 @@ describe('parseTask', () => {
 
 describe('clean', () => {
   test('folds control and bidirectional characters into spaces, then trims', () => {
-    expect(clean('a\tb\u001b[31mc‮d')).toBe('a b [31mc d')
+    expect(clean('a\tb\u001b[31mc\u202Ed')).toBe('a b [31mc d')
   })
 
   test('cuts long text with an ellipsis', () => {

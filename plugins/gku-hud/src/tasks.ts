@@ -17,7 +17,7 @@ export const TEXT_MAX = 120
 
 /** Cuts text to what one row may show, and drops what a terminal would act on. */
 export function clean(text: string, max = TEXT_MAX): string {
-  const plain = text.replace(/[\u0000-\u001f\u007f-\u009f‎‏‪-‮⁦-⁩]/g, ' ')
+  const plain = text.replace(/[\u0000-\u001f\u007f-\u009f\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 

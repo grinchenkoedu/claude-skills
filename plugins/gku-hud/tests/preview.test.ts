@@ -27,18 +27,18 @@ describe('cutPreview', () => {
         expect(isCut).toBe(true)
         expect(shown).toBe(`${'a'.repeat(lead)}${char.repeat(3)}`)
         expect(bytes(shown)).toBeLessThan(limit + 1)
-        expect(shown.includes('�')).toBe(false)
+        expect(shown.includes('\uFFFD')).toBe(false)
       }
     })
   }
 
   test('a U+FFFD the file holds before the limit is kept', () => {
-    expect(cutPreview('ab�cdefgh', 6)).toEqual({ text: 'ab�c', isCut: true })
+    expect(cutPreview('ab\uFFFDcdefgh', 6)).toEqual({ text: 'ab\uFFFDc', isCut: true })
   })
 
   test('a U+FFFD a ranged read put past the limit is cut with the rest', () => {
     // 4 bytes of é, then the stand-in a 2-byte read of the next é decodes to.
-    expect(cutPreview('éé�', 4)).toEqual({ text: 'éé', isCut: true })
+    expect(cutPreview('éé\uFFFD', 4)).toEqual({ text: 'éé', isCut: true })
   })
 
   test('a limit of zero or less shows nothing, and says it is cut', () => {
