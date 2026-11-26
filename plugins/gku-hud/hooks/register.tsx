@@ -3,7 +3,7 @@
 // and puts the next /gku command in the prompt box for the person to send.
 //
 // It reads only. It never writes a file, never submits a prompt, never calls a
-// model and adds nothing to the context: tests/never.test.ts holds it to that.
+// model and adds nothing to the context: evals/hud/never.sh holds it to that.
 // Every hook passes its event on unchanged and closes with a .catch that does
 // the same, so a failure here never stands in the session's way.
 import { atom, read, update } from 'claude-code'
