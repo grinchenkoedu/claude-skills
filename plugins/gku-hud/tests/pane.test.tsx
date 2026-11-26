@@ -20,6 +20,8 @@ type World = {
   reads: { path: string; length?: number }[]
   draft: string
   filled: string[]
+  /** What the module must never do: a file written, a prompt sent. */
+  forbidden: string[]
   toasts: string[]
   opened: string[]
   isShown: boolean
@@ -30,7 +32,7 @@ let world: World
 const file = (name: string, hoursAgo: number, size = 100): Entry => ({ name, kind: 'file', size, mtimeMs: NOW - hoursAgo * HOUR, isLink: false })
 
 function engine(on: On): void {
-  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], toasts: [], opened: [], isShown: true }
+  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], forbidden: [], toasts: [], opened: [], isShown: true }
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('session.root', () => ({ value: ROOT }))
   on('clock.now', () => ({ value: NOW }))
@@ -49,6 +51,14 @@ function engine(on: On): void {
   on('prompt.fill', (_, e) => {
     world.filled.push(e.text)
     return { isFilled: true }
+  })
+  on('fs.write', (_, e) => {
+    world.forbidden.push(`fs.write ${e.path}`)
+    return { value: undefined }
+  })
+  on('prompt.submit', (_, e) => {
+    world.forbidden.push(`prompt.submit ${e.text}`)
+    return { text: e.text }
   })
   on('ui.toast', (_, e) => {
     world.toasts.push(e.text)
@@ -181,6 +191,9 @@ describe('the selection', () => {
     await ui.press({ key: 'report:review-my-branch-20261126-0800.md' })
     await ui.press({ key: 'do-fix' })
     expect(world.filled.at(-1)).toBe('/gku:fix .gku/reports/review-my-branch-20261126-0800.md')
+    await ui.press({ key: 'refresh' })
+    await $.turn.complete({ turnId: 't1', answer: '', durationMs: 1, isAborted: false, reason: 'answer' })
+    expect(world.forbidden).toEqual([])
     await ui.unmount()
   })
 
