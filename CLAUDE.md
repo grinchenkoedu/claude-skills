@@ -1,10 +1,12 @@
 # claude-skills — notes for Claude
 
-A Claude Code plugin, not an application: eleven skills as markdown under `plugins/gku/skills/`,
-shared rules under `plugins/gku/reference/`, three agents, five shell scripts (three hooks under
-`plugins/gku/scripts/`, two helpers under `plugins/gku/bin/`), and eval suites that assert the
-skills still say what they claim. Nothing here runs a product — the "runtime" is a Claude Code
-session that has the plugin installed.
+A Claude Code marketplace of two plugins, not an application. `gku`: eleven skills as markdown
+under `plugins/gku/skills/`, shared rules under `plugins/gku/reference/`, three agents, five
+shell scripts (three hooks under `plugins/gku/scripts/`, two helpers under `plugins/gku/bin/`),
+and eval suites that assert the skills still say what they claim. `gku-hud`, optional: a mod —
+TypeScript the Claude Code engine runs, with no package.json and no build — that draws a pane
+over `.tasks/` and `.gku/reports/`. Nothing here runs a product — the "runtime" is a Claude Code
+session that has the plugins installed.
 
 ## Commands
 
@@ -15,6 +17,7 @@ session that has the plugin installed.
 | Lint | `docker run --rm -v "${PWD}":/mnt -w /mnt koalaman/shellcheck:stable --severity=warning <file>` |
 | Build | none |
 | Run | none locally; `claude plugin validate .` is the closest thing to loading it |
+| gku-hud | `claude plugin validate plugins/gku-hud && claude plugin test plugins/gku-hud`; run it with `claude --plugin-dir plugins/gku-hud`, then `/gku-hud:tasks` |
 
 These run on the host (`exec.kind: host`): there is no container for the project itself, and
 the lint command reaches for one only because shellcheck is not installed here. **There is no
@@ -72,6 +75,15 @@ rules for this repository. Do not edit them to change how a skill behaves.
   a new version, so `/plugin marketplace update` always brings the latest; a declared version
   would hold users on whatever was last bumped. Both READMEs explain it under "Why you always
   get updates" — do not add the field back because a validator suggests it.
+- **gku-hud reads only, and runs on Claude Code 2.1.316.** It never writes a file, submits a
+  prompt, calls a model, touches the context, runs a process or opens a connection —
+  `evals/hud/never.sh` greps its source for each — and every command it fills is held to that
+  skill's `## Arguments` by `evals/hud/commands.sh`, so renaming a flag there means changing
+  `src/actions.ts` too. CI tests it on 2.1.316 (the floor the READMEs promise) and on latest: an
+  element or option newer than 2.1.316 (`Progress`, `$.fs.read`'s `length`) fails there, so
+  check with `npx -y @anthropic-ai/claude-code@2.1.316 plugin test plugins/gku-hud`. Type-check
+  with `tsc` once `plugins/gku-hud/.claude-plugin/types/` holds the engine's types, which an
+  interactive `--plugin-dir` session lays.
 - **What breaks only "in production":** the installed plugin is a cache keyed by content, so a
   session keeps running the version it was started with. A change merged to `main` is not what
   your current session executes — to exercise it, install from the branch or run with
