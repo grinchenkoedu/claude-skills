@@ -236,6 +236,18 @@ describe('the selection', () => {
     await ui.unmount()
   })
 
+  test('a file of exactly the limit is shown whole, with no cut note', async ($, on) => {
+    engine(on)
+    project()
+    const exact = `# Older\n${'x'.repeat(PREVIEW_BYTES_MAX - 8)}`
+    world.files[`${ROOT}/.tasks/older.md`] = exact
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:older.md' })
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(exact)
+    await ui.unmount()
+  })
+
   test('Path shows the project-relative path', async ($, on) => {
     engine(on)
     project()

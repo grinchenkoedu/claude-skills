@@ -77,12 +77,13 @@ function findItem(found: Scan | null, key: string | null): Item | undefined {
 /** The selected file's text, cut at the preview's limit; null when it cannot be read. */
 async function readPreview($: EngineInterface, item: Item): Promise<Preview | null> {
   const root = await $.session.root()
-  const text = await $.fs.read(`${root}/${pathOf(item)}`, { length: PREVIEW_BYTES_MAX }).catch(() => undefined)
+  // One byte past the limit tells a file of exactly the limit from a longer one.
+  const text = await $.fs.read(`${root}/${pathOf(item)}`, { length: PREVIEW_BYTES_MAX + 1 }).catch(() => undefined)
   if (typeof text !== 'string') return null
-  // The read asks for the limit; an engine that ignores `length` (2.1.316) hands the
-  // whole file over, so the text is cut here as well, by characters.
-  const shown = text.length > PREVIEW_BYTES_MAX ? text.slice(0, PREVIEW_BYTES_MAX) : text
-  const isCut = shown !== text || new TextEncoder().encode(text).length >= PREVIEW_BYTES_MAX
+  // An engine that ignores `length` (2.1.316) hands the whole file over, so the text
+  // is cut here as well, by characters; a character the byte limit split is dropped.
+  const isCut = text.length > PREVIEW_BYTES_MAX || new TextEncoder().encode(text).length > PREVIEW_BYTES_MAX
+  const shown = isCut ? text.slice(0, PREVIEW_BYTES_MAX).replace(/\uFFFD+$/, '') : text
 
   return { key: keyOf(item), text: isCut ? `${shown}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : shown }
 }
