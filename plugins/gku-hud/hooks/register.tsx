@@ -10,6 +10,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, FsEntry, Register } from 'claude-code'
 
 import { actionsFor, pathOf, type Action } from '../src/actions'
+import { cutPreview } from '../src/preview'
 import { parseReport } from '../src/reports'
 import { parseTask, unreadTask } from '../src/tasks'
 import type { Item, Preview, Scan, TaskItem } from '../types'
@@ -80,12 +81,11 @@ async function readPreview($: EngineInterface, item: Item): Promise<Preview | nu
   // One byte past the limit tells a file of exactly the limit from a longer one.
   const text = await $.fs.read(`${root}/${pathOf(item)}`, { length: PREVIEW_BYTES_MAX + 1 }).catch(() => undefined)
   if (typeof text !== 'string') return null
-  // An engine that ignores `length` (2.1.316) hands the whole file over, so the text
-  // is cut here as well, by characters; a character the byte limit split is dropped.
-  const isCut = text.length > PREVIEW_BYTES_MAX || new TextEncoder().encode(text).length > PREVIEW_BYTES_MAX
-  const shown = isCut ? text.slice(0, PREVIEW_BYTES_MAX).replace(/\uFFFD+$/, '') : text
+  // An engine that ignores `length` (2.1.316) hands the whole file over: the cut is
+  // made here, by bytes, so every engine shows the same text.
+  const cut = cutPreview(text, PREVIEW_BYTES_MAX)
 
-  return { key: keyOf(item), text: isCut ? `${shown}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : shown }
+  return { key: keyOf(item), text: cut.isCut ? `${cut.text}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : cut.text }
 }
 
 /** Rescans, keeps the selection if its file is still there, and rereads its preview. */
