@@ -213,6 +213,32 @@ The plugin route is easier to keep up to date. Use this only if you have a reaso
 > under `~/.claude/skills/` if you would rather keep the originals.
 </details>
 
+### Optional: a pane for task files and reports
+
+`gku-hud` is a second plugin in the same marketplace, separate from `gku`: a pane beside the
+chat that lists the task files in `.tasks/`, with how many of their steps are ticked, and the
+reports in `.gku/reports/`, newest first. Select one to read it there. The buttons under it put
+the next command in the prompt box — `/gku:implement .tasks/<file> --continue` for a plan half
+built, `/gku:fix .gku/reports/<file>` for a review — and sending it is up to you.
+
+```
+/plugin install gku-hud@grinchenkoedu
+```
+
+Then `/gku-hud:tasks` opens it. Its one option, **Open at start**, opens it with every session
+instead, once the terminal is 144 columns wide; the command opens it at any width.
+
+- **It reads, and nothing more.** It writes no file, never sends the prompt or starts a turn,
+  calls no model and adds nothing to the context, and it leaves a draft you are typing alone.
+  `evals/hud/never.sh` holds its source to that; `evals/hud/commands.sh` holds every command it
+  fills to that skill's own arguments, so a renamed flag fails CI rather than your prompt.
+- **It reads the 30 newest task files** when it opens, when you press Refresh, and when a turn
+  ends while it is shown — that is how the steps `/gku:implement` ticks appear. Older ones are
+  counted, not read; nothing runs on a timer.
+- **It needs Claude Code 2.1.316 or later.** It is a mod, built on Claude Code's function-hooks
+  API, which is early access and may change between releases; CI runs it on 2.1.316 and on the
+  latest release. `gku` does not need it and works the same without it.
+
 ## The skills
 
 They follow the order of the work:

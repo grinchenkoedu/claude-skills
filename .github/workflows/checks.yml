@@ -49,3 +49,29 @@ jobs:
       # No credentials: validate reads the manifest and the skills off disk.
       # The version and author warnings are expected and do not fail the run.
       - run: claude plugin validate . && claude plugin validate plugins/gku
+
+  hud:
+    name: gku-hud (Claude Code ${{ matrix.claude }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # 2.1.316 is the oldest version gku-hud's manifest and READMEs promise: the
+        # gate. latest asks whether it still loads in what people run; the mod API
+        # is early access and moves between releases, so a failure there is a
+        # warning to act on, not a block on merging. gku itself is held to latest
+        # by the plugin job above: it has no mod API to pin.
+        claude: ['2.1.316', 'latest']
+    continue-on-error: ${{ matrix.claude == 'latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install -g @anthropic-ai/claude-code@${{ matrix.claude }}
+      # No credentials: validate reads the files off disk, and the tests run
+      # against the engine's own kit.
+      - run: |
+          claude plugin validate plugins/gku-hud
+          claude plugin test plugins/gku-hud

@@ -1,0 +1,20 @@
+{
+  "name": "gku-hud",
+  "description": "A pane beside the chat for gku's working files: the task files in .tasks/ with how many steps are ticked, and the reports in .gku/reports/, newest first. Select one to read it; a button puts the next /gku command into the prompt for you to send. Reads only: it writes no file and starts no turn. Needs Claude Code with mods (2.1.316 or later).",
+  "license": "MIT",
+  "author": {
+    "name": "Borys Grinchenko Kyiv Metropolitan University",
+    "url": "https://github.com/grinchenkoedu/claude-skills"
+  },
+  "keywords": ["claude-code", "mod", "gku", "tasks", "sidebar"],
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "open": {
+      "type": "string",
+      "title": "Open at start",
+      "description": "Open the pane when a session starts (placed from 144 columns; /gku-hud:tasks opens it at any width), or only when asked.",
+      "options": ["off", "on"],
+      "default": "off"
+    }
+  }
+}
