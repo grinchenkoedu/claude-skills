@@ -21,7 +21,9 @@ export function clean(text: string, max = TEXT_MAX): string {
     .replace(/\s+/g, ' ')
     .trim()
 
-  return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain
+  if (plain.length <= max) return plain
+  // A cut between the two halves of a surrogate pair (an emoji) drops the half it kept.
+  return `${plain.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, '')}…`
 }
 
 /** Lines outside fenced code: a plan may quote a template that has headings of its own. */

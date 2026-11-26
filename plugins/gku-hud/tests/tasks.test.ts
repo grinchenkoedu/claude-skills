@@ -107,6 +107,12 @@ describe('clean', () => {
   test('cuts long text with an ellipsis', () => {
     expect(clean('x'.repeat(10), 5)).toBe('xxxx…')
   })
+
+  test('never cuts an emoji in half', () => {
+    // 'ab😀c' is five UTF-16 units: a cut after three would keep half the emoji.
+    expect(clean('ab😀c', 4)).toBe('ab…')
+    expect(clean('ab😀cd', 5)).toBe('ab😀…')
+  })
 })
 
 test('unreadTask lists a file by name only', () => {
