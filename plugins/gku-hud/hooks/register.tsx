@@ -133,8 +133,9 @@ async function back($: EngineInterface): Promise<void> {
   await update($, selected, () => null)
   await update($, preview, () => null)
   if (key === null) return
-  await reveal($, () => $.ui.scroll({ in: PANE_ID, to: { key }, block: 'center' }))
+  // Focus first: it waits for the row to be drawn again, which the scroll does not.
   await reveal($, () => $.ui.focus({ requestId: PANE_ID, key }))
+  await reveal($, () => $.ui.scroll({ in: PANE_ID, to: { key }, block: 'center' }))
 }
 
 /** Puts the command in the prompt box, never over a draft, and never sends it. */
