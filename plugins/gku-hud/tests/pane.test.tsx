@@ -170,10 +170,9 @@ describe('the selection', () => {
     await opened($)
     const ui = await $.ui.mount(PANE())
     await ui.press({ key: 'task:export.md' })
-    expect(world.reads.at(-1)).toEqual({ path: `${ROOT}/.tasks/export.md`, length: PREVIEW_BYTES_MAX })
+    expect(world.reads.at(-1)?.path).toBe(`${ROOT}/.tasks/export.md`)
     expect((await ui.find({ type: 'Markdown' }))?.text).toContain('Export departments')
-    // The terminal draws a Progress as its parts: the label, the bar and the figure.
-    expect((await ui.find({ type: 'Text', text: /^Steps 1\/3$/ }))?.text).toBe('Steps 1/3')
+    expect((await ui.find({ type: 'Text', text: /^Steps / }))?.text).toBe('Steps ████░░░░░░░░ 1/3')
     expect(await ui.find({ type: 'Button', key: 'do-continue' })).toBeTruthy()
     await ui.press({ key: 'task:export.md' })
     expect(await ui.find({ type: 'Markdown' })).toBeFalsy()
@@ -207,6 +206,19 @@ describe('the selection', () => {
     await ui.press({ key: 'do-continue' })
     expect(world.filled).toEqual([])
     expect(world.toasts).toEqual(['The prompt holds a draft: send or clear it, then press again.'])
+    await ui.unmount()
+  })
+
+  test('a preview stops at the limit and says so, however much the read hands over', async ($, on) => {
+    engine(on)
+    project()
+    world.files[`${ROOT}/.tasks/older.md`] = `# Older\n${'x'.repeat(PREVIEW_BYTES_MAX + 10)}`
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:older.md' })
+    const shown = (await ui.find({ type: 'Markdown' }))?.text ?? ''
+    expect(shown.endsWith(`*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*`)).toBe(true)
+    expect(shown.length).toBeLessThan(PREVIEW_BYTES_MAX + 40)
     await ui.unmount()
   })
 

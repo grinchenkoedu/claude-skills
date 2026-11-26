@@ -21,8 +21,8 @@ export const READ_MAX = 30
 export const REPORTS_MAX = 30
 /** A task file larger than this is listed by name only. */
 export const TASK_BYTES_MAX = 1024 * 1024
-/** The most of a file the preview reads. */
-export const PREVIEW_BYTES_MAX = 256 * 1024
+/** The most of a file the preview reads: well under the 100,000 characters an engine draws of one tree. */
+export const PREVIEW_BYTES_MAX = 64 * 1024
 
 // The values the pane keeps for the session, each declared in types/index.d.ts.
 // They live in the file that reads and writes them, as the engine's scan asks.
@@ -79,9 +79,12 @@ async function readPreview($: EngineInterface, item: Item): Promise<Preview | nu
   const root = await $.session.root()
   const text = await $.fs.read(`${root}/${pathOf(item)}`, { length: PREVIEW_BYTES_MAX }).catch(() => undefined)
   if (typeof text !== 'string') return null
-  const isCut = new TextEncoder().encode(text).length >= PREVIEW_BYTES_MAX
+  // The read asks for the limit; an engine that ignores `length` (2.1.316) hands the
+  // whole file over, so the text is cut here as well, by characters.
+  const shown = text.length > PREVIEW_BYTES_MAX ? text.slice(0, PREVIEW_BYTES_MAX) : text
+  const isCut = shown !== text || new TextEncoder().encode(text).length >= PREVIEW_BYTES_MAX
 
-  return { key: keyOf(item), text: isCut ? `${text}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : text }
+  return { key: keyOf(item), text: isCut ? `${shown}\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*` : shown }
 }
 
 /** Rescans, keeps the selection if its file is still there, and rereads its preview. */

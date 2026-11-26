@@ -5,6 +5,7 @@ import type { EngineInterface, RenderInput } from 'claude-code'
 
 import type { Action } from '../src/actions'
 import { age } from '../src/age'
+import { stepsBar } from '../src/bar'
 import type { Item, Preview, ReportItem, Scan, TaskItem } from '../types'
 
 export const PANE_ID = 'gku-tasks'
@@ -47,7 +48,7 @@ function reportMeta(report: ReportItem, now: number): string {
 
 /** The pane's tree. Titles, types and slugs are drawn as plain text; only the preview is Markdown. */
 export function drawPane($: EngineInterface, e: RenderInput<'Pane'>, view: PaneView, on: PaneHandlers) {
-  const { Box, Text, Button, Markdown, Progress } = $.ui.resolve(e)
+  const { Box, Text, Button, Markdown } = $.ui.resolve(e)
   const { scan, selected, preview, actions, now } = view
   const selectedKey = selected === undefined ? undefined : keyOf(selected)
   const mark = (key: string) => (key === selectedKey ? '▸ ' : '  ')
@@ -78,7 +79,7 @@ export function drawPane($: EngineInterface, e: RenderInput<'Pane'>, view: PaneV
       {selected === undefined ? null : (
         <Box flexDirection="column" marginTop={1}>
           {selected.kind === 'task' && selected.total > 0
-            ? <Progress label="Steps" value={selected.ticked} max={selected.total} valueText={`${selected.ticked}/${selected.total}`} />
+            ? <Text>{stepsBar(selected.ticked, selected.total)}</Text>
             : null}
           <Box flexDirection="row" flexWrap="wrap" gap={1}>
             {actions.map((action, index) => (
