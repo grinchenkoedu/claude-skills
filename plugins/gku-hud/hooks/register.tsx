@@ -106,15 +106,17 @@ async function refresh($: EngineInterface): Promise<void> {
   await showPreview($, keyOf(item), await readPreview($, item))
 }
 
+/** Opens one item in the pane, in place of the list. */
 async function select($: EngineInterface, key: string): Promise<void> {
-  if ((await read($, selected)) === key) {
-    await update($, selected, () => null)
-    await update($, preview, () => null)
-    return
-  }
   await update($, selected, () => key)
   const item = findItem(await read($, scan), key)
   await showPreview($, key, item === undefined ? null : await readPreview($, item))
+}
+
+/** Closes the open item: the list again. */
+async function back($: EngineInterface): Promise<void> {
+  await update($, selected, () => null)
+  await update($, preview, () => null)
 }
 
 /** Puts the command in the prompt box, never over a draft, and never sends it. */
@@ -177,6 +179,7 @@ export const register: Register = (on, options) => {
     }, {
       onRefresh: () => void refresh($).catch(() => undefined),
       onSelect: key => void select($, key).catch(() => undefined),
+      onBack: () => void back($).catch(() => undefined),
       onAction: action => void fill($, action).catch(() => undefined),
       onPath: picked => $.ui.toast(pathOf(picked)),
     })
