@@ -21,3 +21,5 @@ evals/live/results/
 # history.jsonl is the fixture a case names on purpose, everything else there is harness output
 evals/live/*/*.jsonl
 !evals/live/*/history.jsonl
+# the engine lays its API types here when it loads the mod
+plugins/gku-hud/.claude-plugin/types/
