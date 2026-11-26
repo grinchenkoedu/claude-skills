@@ -148,15 +148,24 @@ That is all. Type `/` and you will see `/gku:init`, `/gku:audit`, `/gku:research
 
 ### Updating
 
-The skills are improved regularly. To pull the latest:
+The skills are improved regularly. To pull the latest, from a shell:
+
+```bash
+claude plugin marketplace update grinchenkoedu
+claude plugin update gku@grinchenkoedu
+claude plugin update gku-hud@grinchenkoedu   # only if you installed it
+```
+
+Then, in every Claude Code session that is already open:
 
 ```
-/plugin marketplace update grinchenkoedu
 /reload-plugins
 ```
 
-The first refreshes the marketplace from GitHub; the second reloads skills in the current
-session so you do not have to restart.
+The first command refreshes the marketplace from GitHub, which on its own leaves the plugins you
+installed where they were; the next brings each one to the latest commit. A session keeps the
+version it started with — a session running in the background too — until `/reload-plugins`
+loads the new one, or the session is restarted.
 
 If you would rather not think about it, `/plugin` opens the manager where you can check what is
 installed and update from there.

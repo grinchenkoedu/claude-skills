@@ -47,6 +47,7 @@ for doc in README.md README.uk.md; do
     '/effort' \
     'prompt-audit' \
     'gku-hud@grinchenkoedu' \
+    'claude plugin update gku@grinchenkoedu' \
     'evals/hud/never.sh' \
     'evals/hud/commands.sh'
   do
