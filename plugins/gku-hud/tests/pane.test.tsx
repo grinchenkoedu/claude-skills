@@ -228,6 +228,26 @@ describe('the selection', () => {
     await ui.unmount()
   })
 
+  // The kit has no implementation for a plugin scrolling or focusing its own pane: every
+  // $.ui.scroll and $.ui.focus the module makes from a press rejects here
+  // ("no implementation for ui.scroll"). That is the failure this test needs. Whether a
+  // real engine moves the window and the ring is checked by hand: see the task's How to check it.
+  test('a scroll or focus the engine cannot make changes nothing else: the view still switches', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:export.md' })
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(PLAN)
+    expect(await ui.find({ type: 'Button', key: 'back' })).toBeTruthy()
+    await ui.press({ key: 'back' })
+    expect(await ui.find({ type: 'Button', key: 'task:export.md' })).toBeTruthy()
+    expect(await ui.find({ type: 'Markdown' })).toBeFalsy()
+    await ui.press({ key: 'task:older.md' })
+    expect((await ui.find({ type: 'Markdown' }))?.text).toContain('# Older')
+    await ui.unmount()
+  })
+
   test('Refresh in an open item rereads it and keeps it open', async ($, on) => {
     engine(on)
     project()

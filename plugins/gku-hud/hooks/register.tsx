@@ -106,17 +106,35 @@ async function refresh($: EngineInterface): Promise<void> {
   await showPreview($, keyOf(item), await readPreview($, item))
 }
 
-/** Opens one item in the pane, in place of the list. */
+/**
+ * Asks the engine to move the pane's window or its focus ring, and takes no for
+ * an answer: the ring stays put while the pane does not hold the keys, and the
+ * view has switched either way.
+ */
+async function reveal($: EngineInterface, move: () => Promise<unknown>): Promise<void> {
+  try {
+    await move()
+  } catch {
+    // A refusal or an engine without the call leaves the pane where it was.
+  }
+}
+
+/** Opens one item in the pane, in place of the list, from its top. */
 async function select($: EngineInterface, key: string): Promise<void> {
   await update($, selected, () => key)
+  await reveal($, () => $.ui.scroll({ in: PANE_ID, to: 'start' }))
   const item = findItem(await read($, scan), key)
   await showPreview($, key, item === undefined ? null : await readPreview($, item))
 }
 
-/** Closes the open item: the list again. */
+/** Closes the open item: the list again, at the row it was opened from. */
 async function back($: EngineInterface): Promise<void> {
+  const key = await read($, selected)
   await update($, selected, () => null)
   await update($, preview, () => null)
+  if (key === null) return
+  await reveal($, () => $.ui.scroll({ in: PANE_ID, to: { key }, block: 'center' }))
+  await reveal($, () => $.ui.focus({ requestId: PANE_ID, key }))
 }
 
 /** Puts the command in the prompt box, never over a draft, and never sends it. */
