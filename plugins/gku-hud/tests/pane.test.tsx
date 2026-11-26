@@ -25,6 +25,10 @@ type World = {
   toasts: string[]
   opened: string[]
   isShown: boolean
+  /** Reads honour `length`, as 2.1.332's do; left false, a read hands the whole file over, as 2.1.316's does. */
+  honoursLength: boolean
+  /** Reads of these paths wait until the promise settles: a slow disk, for a race. */
+  gates: Record<string, Promise<void>>
 }
 
 let world: World
@@ -32,7 +36,7 @@ let world: World
 const file = (name: string, hoursAgo: number, size = 100): Entry => ({ name, kind: 'file', size, mtimeMs: NOW - hoursAgo * HOUR, isLink: false })
 
 function engine(on: On): void {
-  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], forbidden: [], toasts: [], opened: [], isShown: true }
+  world = { dirs: {}, files: {}, reads: [], draft: '', filled: [], forbidden: [], toasts: [], opened: [], isShown: true, honoursLength: false, gates: {} }
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('session.root', () => ({ value: ROOT }))
   on('clock.now', () => ({ value: NOW }))
@@ -41,11 +45,14 @@ function engine(on: On): void {
     if (entries === undefined) throw new Error('ENOENT')
     return { value: entries }
   })
-  on('fs.read', (_, e) => {
+  on('fs.read', async (_, e) => {
     world.reads.push({ path: e.path, ...(e.length === undefined ? {} : { length: e.length }) })
+    await world.gates[e.path]
     const text = world.files[e.path]
     if (text === undefined) throw new Error('ENOENT')
-    return { value: text }
+    if (!world.honoursLength || e.length === undefined) return { value: text }
+    // A ranged read, decoded as text: a character the range splits comes back as U+FFFD.
+    return { value: new TextDecoder().decode(new TextEncoder().encode(text).subarray(0, e.length)) }
   })
   on('prompt.read', () => ({ value: { text: world.draft, cursor: world.draft.length } }))
   on('prompt.fill', (_, e) => {
@@ -222,6 +229,58 @@ describe('the selection', () => {
     await ui.unmount()
   })
 
+  describe('a multibyte file', () => {
+    const bytes = (text: string) => new TextEncoder().encode(text).length
+    const NOTE = `\n\n*… cut at ${PREVIEW_BYTES_MAX / 1024} KiB*`
+    // 40,000 two-byte characters: 80,000 bytes, while the characters alone would fit.
+    const WIDE = `# Older\n${'é'.repeat(40_000)}`
+
+    const previewOf = async ($: Engine, on: On, text: string, honoursLength: boolean) => {
+      engine(on)
+      project()
+      world.honoursLength = honoursLength
+      world.files[`${ROOT}/.tasks/older.md`] = text
+      await opened($)
+      const ui = await $.ui.mount(PANE())
+      await ui.press({ key: 'task:older.md' })
+      const shown = (await ui.find({ type: 'Markdown' }))?.text ?? ''
+      await ui.unmount()
+
+      return shown
+    }
+
+    for (const honoursLength of [false, true]) {
+      const engineName = honoursLength ? 'a ranged read (2.1.332)' : 'a whole-file read (2.1.316)'
+
+      test(`over the limit in bytes, it is cut to the limit and says so, under ${engineName}`, async ($, on) => {
+        const shown = await previewOf($, on, WIDE, honoursLength)
+        expect(shown.endsWith(NOTE)).toBe(true)
+        const body = shown.slice(0, -NOTE.length)
+        expect(bytes(body)).toBeLessThan(PREVIEW_BYTES_MAX + 1)
+        expect(body.endsWith('é')).toBe(true)
+        expect(body.includes('\uFFFD')).toBe(false)
+      })
+    }
+
+    test('both engines show the same text', async ($, on) => {
+      const whole = await previewOf($, on, WIDE, false)
+      // The same session, its reads now ranged: deselect, then select again to reread.
+      world.honoursLength = true
+      const ui = await $.ui.mount(PANE())
+      await ui.press({ key: 'task:older.md' })
+      await ui.press({ key: 'task:older.md' })
+      const ranged = (await ui.find({ type: 'Markdown' }))?.text ?? ''
+      await ui.unmount()
+      expect(world.reads.filter(read => read.path.endsWith('older.md')).length).toBeGreaterThan(1)
+      expect(ranged).toBe(whole)
+    })
+
+    test('within the limit in bytes, it is shown whole with no note', async ($, on) => {
+      const fits = `# Older\n${'é'.repeat(30_000)}`
+      expect(await previewOf($, on, fits, false)).toBe(fits)
+    })
+  })
+
   test('a manual plan not yet finished says why it offers no build', async ($, on) => {
     engine(on)
     project()
@@ -245,6 +304,22 @@ describe('the selection', () => {
     const ui = await $.ui.mount(PANE())
     await ui.press({ key: 'task:older.md' })
     expect((await ui.find({ type: 'Markdown' }))?.text).toBe(exact)
+    await ui.unmount()
+  })
+
+  test('a slow read of an earlier selection never overwrites the later one', async ($, on) => {
+    engine(on)
+    project()
+    await opened($)
+    let release = () => {}
+    world.gates[`${ROOT}/.tasks/older.md`] = new Promise<void>(resolve => { release = resolve })
+    const ui = await $.ui.mount(PANE())
+    await ui.press({ key: 'task:older.md' })
+    await ui.press({ key: 'task:export.md' })
+    release()
+    for (let i = 0; i < 50; i++) await Promise.resolve()
+    expect((await ui.find({ type: 'Markdown' }))?.text).toBe(PLAN)
+    expect(await ui.find({ type: 'Text', text: /Could not read the file/ })).toBeFalsy()
     await ui.unmount()
   })
 

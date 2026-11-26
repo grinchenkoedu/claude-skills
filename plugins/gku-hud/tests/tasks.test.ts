@@ -101,11 +101,17 @@ describe('parseTask', () => {
 
 describe('clean', () => {
   test('folds control and bidirectional characters into spaces, then trims', () => {
-    expect(clean('a\tb\u001b[31mc‮d')).toBe('a b [31mc d')
+    expect(clean('a\tb\u001b[31mc\u202Ed')).toBe('a b [31mc d')
   })
 
   test('cuts long text with an ellipsis', () => {
     expect(clean('x'.repeat(10), 5)).toBe('xxxx…')
+  })
+
+  test('never cuts an emoji in half', () => {
+    // 'ab😀c' is five UTF-16 units: a cut after three would keep half the emoji.
+    expect(clean('ab😀c', 4)).toBe('ab…')
+    expect(clean('ab😀cd', 5)).toBe('ab😀…')
   })
 })
 

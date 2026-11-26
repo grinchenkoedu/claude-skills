@@ -17,10 +17,17 @@ export function argument(path: string): string {
   return /\s/.test(path) ? `"${path}"` : path
 }
 
-/** Whether a file name is safe to put in a command: one line, no quote, no control character. */
+/**
+ * Whether a file name is safe to put in a command: one line, no quote, no control
+ * character, and nothing that makes a prompt box show other text than it holds.
+ */
 export function isSafeName(file: string): boolean {
-  return file !== '' && !/["'`\\\u0000-\u001f\u007f]/.test(file) && !file.startsWith('-')
+  return file !== '' && !file.startsWith('-') && !UNSAFE_NAME.test(file)
 }
+
+// Quotes and the backslash; C0 and C1 controls; the line and paragraph separators;
+// the bidi marks, embeddings, overrides and isolates.
+const UNSAFE_NAME = /["'`\\\u0000-\u001f\u007f-\u009f\u2028\u2029\u200e\u200f\u202a-\u202e\u2066-\u2069]/
 
 /** The project-relative path of an item, as the commands name it. */
 export function pathOf(item: Item): string {

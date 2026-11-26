@@ -70,3 +70,12 @@ test('argument and isSafeName', () => {
   expect(isSafeName('a\nb.md')).toBe(false)
   expect(isSafeName("a'b.md")).toBe(false)
 })
+
+test('isSafeName refuses a name whose shown text could differ from the command it fills', () => {
+  // A line separator, a C1 control, and the bidi controls that reorder what a prompt box shows.
+  for (const code of ['2028', '2029', '0085', '200E', '200F', '202A', '202E', '2066', '2069']) {
+    const name = `a${String.fromCharCode(parseInt(code, 16))}b.md`
+    expect([code, isSafeName(name)]).toEqual([code, false])
+  }
+  expect(isSafeName('план-é-字.md')).toBe(true)
+})

@@ -17,11 +17,13 @@ export const TEXT_MAX = 120
 
 /** Cuts text to what one row may show, and drops what a terminal would act on. */
 export function clean(text: string, max = TEXT_MAX): string {
-  const plain = text.replace(/[\u0000-\u001f\u007f-\u009f‎‏‪-‮⁦-⁩]/g, ' ')
+  const plain = text.replace(/[\u0000-\u001f\u007f-\u009f\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 
-  return plain.length > max ? `${plain.slice(0, max - 1)}…` : plain
+  if (plain.length <= max) return plain
+  // A cut between the two halves of a surrogate pair (an emoji) drops the half it kept.
+  return `${plain.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, '')}…`
 }
 
 /** Lines outside fenced code: a plan may quote a template that has headings of its own. */
